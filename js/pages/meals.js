@@ -1,15 +1,25 @@
 import { t, dayLabel } from "../i18n.js";
 import { buildDayMeals } from "../plangen.js";
+import {
+  getFoodTotals,
+  isMealEaten,
+  toggleMealEaten,
+} from "../foodLog.js";
 
 const SLOT_TIMES = {
-  breakfast:  "7:00 AM",
-  mid_morning:"10:00 AM",
-  lunch:      "1:00 PM",
-  pre_workout:"4:00 PM",
-  post_workout:"7:30 PM",
-  dinner:     "7:00 PM",
-  snack:      "3:30 PM",
+  breakfast: "7:00 AM",
+  mid_morning: "10:00 AM",
+  lunch: "1:00 PM",
+  pre_workout: "4:00 PM",
+  post_workout: "7:30 PM",
+  dinner: "7:00 PM",
+  snack: "3:30 PM",
 };
+
+function mondayBasedToday() {
+  const d = new Date().getDay();
+  return d === 0 ? 6 : d - 1;
+}
 
 export function mountMeals(root, profile, plan) {
   let day = new Date().getDay();
@@ -20,22 +30,62 @@ export function mountMeals(root, profile, plan) {
     const forceRest = tab === "rest";
     const meals = buildDayMeals(profile, day, plan.targetCalories, { forceRest });
 
-    const dayRow = [0, 1, 2, 3, 4, 5, 6].map(i =>
-      `<button type="button" class="day-pill ${i === day ? "active" : ""}" data-day="${i}">${dayLabel(i)}</button>`
-    ).join("");
+    const dayRow = [0, 1, 2, 3, 4, 5, 6]
+      .map(
+        (i) =>
+          `<button type="button" class="day-pill ${i === day ? "active" : ""}" data-day="${i}">${dayLabel(i)}</button>`
+      )
+      .join("");
 
-    const mealCards = meals.map(m => {
-      const time = SLOT_TIMES[m.slot] || "";
-      const tags = [];
-      if (m.tags?.includes("high_protein")) tags.push(`<span class="tag tag-lime">${t("meals.high_protein")}</span>`);
-      if (m.tags?.includes("no_cook"))      tags.push(`<span class="tag">No cook</span>`);
-      if (m.tags?.includes("batch"))        tags.push(`<span class="tag">Batch cook</span>`);
+    const viewingToday = day === mondayBasedToday();
+    const totals = getFoodTotals();
+    const tgt = plan.targetCalories || 1;
+    const pct = Math.min(100, Math.round((totals.kcal / tgt) * 100));
 
-      const ings = m.ingredients.map(ing =>
-        `<li>${ing.name}<span style="margin-left:auto;font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted);flex-shrink:0">${ing.grams}g</span></li>`
-      ).join("");
+    const complianceBar =
+      viewingToday && meals.length > 0
+        ? `
+        <div class="compliance-bar glass" id="compliance-bar">
+          <div class="compliance-row">
+            <span class="compliance-label">${t("meals.compliance_today")}</span>
+            <span class="compliance-kcal" id="comp-kcal">${totals.kcal} / ${plan.targetCalories} kcal</span>
+          </div>
+          <div class="progress-track" style="margin-top:8px">
+            <div class="progress-fill" id="comp-fill" style="width:${pct}%;animation:none"></div>
+          </div>
+          <div class="compliance-macros">
+            <span>P: ${Math.round(totals.protein)}g / ${plan.macro?.protein ?? 0}g</span>
+            <span>C: ${Math.round(totals.carbs)}g / ${plan.macro?.carbs ?? 0}g</span>
+            <span>F: ${Math.round(totals.fat)}g / ${plan.macro?.fat ?? 0}g</span>
+          </div>
+        </div>`
+        : "";
 
-      return `
+    const mealCards = meals
+      .map((m) => {
+        const time = SLOT_TIMES[m.slot] || "";
+        const tags = [];
+        if (m.tags?.includes("high_protein")) tags.push(`<span class="tag tag-lime">${t("meals.high_protein")}</span>`);
+        if (m.tags?.includes("no_cook")) tags.push(`<span class="tag">No cook</span>`);
+        if (m.tags?.includes("batch")) tags.push(`<span class="tag">Batch cook</span>`);
+
+        const ings = m.ingredients
+          .map(
+            (ing) =>
+              `<li>${ing.name}<span style="margin-left:auto;font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted);flex-shrink:0">${ing.grams}g</span></li>`
+          )
+          .join("");
+
+        const eaten = viewingToday && isMealEaten(m.slot);
+        const eatBtn =
+          viewingToday
+            ? `
+          <button type="button" class="meal-eat-btn ${eaten ? "eaten" : ""}" data-meal-slot="${m.slot}" data-meal-name="${encodeURIComponent(m.name)}" data-meal-kcal="${m.kcal}">
+            ${eaten ? t("meals.eaten") : t("meals.mark_eaten")}
+          </button>`
+            : "";
+
+        return `
         <div class="meal-card">
           <div class="meal-head">
             ${time ? `<div class="meal-time-badge">${time}</div>` : ""}
@@ -45,9 +95,11 @@ export function mountMeals(root, profile, plan) {
           <div class="meal-body">
             <ul class="ing-list">${ings}</ul>
             ${tags.length ? `<div class="meal-tags">${tags.join("")}</div>` : ""}
+            ${eatBtn}
           </div>
         </div>`;
-    }).join("");
+      })
+      .join("");
 
     const totalKcal = meals.reduce((s, m) => s + (m.kcal || 0), 0);
     const jainNote = plan.flags?.jain
@@ -71,6 +123,8 @@ export function mountMeals(root, profile, plan) {
 
         ${jainNote}
 
+        ${complianceBar}
+
         ${totalKcal > 0 ? `
           <div class="info-box info-box-lime" style="margin-bottom:14px">
             <strong>Total today: ~${totalKcal} kcal.</strong>
@@ -82,11 +136,27 @@ export function mountMeals(root, profile, plan) {
         ${mealCards || `<div class="empty-hint">${t("meals.rest")}</div>`}
       </div>`;
 
-    root.querySelectorAll("[data-tab]").forEach(b => {
-      b.addEventListener("click", () => { tab = b.dataset.tab; renderInner(); });
+    root.querySelectorAll("[data-tab]").forEach((b) => {
+      b.addEventListener("click", () => {
+        tab = b.dataset.tab;
+        renderInner();
+      });
     });
-    root.querySelectorAll("[data-day]").forEach(b => {
-      b.addEventListener("click", () => { day = +b.dataset.day; renderInner(); });
+    root.querySelectorAll("[data-day]").forEach((b) => {
+      b.addEventListener("click", () => {
+        day = +b.dataset.day;
+        renderInner();
+      });
+    });
+
+    root.querySelectorAll(".meal-eat-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const slot = btn.dataset.mealSlot;
+        const name = decodeURIComponent(btn.dataset.mealName || "");
+        const kcal = +btn.dataset.mealKcal || 0;
+        toggleMealEaten(slot, name, kcal, plan);
+        renderInner();
+      });
     });
   }
 

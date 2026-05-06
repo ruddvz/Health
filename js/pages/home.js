@@ -1,13 +1,91 @@
 import { t } from "../i18n.js";
 import { buildDayMeals } from "../plangen.js";
+import { todayKey, getFoodTotals } from "../foodLog.js";
 
-const WATER_KEY   = "np_water_";
+const WATER_KEY = "np_water_";
 const CHECKIN_KEY = "np_checkin_";
-const STREAK_KEY  = "np_streak";
-const WEIGHT_KEY  = "np_weights";
+const STREAK_KEY = "np_streak";
+const WEIGHT_KEY = "np_weights";
 
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
+function getWeights() {
+  try {
+    return JSON.parse(localStorage.getItem(WEIGHT_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function logWeight(kg) {
+  const weights = getWeights();
+  const today = todayKey();
+  const idx = weights.findIndex((w) => w.date === today);
+  if (idx >= 0) weights[idx].kg = kg;
+  else weights.push({ date: today, kg });
+  weights.sort((a, b) => a.date.localeCompare(b.date));
+  localStorage.setItem(WEIGHT_KEY, JSON.stringify(weights.slice(-52)));
+}
+
+function renderWeightSection(profile) {
+  const weights = getWeights();
+  const today = todayKey();
+  const todayEntry = weights.find((w) => w.date === today);
+  const spark =
+    weights.length >= 2
+      ? (() => {
+          const last8 = weights.slice(-8);
+          const vals = last8.map((w) => w.kg);
+          const min = Math.min(...vals);
+          const max = Math.max(...vals);
+          const range = max - min || 1;
+          const W = 120;
+          const H = 32;
+          const pad = 4;
+          const points = vals
+            .map((v, i) => {
+              const x = pad + (i / (vals.length - 1)) * (W - pad * 2);
+              const y = H - pad - ((v - min) / range) * (H - pad * 2);
+              return `${x},${y}`;
+            })
+            .join(" ");
+          const trend = vals[vals.length - 1] - vals[0];
+          const trendIcon = trend < -0.2 ? "↓" : trend > 0.2 ? "↑" : "→";
+          const trendColor =
+            trend < -0.2 ? "var(--accent-lime)" : trend > 0.2 ? "var(--accent-orange)" : "var(--accent-teal)";
+          const dots = vals
+            .map((v, i) => {
+              const x = pad + (i / (vals.length - 1)) * (W - pad * 2);
+              const y = H - pad - ((v - min) / range) * (H - pad * 2);
+              return `<circle cx="${x}" cy="${y}" r="2.5" fill="var(--accent-lime)"/>`;
+            })
+            .join("");
+          return `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="section-eyebrow" style="margin:0">${t("home.weight_log")}</span>
+        <span style="font-family:var(--font-display);font-size:1.05rem;font-weight:900;color:${trendColor}">${vals[vals.length - 1]} kg ${trendIcon}</span>
+      </div>
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;overflow:visible;margin-bottom:10px" aria-hidden="true">
+        <polyline points="${points}" fill="none" stroke="var(--accent-lime)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        ${dots}
+      </svg>`;
+        })()
+      : `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="section-eyebrow" style="margin:0">${t("home.weight_log")}</span>
+      </div>`;
+
+  const placeholder = todayEntry ? String(todayEntry.kg) : String(profile.weight_kg ?? "");
+
+  return `
+    <div class="weight-widget glass" id="weight-widget">
+      ${spark}
+      <div class="weight-input-row">
+        <label class="weight-field">
+          <span class="weight-field-lbl">${t("home.weight_kg")}</span>
+          <input type="number" class="weight-input" id="weight-input" step="0.1" min="30" max="300" placeholder="${t("home.weight_ph")}" value="${placeholder}" />
+        </label>
+        <button type="button" class="btn btn-primary weight-save-btn" id="weight-save">${t("home.weight_save")}</button>
+      </div>
+    </div>`;
 }
 
 function greeting(profile) {
@@ -72,9 +150,13 @@ export function mountHome(root, profile, plan) {
   const totalWeeks  = profile.durationWeeks || 16;
   const weekPct     = Math.round((weekNum / totalWeeks) * 100);
 
-  const proteinPct = Math.min(100, Math.round((plan.macro?.protein / plan.macro?.protein) * 100));
-  const carbPct    = Math.min(100, Math.round(((plan.macro?.carbs || 0) / (plan.macro?.carbs || 1)) * 100));
-  const fatPct     = Math.min(100, Math.round(((plan.macro?.fat || 0) / (plan.macro?.fat || 1)) * 100));
+  const food = getFoodTotals();
+  const mp = plan.macro?.protein || 1;
+  const mc = plan.macro?.carbs || 1;
+  const mf = plan.macro?.fat || 1;
+  const proteinPct = Math.min(100, Math.round((food.protein / mp) * 100));
+  const carbPct = Math.min(100, Math.round((food.carbs / mc) * 100));
+  const fatPct = Math.min(100, Math.round((food.fat / mf) * 100));
 
   const dayLabels = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   const dayType   = isWorkout
@@ -142,6 +224,10 @@ export function mountHome(root, profile, plan) {
         </div>
       </div>
 
+      <!-- Weight log -->
+      <div class="section-eyebrow" style="margin-top:4px">${t("home.weight_section")}</div>
+      ${renderWeightSection(profile)}
+
       <!-- Streak + progress -->
       <div class="streak-row">
         <span class="streak-icon">🔥</span>
@@ -156,7 +242,7 @@ export function mountHome(root, profile, plan) {
       <div class="progress-card">
         <div class="progress-card-head">
           <span class="progress-card-title">Plan Progress</span>
-          <span class="progress-card-label">Week ${weekNum} of ${totalWeeks}</span>
+          <span class="progress-card-label">Week ${weekNum} of ${totalWeeks} · ${food.kcal}/${plan.targetCalories ?? 0} ${t("home.kcal_today")}</span>
         </div>
         <div class="progress-week-bar">
           <div class="progress-week-fill" style="width:${weekPct}%"></div>
@@ -169,22 +255,22 @@ export function mountHome(root, profile, plan) {
           <span class="progress-tick">End</span>
         </div>
 
-        <!-- Macro targets -->
+        <!-- Macros vs today's log -->
         <div class="macro-bars" style="margin-top:16px">
           <div class="macro-bar-row">
             <span class="macro-bar-label">Protein</span>
             <div class="macro-bar-track"><div class="macro-bar-fill protein" style="width:${proteinPct}%"></div></div>
-            <span class="macro-bar-val">${plan.macro?.protein || 0}g</span>
+            <span class="macro-bar-val">${Math.round(food.protein)}/${plan.macro?.protein || 0}g</span>
           </div>
           <div class="macro-bar-row">
             <span class="macro-bar-label">Carbs</span>
             <div class="macro-bar-track"><div class="macro-bar-fill carbs" style="width:${carbPct}%"></div></div>
-            <span class="macro-bar-val">${plan.macro?.carbs || 0}g</span>
+            <span class="macro-bar-val">${Math.round(food.carbs)}/${plan.macro?.carbs || 0}g</span>
           </div>
           <div class="macro-bar-row">
             <span class="macro-bar-label">Fat</span>
             <div class="macro-bar-track"><div class="macro-bar-fill fat" style="width:${fatPct}%"></div></div>
-            <span class="macro-bar-val">${plan.macro?.fat || 0}g</span>
+            <span class="macro-bar-val">${Math.round(food.fat)}/${plan.macro?.fat || 0}g</span>
           </div>
         </div>
       </div>
@@ -251,6 +337,19 @@ export function mountHome(root, profile, plan) {
       </div>
 
     </div>`;
+
+  function bindWeightWidget() {
+    root.querySelector("#weight-save")?.addEventListener("click", () => {
+      const kg = parseFloat(root.querySelector("#weight-input")?.value || "");
+      if (!Number.isFinite(kg) || kg < 20 || kg > 400) return;
+      logWeight(kg);
+      const slot = root.querySelector("#weight-widget");
+      if (!slot) return;
+      slot.outerHTML = renderWeightSection(profile);
+      bindWeightWidget();
+    });
+  }
+  bindWeightWidget();
 
   // ── Water glasses ──
   root.querySelectorAll(".water-glass").forEach((btn) => {
