@@ -76,12 +76,14 @@ function renderMain() {
       setPlan(plan);
     } catch (_) {
       main.innerHTML = `
-        <div style="padding:32px 20px;text-align:center">
+        <div class="page-enter" style="padding:32px 20px;text-align:center">
           <p style="color:var(--text-dim);margin-bottom:20px">Something went wrong loading your plan.</p>
-          <button type="button" class="btn btn-primary" onclick="localStorage.removeItem('np_profile');localStorage.removeItem('np_plan');window.location.href='index.html'">
-            Start over
-          </button>
+          <button type="button" class="btn btn-primary" id="np-restart-btn">Start over</button>
         </div>`;
+      document.getElementById("np-restart-btn")?.addEventListener("click", () => {
+        localStorage.clear();
+        window.location.href = "index.html";
+      });
       return;
     }
   }
@@ -98,7 +100,22 @@ function renderMain() {
     supps: mountSupps,
     tools: mountTools,
   };
-  pages[route]?.(main, profile, plan);
+
+  let mountResult;
+  try {
+    mountResult = pages[route]?.(main, profile, plan);
+  } catch (err) {
+    main.innerHTML = `<div class="page-enter" style="padding:20px;text-align:center;color:var(--text-dim)">Could not load this section.</div>`;
+  }
+
+  // Handle async mount functions (meals, grocery, supps use dynamic imports)
+  if (mountResult instanceof Promise) {
+    mountResult.catch(() => {
+      if (!main.hasChildNodes()) {
+        main.innerHTML = `<div class="page-enter" style="padding:20px;text-align:center;color:var(--text-dim)">Could not load this section. Check your connection.</div>`;
+      }
+    });
+  }
 
   window.scrollTo({ top: 0, behavior: "instant" });
 }

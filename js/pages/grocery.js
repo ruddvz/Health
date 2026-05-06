@@ -1,9 +1,15 @@
 import { t } from "../i18n.js";
-import { SHOPPING_TIPS, BATCH_COOK_LIST } from "../data/groceryRef.js";
 
 const CAT_KEYS = ["protein", "carbs", "veg", "dairy", "pantry"];
 
-export function mountGrocery(root, profile, plan) {
+export async function mountGrocery(root, profile, plan) {
+  let SHOPPING_TIPS = { general: [], budget: [], indian_grocery: [] };
+  let BATCH_COOK_LIST = { veg: [], vegan: [], nonveg: [], eggetarian: [] };
+  try {
+    const mod = await import("../data/groceryRef.js");
+    SHOPPING_TIPS = mod.SHOPPING_TIPS;
+    BATCH_COOK_LIST = mod.BATCH_COOK_LIST;
+  } catch (_) { /* degrade gracefully — batch-cook guide and tips hidden */ }
   let cat = "protein";
   const storageKey = "np_grocery_checked";
   let checked = new Set(JSON.parse(localStorage.getItem(storageKey) || "[]"));

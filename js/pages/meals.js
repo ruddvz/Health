@@ -2,7 +2,6 @@ import { t, dayLabel } from "../i18n.js";
 import { buildDayMeals, getSwapAlternatives } from "../plangen.js";
 import { getFoodTotals, isMealEaten, toggleMealEaten } from "../foodLog.js";
 import { getSwapOverride, setSwapOverride } from "../mealSwap.js";
-import { MEAL_TIMING, getMealOptionsForSlot } from "../data/mealOptions.js";
 
 const SLOT_TIMES = {
   breakfast: "7:00 AM",
@@ -19,7 +18,14 @@ function mondayBasedToday() {
   return d === 0 ? 6 : d - 1;
 }
 
-export function mountMeals(root, profile, plan) {
+export async function mountMeals(root, profile, plan) {
+  let MEAL_TIMING = {};
+  let getMealOptionsForSlot = () => [];
+  try {
+    const mod = await import("../data/mealOptions.js");
+    MEAL_TIMING = mod.MEAL_TIMING;
+    getMealOptionsForSlot = mod.getMealOptionsForSlot;
+  } catch (_) { /* degrade gracefully — timing notes and extra ideas hidden */ }
   let day = new Date().getDay();
   day = day === 0 ? 6 : day - 1;
   let tab = "workout";

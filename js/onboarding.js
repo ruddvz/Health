@@ -596,11 +596,6 @@ function finish() {
 }
 
 function initOnboarding() {
-  // Already completed — go straight to the app.
-  if (localStorage.getItem("np_profile") && localStorage.getItem("np_plan")) {
-    window.location.replace("app.html");
-    return;
-  }
   if (!localStorage.getItem("np_lang")) step = 0;
   else step = 1;
   render();

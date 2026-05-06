@@ -48,9 +48,11 @@
   --purple-15: rgba(180, 160, 255, 0.15);
 
   /* ── Text ── */
-  --text:       #ffffff;
-  --text-dim:   rgba(255, 255, 255, 0.55);
-  --text-muted: rgba(255, 255, 255, 0.30);
+  --text:          #ffffff;
+  --text-primary:  #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.80);
+  --text-dim:      rgba(255, 255, 255, 0.55);
+  --text-muted:    rgba(255, 255, 255, 0.30);
 
   /* ── Glow box-shadows ── */
   --glow-lime:   0 0 28px rgba(212, 245, 60, 0.45);
@@ -106,9 +108,11 @@
     --nav:        rgba(255, 255, 255, 0.92);
     --border:     rgba(0, 0, 0, 0.08);
     --border-mid: rgba(0, 0, 0, 0.14);
-    --text:       #0a0a0a;
-    --text-dim:   rgba(0, 0, 0, 0.55);
-    --text-muted: rgba(0, 0, 0, 0.35);
+    --text:          #0a0a0a;
+    --text-primary:  #0a0a0a;
+    --text-secondary: rgba(0, 0, 0, 0.75);
+    --text-dim:      rgba(0, 0, 0, 0.55);
+    --text-muted:    rgba(0, 0, 0, 0.35);
     --shadow-glass: 0 8px 28px rgba(0, 0, 0, 0.08);
     --shadow-card:  0 4px 16px rgba(0, 0, 0, 0.06);
   }

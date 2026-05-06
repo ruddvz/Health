@@ -1,6 +1,5 @@
 import { t } from "../i18n.js";
 import { todayKey } from "../foodLog.js";
-import { SUPP_DETAIL, SUPP_STACK_GUIDE, DAILY_SCHEDULE } from "../data/supplements.js";
 
 const SUPP_META = {
   creatine: { dot: "var(--accent-lime)",   name: "Creatine Monohydrate",    status: "have" },
@@ -53,7 +52,16 @@ function suppStreak(suppId) {
   return streak;
 }
 
-export function mountSupps(root, profile, plan) {
+export async function mountSupps(root, profile, plan) {
+  let SUPP_DETAIL = {};
+  let SUPP_STACK_GUIDE = { avoid: [], beginner: { label: "", rationale: "", items: [] }, intermediate: { label: "", rationale: "", items: [] }, full: { label: "", rationale: "", items: [] } };
+  let DAILY_SCHEDULE = [];
+  try {
+    const mod = await import("../data/supplements.js");
+    SUPP_DETAIL = mod.SUPP_DETAIL;
+    SUPP_STACK_GUIDE = mod.SUPP_STACK_GUIDE;
+    DAILY_SCHEDULE = mod.DAILY_SCHEDULE;
+  } catch (_) { /* degrade gracefully — detailed supplement info hidden */ }
   const hasWhey = profile.supplements?.includes("whey");
   const veg = ["veg", "vegan", "eggetarian"].includes(profile.dietType);
   const userSupps = new Set(profile.supplements || []);
