@@ -65,8 +65,26 @@ function renderMain() {
   const main = document.getElementById("app-main");
   main.innerHTML = "";
   const profile = getProfile();
-  const plan = getPlan();
-  if (!profile || !plan) return;
+  let plan = getPlan();
+
+  if (!profile) return;
+
+  if (!plan) {
+    // Plan missing — try to regenerate silently before rendering.
+    try {
+      plan = generatePlan(profile);
+      setPlan(plan);
+    } catch (_) {
+      main.innerHTML = `
+        <div style="padding:32px 20px;text-align:center">
+          <p style="color:var(--text-dim);margin-bottom:20px">Something went wrong loading your plan.</p>
+          <button type="button" class="btn btn-primary" onclick="localStorage.removeItem('np_profile');localStorage.removeItem('np_plan');window.location.href='index.html'">
+            Start over
+          </button>
+        </div>`;
+      return;
+    }
+  }
 
   document.getElementById("app-name").textContent = `${profile.name}.`;
 

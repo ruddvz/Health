@@ -1,4 +1,4 @@
-const CACHE = "nutripal-v12";
+const CACHE = "nutripal-v13";
 /** Paths relative to the service worker scope (works on GitHub Pages `/repo/`). */
 const ASSET_PATHS = [
   "./",
@@ -19,6 +19,9 @@ const ASSET_PATHS = [
   "js/onboarding.js",
   "js/app.js",
   "js/data/foods.js",
+  "js/data/mealOptions.js",
+  "js/data/supplements.js",
+  "js/data/groceryRef.js",
   "js/pages/home.js",
   "js/pages/phases.js",
   "js/pages/meals.js",

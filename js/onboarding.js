@@ -585,12 +585,22 @@ function finish() {
     supplements: data.supplements,
     city: data.city,
   };
-  setProfile(profile);
-  setPlan(generatePlan(profile));
+  try {
+    setProfile(profile);
+    setPlan(generatePlan(profile));
+  } catch (e) {
+    // Save profile so app.html can regenerate the plan on load
+    try { setProfile(profile); } catch (_) { /* ignore */ }
+  }
   window.location.href = "app.html";
 }
 
 function initOnboarding() {
+  // Already completed — go straight to the app.
+  if (localStorage.getItem("np_profile") && localStorage.getItem("np_plan")) {
+    window.location.replace("app.html");
+    return;
+  }
   if (!localStorage.getItem("np_lang")) step = 0;
   else step = 1;
   render();
