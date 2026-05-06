@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write minimal solid-colour PNGs (stdlib only) for PWA / mascot placeholders."""
+"""Write minimal solid-colour PNGs (stdlib only) for PWA icons."""
 import struct, zlib
 
 def chunk(tag, data):

@@ -1,6 +1,5 @@
 import { t } from "../i18n.js";
 import { buildDayMeals } from "../plangen.js";
-import { mascotBlock } from "../mascot.js";
 
 function greeting(profile) {
   const h = new Date().getHours();
@@ -22,7 +21,6 @@ export function mountHome(root, profile, plan) {
 
   root.innerHTML = `
     <div class="page-enter">
-      ${mascotBlock("eat", { hero: true })}
       <p class="step-sub" style="margin-top:0">${greeting(profile)}</p>
       <div class="glass card">
         <h3>${t("home.today")}</h3>

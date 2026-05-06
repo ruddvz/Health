@@ -1,5 +1,4 @@
 import { t } from "../i18n.js";
-import { mascotBlock } from "../mascot.js";
 
 export function mountPrep(root, profile, plan) {
   const steps = plan.prep
@@ -7,7 +6,6 @@ export function mountPrep(root, profile, plan) {
     .join("");
   root.innerHTML = `
     <div class="page-enter">
-      ${mascotBlock("think", { hero: true })}
       <h2 class="step-title" style="font-size:1.2rem">${t("prep.title")}</h2>
       <p class="step-sub">${t("prep.intro")}</p>
       <div class="glass card">

@@ -1,4 +1,4 @@
-const CACHE = "nutripal-v3";
+const CACHE = "nutripal-v4";
 const ASSETS = [
   "/",
   "/index.html",
@@ -19,7 +19,6 @@ const ASSETS = [
   "/js/pages/prep.js",
   "/js/pages/grocery.js",
   "/js/pages/supps.js",
-  "/js/mascot.js",
   "/assets/icons/icon-192.png",
   "/assets/icons/icon-512.png",
 ];

@@ -1,7 +1,7 @@
 # NutriPal PWA — Full Implementation Plan v3
 
-> **Status**: Living spec. App shell implemented on `main`; v3 aligns mascot and design prompts with `PROMPTS.md`.
-> **Your manual tasks**: Export mascot + screen mockups from `PROMPTS.md` (Section 8 summary below). Everything else is for the build agent.
+> **Status**: Living spec. UI follows **iOS-style liquid glass** (Section 6). Optional mascot and pixel mockups live in `PROMPTS.md` for a later pass — the shipped app stays text-first and simple.
+> **Your manual tasks**: App icons (`assets/icons/`). When you add a mascot, use `PROMPTS.md` as the art brief.
 
 ---
 
@@ -11,12 +11,12 @@ A mobile-first **Progressive Web App** (PWA) — no server, no login, works offl
 
 **Core flow:**
 1. User picks their language (English / Hinglish / Gujlish)
-2. Mascot-guided step-by-step quiz collects their stats and preferences
+2. Step-by-step quiz collects their stats and preferences
 3. App generates a fully personalised plan — correct duration, correct meals for their diet type, correct language
 4. They tap "Add to Home Screen" — it lives on their phone like a native app
 5. Everything stored on device, nothing sent anywhere
 
-**Mascot:** Otto the Otter — chubby brown and cream, big glossy eyes, flat tail, thick-outline flat vector (see `PROMPTS.md` for exact art direction). Gender-neutral, Duolingo-level charm.
+**Visual style:** Apple **iOS 26–style** liquid glass — SF system fonts, frosted cards, subtle depth, lime/teal accents on a deep background (see Section 6). **Mascot:** deferred; `PROMPTS.md` documents an optional Otto character for when you want illustrations.
 
 ---
 
@@ -36,7 +36,6 @@ A mobile-first **Progressive Web App** (PWA) — no server, no login, works offl
 ├── js/
 │   ├── store.js            ← localStorage helper
 │   ├── i18n.js             ← All 3 language strings
-│   ├── mascot.js           ← Otto inline SVG placeholders (+ future PNG swap)
 │   ├── onboarding.js       ← Quiz logic
 │   ├── plangen.js          ← Plan generation engine
 │   ├── app.js              ← Router + bottom nav
@@ -48,7 +47,7 @@ A mobile-first **Progressive Web App** (PWA) — no server, no login, works offl
 │       ├── grocery.js
 │       └── supps.js
 └── assets/
-    ├── otto/               ← optional: PNG exports from PROMPTS.md (app uses inline SVG in `js/mascot.js` until then)
+    ├── otto/               ← optional future: mascot PNGs from PROMPTS.md (not required for the app)
     │   ├── otto-wave.png
     │   ├── otto-think.png
     │   ├── otto-flex.png
@@ -154,12 +153,12 @@ Every piece of visible text in the entire app calls `t('key')` — never hardcod
 
 ## Section 2 — Onboarding Quiz (14 Steps)
 
-Axo appears at the top of every step. Progress bar at top shows how far through they are.
+Progress bar at top shows how far through they are.
 
 | # | Screen | Question | Input | Notes |
 |---|--------|----------|-------|-------|
 | 0 | Language | Pick your language | 3 cards | First screen, no back button |
-| 1 | Splash | "Let's build your plan." | Tap to begin | Axo waves, user's name not known yet |
+| 1 | Splash | "Let's build your plan." | Tap to begin | Clean headline + primary button |
 | 2 | Name | "What's your name?" | Text field | Used everywhere after this |
 | 3 | Goal | "Main goal?" | 3 big buttons: Cut / Build / Recomp | |
 | 4 | Duration | "How long do you want your plan?" | Option grid: 4 weeks / 8 weeks / 12 weeks / 16 weeks / 6 months / 1 year | Custom option too |
@@ -173,7 +172,7 @@ Axo appears at the top of every step. Progress bar at top shows how far through 
 | 12 | Food preferences | "Any other preferences?" | Multi-select chips | No dairy / No gluten / No pork / Jain (no root veg) / Halal only |
 | 13 | Supplements | "Which supplements do you have?" | Multi-select chips | Creatine / Whey / Pre-workout / Omega-3 / Multivitamin / Magnesium / Ashwagandha / None |
 | 14 | City | "City or region?" | Text field, skippable | For grocery store tips |
-| 15 | Loading | "Building your plan…" | Axo animated + progress → redirect | 2–3 sec fake progress, then to app.html |
+| 15 | Loading | "Building your plan…" | Progress bar → redirect | 2–3 sec fake progress, then to app.html |
 
 ---
 
@@ -374,7 +373,6 @@ Full pill:  9999px
 
 ### Animations
 - Page transitions: slide + fade, 300ms ease-out
-- Axo mascot: gentle floating bob loop
 - Button tap: scale 0.96 → spring back
 - Progress bar: smooth width CSS transition
 
@@ -429,11 +427,11 @@ All text rendered via `t('key')` so it's in the user's chosen language.
 
 ## Section 8 — Your Manual Tasks (Images)
 
-### Pixel mockups + copy‑paste prompts
+### Optional mascot + pixel mockups
 
-**Authoritative prompts** (every onboarding + app screen at iPhone 15 Pro resolution, Hinglish/Gujlish variants, Otto poses): see **`PROMPTS.md`** in the repo root. Generate those images first if you want a pixel‑matched build; Section 8 here is the short checklist.
+**`PROMPTS.md`** holds full-screen mockup prompts (iPhone 15 Pro framing) and an optional **Otto the Otter** character pack. Use it when you are ready to add illustrations or match marketing visuals; the default product UI does **not** depend on it.
 
-### Mascot: Otto the Otter — 6 poses (transparent PNG)
+### Mascot (later) — Otto the Otter — 6 poses (transparent PNG)
 
 Use any AI image generator. Export each as **PNG with transparent background**. File names below match `PROMPTS.md` and optional `assets/otto/`.
 
@@ -444,9 +442,9 @@ Use any AI image generator. Export each as **PNG with transparent background**. 
 | `otto-flex.png` | Loading complete, supplements |
 | `otto-eat.png` | Home, meals (workout days) |
 | `otto-sleep.png` | Meals (rest tab) |
-| `otto-shop.png` | Grocery |
+| `otto-shop.png` | Grocery (optional) |
 
-Until PNGs exist, the app renders **inline SVG placeholders** in `js/mascot.js` (same poses, brown/cream otter).
+Integrate into the UI when you have final assets.
 
 ---
 
@@ -510,7 +508,7 @@ When you implement this plan:
 4. **Duration drives phases**: phase count and length must be computed from `userProfile.durationWeeks` (4 / 8 / 12 / 16 / 24 / 52)
 5. **Weekday meals**: Meals page must have a 7-day picker (Mon–Sun) — not just Workout/Rest tabs — each showing the unique rotation for that day
 6. **Design system**: use the tokens in Section 6 exactly. iOS 26 Liquid Glass. Squircle radii. No flat corporate look.
-7. **Otto**: follow `PROMPTS.md` for final art. If `assets/otto/*.png` files are missing, `js/mascot.js` supplies inline SVG placeholders (thick outline, brown/cream) so the app still looks good
+7. **Optional mascot**: `PROMPTS.md` + `assets/otto/` when you add character art — not required for launch
 8. **LocalStorage contract**:
    ```js
    // Keys stored by onboarding:
@@ -527,4 +525,4 @@ When you implement this plan:
 
 ---
 
-*Plan v3 — May 2026: Otto mascot + `PROMPTS.md` screen library; optional `otto-sleep` / `otto-shop` poses; same product scope as v2 (languages, meals, duration, diet types).*
+*Plan v3 — May 2026: iOS liquid-glass UI; optional `PROMPTS.md` / Otto art pack deferred; same product scope as v2 (languages, meals, duration, diet types).*

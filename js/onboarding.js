@@ -1,7 +1,6 @@
 import { t } from "./i18n.js";
 import { setLang, setProfile, setPlan } from "./store.js";
 import { generatePlan } from "./plangen.js";
-import { mascotBlock } from "./mascot.js";
 
 const STEPS = 16;
 let step = 0;
@@ -47,7 +46,7 @@ function render() {
   if (step === 0) {
     root.innerHTML = `
       <div class="page-enter">
-        ${mascotBlock("wave", { hero: true })}
+        <p class="app-brand">NutriPal</p>
         <h1 class="step-title">${t("lang.pick")}</h1>
         <div class="lang-grid">
           <button type="button" class="glass lang-card" data-lang="en">
@@ -77,7 +76,7 @@ function render() {
   if (step === 1) {
     root.innerHTML = `
       <div class="page-enter">
-        ${mascotBlock("wave")}
+        <p class="app-brand">NutriPal</p>
         <h1 class="step-title">${t("lang.sample_" + (localStorage.getItem("np_lang") || "en"))}</h1>
         <p class="step-sub">${t("onb.tap_begin")}</p>
         <div class="splash-tap"><button type="button" class="btn btn-primary" id="splash-go">${t("onb.next")}</button></div>
@@ -87,15 +86,13 @@ function render() {
   }
 
   let body = "";
-  const pose = step >= 15 ? "flex" : "think";
-  const mascot = mascotBlock(pose);
 
   if (step === 2) {
-    body = `${mascot}<h1 class="step-title">${t("onb.q_name")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_name")}</h1>
       <label class="label">${t("onb.q_name")}</label>
       <input class="field" id="f-name" value="${data.name.replace(/"/g, "&quot;")}" autocomplete="name">`;
   } else if (step === 3) {
-    body = `${mascot}<h1 class="step-title">${t("onb.q_goal")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_goal")}</h1>
       <div class="option-grid cols-3">
         ${["cut", "build", "recomp"]
           .map(
@@ -112,7 +109,7 @@ function render() {
       [24, "w24"],
       [52, "w52"],
     ];
-    body = `${mascot}<h1 class="step-title">${t("onb.q_duration")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_duration")}</h1>
       <div class="option-grid">${opts
         .map(
           ([w, key]) =>
@@ -123,21 +120,21 @@ function render() {
       <input class="field" type="number" min="1" max="104" id="f-custom-w" placeholder="12" value="${data.durationWeeks}">`;
   } else if (step === 5) {
     const disp = weightUnit === "kg" ? data.weight_kg : lbsFrom(data.weight_kg);
-    body = `${mascot}<h1 class="step-title">${t("onb.q_weight")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_weight")}</h1>
       <div class="slider-row"><span id="weight-disp">${disp}${weightUnit === "kg" ? " kg" : " lb"}</span>
       <div class="toggle" style="margin-left:auto"><button type="button" class="${weightUnit === "kg" ? "active" : ""}" data-wu="kg">kg</button><button type="button" class="${weightUnit === "lbs" ? "active" : ""}" data-wu="lbs">lb</button></div></div>
       <input type="range" id="f-weight" min="${weightUnit === "kg" ? 40 : 88}" max="${weightUnit === "kg" ? 180 : 400}" step="1" value="${disp}">`;
   } else if (step === 6) {
-    body = `${mascot}<h1 class="step-title">${t("onb.q_height")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_height")}</h1>
       <div class="slider-row"><span id="height-disp">${data.height_cm} cm</span></div>
       <input type="range" id="f-height" min="140" max="210" step="1" value="${data.height_cm}">`;
   } else if (step === 7) {
-    body = `${mascot}<h1 class="step-title">${t("onb.q_age")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_age")}</h1>
       <div class="number-stepper">
         <button type="button" id="age-minus">−</button><div class="value" id="age-val">${data.age}</div><button type="button" id="age-plus">+</button>
       </div>`;
   } else if (step === 8) {
-    body = `${mascot}<h1 class="step-title">${t("onb.q_sex")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_sex")}</h1>
       <div class="option-grid cols-3">
         ${[
           ["male", "m"],
@@ -151,7 +148,7 @@ function render() {
           .join("")}</div>`;
   } else if (step === 9) {
     const acts = ["sedentary", "light", "moderate", "high"];
-    body = `${mascot}<h1 class="step-title">${t("onb.q_activity")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_activity")}</h1>
       <div class="option-grid">${acts
         .map(
           (a) =>
@@ -159,7 +156,7 @@ function render() {
         )
         .join("")}</div>`;
   } else if (step === 10) {
-    body = `${mascot}<h1 class="step-title">${t("onb.q_train")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_train")}</h1>
       <div class="option-grid cols-3">${[1, 2, 3, 4, 5, 6, 7]
         .map(
           (n) =>
@@ -167,7 +164,7 @@ function render() {
         )
         .join("")}</div>`;
   } else if (step === 11) {
-    body = `${mascot}<h1 class="step-title">${t("onb.q_diet")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_diet")}</h1>
       <div class="option-grid">${["nonveg", "veg", "eggetarian", "vegan"]
         .map(
           (d) =>
@@ -176,7 +173,7 @@ function render() {
         .join("")}</div>`;
   } else if (step === 12) {
     const prefs = ["nodairy", "nogluten", "nopork", "jain", "halal"];
-    body = `${mascot}<h1 class="step-title">${t("onb.q_prefs")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_prefs")}</h1>
       <div class="chip-grid">${prefs
         .map((p) => {
           const on = data.foodPrefs.includes(p);
@@ -185,7 +182,7 @@ function render() {
         .join("")}</div>`;
   } else if (step === 13) {
     const sups = ["creatine", "whey", "pre", "omega", "multi", "mag", "ash", "none"];
-    body = `${mascot}<h1 class="step-title">${t("onb.q_supps")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_supps")}</h1>
       <div class="chip-grid">${sups
         .map((s) => {
           const on = data.supplements.includes(s);
@@ -193,10 +190,10 @@ function render() {
         })
         .join("")}</div>`;
   } else if (step === 14) {
-    body = `${mascot}<h1 class="step-title">${t("onb.q_city")}</h1>
+    body = `<h1 class="step-title">${t("onb.q_city")}</h1>
       <input class="field" id="f-city" placeholder="${t("onb.city_ph")}" value="${data.city.replace(/"/g, "&quot;")}">`;
   } else if (step === 15) {
-    body = `${mascot}<h1 class="step-title">${t("onb.loading")}</h1><div class="loading-bar"><div class="progress-track"><div class="progress-fill" id="load-bar" style="width:5%"></div></div></div>`;
+    body = `<h1 class="step-title">${t("onb.loading")}</h1><div class="loading-bar"><div class="progress-track"><div class="progress-fill" id="load-bar" style="width:5%"></div></div></div>`;
   }
 
   root.innerHTML = `<div class="page-enter">${body}${

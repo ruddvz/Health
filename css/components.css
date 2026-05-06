@@ -6,6 +6,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-glass);
 }
 
 .btn {
@@ -29,9 +30,10 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-lime), var(--accent-teal));
+  background: var(--accent-lime);
   color: #0a0a0a;
   border: none;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 8px 24px rgba(212, 245, 60, 0.22);
 }
 
 .btn-ghost {
@@ -88,35 +90,6 @@
     opacity: 1;
     transform: translateX(0);
   }
-}
-
-@keyframes mascotBob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-.mascot-wrap {
-  display: flex;
-  justify-content: center;
-  margin: 12px 0 20px;
-}
-
-.mascot-wrap svg,
-.mascot-wrap img {
-  width: min(200px, 55vw);
-  height: auto;
-  animation: mascotBob 3s ease-in-out infinite;
-}
-
-.mascot-wrap.mascot-hero svg,
-.mascot-wrap.mascot-hero img {
-  width: min(120px, 32vw);
-  margin-bottom: 4px;
 }
 
 .field {
