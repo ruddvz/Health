@@ -31,7 +31,15 @@ function scopeUrls() {
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(scopeUrls()))
+    caches.open(CACHE).then((c) =>
+      Promise.all(
+        scopeUrls().map((url) =>
+          c.add(url).catch(() => {
+            // Silently skip assets that are not yet present (e.g. icons).
+          })
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
