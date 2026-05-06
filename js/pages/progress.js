@@ -182,6 +182,57 @@ function renderComplianceStrip(profile, plan) {
   </div>`;
 }
 
+function renderBodyCompCard(profile, weightKg) {
+  const h = profile.height_cm || 170;
+  const age = profile.age || 30;
+  const sex = profile.sex === "female" ? "female" : "male";
+  const bmiRaw = weightKg / (h / 100) ** 2;
+  const bmi = +bmiRaw.toFixed(1);
+  let bfPct = sex === "female" ? 1.2 * bmiRaw + 0.23 * age - 5.4 : 1.2 * bmiRaw + 0.23 * age - 16.2;
+  bfPct = Math.max(4, Math.min(55, bfPct));
+  const fatMass = (bfPct / 100) * weightKg;
+  const leanMass = weightKg - fatMass;
+
+  let bmiLabel = "progress.bmi_normal";
+  let bmiColor = "var(--accent-lime)";
+  if (bmiRaw < 18.5) {
+    bmiLabel = "progress.bmi_under";
+    bmiColor = "var(--accent-teal)";
+  } else if (bmiRaw < 25) {
+    bmiLabel = "progress.bmi_normal";
+  } else if (bmiRaw < 30) {
+    bmiLabel = "progress.bmi_over";
+    bmiColor = "var(--accent-orange)";
+  } else {
+    bmiLabel = "progress.bmi_obese";
+    bmiColor = "var(--accent-orange)";
+  }
+
+  return `
+      <div class="section-eyebrow">${t("progress.body_comp")}</div>
+      <div class="glass body-comp-card">
+        <p class="body-comp-note">${t("progress.body_comp_note")}</p>
+        <div class="body-comp-grid">
+          <div class="body-comp-cell">
+            <div class="body-comp-val" style="color:${bmiColor}">${bmi}</div>
+            <div class="body-comp-lbl">BMI · ${t(bmiLabel)}</div>
+          </div>
+          <div class="body-comp-cell">
+            <div class="body-comp-val">${bfPct.toFixed(1)}%</div>
+            <div class="body-comp-lbl">${t("progress.est_bf")}</div>
+          </div>
+          <div class="body-comp-cell">
+            <div class="body-comp-val">${leanMass.toFixed(1)}</div>
+            <div class="body-comp-lbl">${t("progress.lean_kg")}</div>
+          </div>
+          <div class="body-comp-cell">
+            <div class="body-comp-val">${fatMass.toFixed(1)}</div>
+            <div class="body-comp-lbl">${t("progress.fat_kg")}</div>
+          </div>
+        </div>
+      </div>`;
+}
+
 export function mountProgress(root, profile, plan) {
   const weights = getWeights();
   const measures = getMeasures();
@@ -216,6 +267,8 @@ export function mountProgress(root, profile, plan) {
           <span class="home-stat-lbl">${t("progress.current_kg")}</span>
         </div>
       </div>
+
+      ${renderBodyCompCard(profile, lastWeight)}
 
       <div class="info-box info-box-lime progress-food-summary">
         <strong>${t("progress.today_logged")}</strong> ${food.kcal} / ${plan.targetCalories ?? "—"} kcal · ${t("progress.week_label")} ${wn}

@@ -2,10 +2,12 @@ import { t } from "../i18n.js";
 import { buildDayMeals } from "../plangen.js";
 import { todayKey, getFoodTotals } from "../foodLog.js";
 import { getWeights, logWeight } from "../weightStore.js";
+import { getSwapOverride } from "../mealSwap.js";
 
 const WATER_KEY = "np_water_";
 const CHECKIN_KEY = "np_checkin_";
 const STREAK_KEY = "np_streak";
+const PHOTO_DISMISS_KEY = "np_photo_dismissed";
 
 function renderWeightSection(profile) {
   const weights = getWeights();
@@ -126,7 +128,10 @@ export function mountHome(root, profile, plan) {
   const monBased = today === 0 ? 6 : today - 1;
   const td = Math.min(Math.max(profile.trainingDays || 4, 1), 7);
   const isWorkout = monBased < td;
-  const meals = buildDayMeals(profile, monBased, plan.targetCalories, { forceRest: !isWorkout });
+  const meals = buildDayMeals(profile, monBased, plan.targetCalories, { forceRest: !isWorkout }).map((bm) => {
+    const sw = getSwapOverride(monBased, bm.slot);
+    return { ...bm, name: sw || bm.name };
+  });
 
   const streak   = updateStreak();
   let water      = getWater();
@@ -188,8 +193,24 @@ export function mountHome(root, profile, plan) {
   ];
   const tip = coachTips[new Date().getDay() % coachTips.length];
 
+  const photoDismissed = localStorage.getItem(PHOTO_DISMISS_KEY);
+  const photoDue = weekNum > 0 && weekNum % 4 === 0;
+  const showPhotoBanner = photoDue && photoDismissed !== String(weekNum);
+
   root.innerHTML = `
     <div class="page-enter">
+
+      ${showPhotoBanner ? `
+      <div class="photo-banner glass" id="photo-banner">
+        <div class="photo-banner-inner">
+          <span class="photo-banner-icon" aria-hidden="true">📸</span>
+          <div class="photo-banner-copy">
+            <div class="photo-banner-title">${t("home.photo_title", { week: weekNum })}</div>
+            <div class="photo-banner-sub">${t("home.photo_sub")}</div>
+          </div>
+          <button type="button" class="photo-dismiss" id="photo-dismiss" data-week="${weekNum}" aria-label="${t("home.photo_dismiss")}">×</button>
+        </div>
+      </div>` : ""}
 
       <!-- Hero -->
       <div class="home-hero">
@@ -356,6 +377,12 @@ export function mountHome(root, profile, plan) {
           <div class="qc-sub">${t("home.quick_progress")}</div>
           <span class="qc-arrow">›</span>
         </button>
+        <button type="button" class="glass quick-card" data-go="tools">
+          <span class="qc-icon">🔎</span>
+          <div class="qc-title">${t("nav.tools")}</div>
+          <div class="qc-sub">${t("home.quick_tools")}</div>
+          <span class="qc-arrow">›</span>
+        </button>
       </div>
 
       <!-- Coach tip -->
@@ -383,6 +410,12 @@ export function mountHome(root, profile, plan) {
     });
   }
   bindWeightWidget();
+
+  root.querySelector("#photo-dismiss")?.addEventListener("click", (e) => {
+    const w = e.target?.closest("#photo-dismiss")?.dataset?.week;
+    if (w != null) localStorage.setItem(PHOTO_DISMISS_KEY, String(w));
+    document.getElementById("photo-banner")?.remove();
+  });
 
   root.querySelector("#sleep-hrs")?.addEventListener("change", () => {
     const inp = root.querySelector("#sleep-hrs");

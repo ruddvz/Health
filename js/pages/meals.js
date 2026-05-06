@@ -1,10 +1,7 @@
 import { t, dayLabel } from "../i18n.js";
-import { buildDayMeals } from "../plangen.js";
-import {
-  getFoodTotals,
-  isMealEaten,
-  toggleMealEaten,
-} from "../foodLog.js";
+import { buildDayMeals, getSwapAlternatives } from "../plangen.js";
+import { getFoodTotals, isMealEaten, toggleMealEaten } from "../foodLog.js";
+import { getSwapOverride, setSwapOverride } from "../mealSwap.js";
 
 const SLOT_TIMES = {
   breakfast: "7:00 AM",
@@ -26,9 +23,48 @@ export function mountMeals(root, profile, plan) {
   day = day === 0 ? 6 : day - 1;
   let tab = "workout";
 
+  let swapSlot = null;
+
+  function closeDrawer() {
+    swapSlot = null;
+    const drawer = root.querySelector("#swap-drawer");
+    if (drawer) drawer.hidden = true;
+  }
+
+  function openDrawer(slot, templateName) {
+    swapSlot = slot;
+    const drawer = root.querySelector("#swap-drawer");
+    const optsEl = root.querySelector("#swap-options");
+    if (!drawer || !optsEl) return;
+    const opts = getSwapAlternatives(profile, day, slot, templateName);
+    optsEl.innerHTML =
+      opts.length > 0
+        ? opts
+            .map(
+              (name) =>
+                `<button type="button" class="swap-opt-btn glass" data-pick-name="${encodeURIComponent(name)}">${name}</button>`
+            )
+            .join("")
+        : `<p class="swap-empty">${t("meals.swap_none")}</p>`;
+    drawer.hidden = false;
+    drawer.querySelectorAll("[data-pick-name]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const nm = decodeURIComponent(btn.dataset.pickName || "");
+        if (nm) setSwapOverride(day, slot, nm);
+        closeDrawer();
+        renderInner();
+      });
+    });
+  }
+
   function renderInner() {
     const forceRest = tab === "rest";
-    const meals = buildDayMeals(profile, day, plan.targetCalories, { forceRest });
+    const baseMeals = buildDayMeals(profile, day, plan.targetCalories, { forceRest });
+    const meals = baseMeals.map((bm) => {
+      const sw = getSwapOverride(day, bm.slot);
+      return { ...bm, name: sw || bm.name };
+    });
+    const templateBySlot = Object.fromEntries(baseMeals.map((m) => [m.slot, m.name]));
 
     const dayRow = [0, 1, 2, 3, 4, 5, 6]
       .map(
@@ -85,6 +121,9 @@ export function mountMeals(root, profile, plan) {
           </button>`
             : "";
 
+        const tmpl = templateBySlot[m.slot] || m.name;
+        const hasSwap = !!getSwapOverride(day, m.slot);
+
         return `
         <div class="meal-card">
           <div class="meal-head">
@@ -95,6 +134,10 @@ export function mountMeals(root, profile, plan) {
           <div class="meal-body">
             <ul class="ing-list">${ings}</ul>
             ${tags.length ? `<div class="meal-tags">${tags.join("")}</div>` : ""}
+            <button type="button" class="meal-swap-btn" data-swap-slot="${m.slot}" data-template="${encodeURIComponent(tmpl)}">
+              ${t("meals.swap")}
+            </button>
+            ${hasSwap ? `<button type="button" class="meal-swap-reset" data-reset-slot="${m.slot}">${t("meals.swap_reset")}</button>` : ""}
             ${eatBtn}
           </div>
         </div>`;
@@ -134,17 +177,45 @@ export function mountMeals(root, profile, plan) {
           </div>` : ""}
 
         ${mealCards || `<div class="empty-hint">${t("meals.rest")}</div>`}
+
+        <div class="swap-drawer glass" id="swap-drawer" hidden>
+          <div class="section-eyebrow swap-drawer-title">${t("meals.swap_alts")}</div>
+          <div id="swap-options" class="swap-options"></div>
+          <div class="swap-drawer-actions">
+            <button type="button" class="btn btn-ghost" id="swap-close">${t("meals.swap_cancel")}</button>
+          </div>
+        </div>
       </div>`;
+
+    root.querySelector("#swap-close")?.addEventListener("click", closeDrawer);
 
     root.querySelectorAll("[data-tab]").forEach((b) => {
       b.addEventListener("click", () => {
         tab = b.dataset.tab;
+        closeDrawer();
         renderInner();
       });
     });
     root.querySelectorAll("[data-day]").forEach((b) => {
       b.addEventListener("click", () => {
         day = +b.dataset.day;
+        closeDrawer();
+        renderInner();
+      });
+    });
+
+    root.querySelectorAll(".meal-swap-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const slot = btn.dataset.swapSlot;
+        const tmpl = decodeURIComponent(btn.dataset.template || "");
+        openDrawer(slot, tmpl);
+      });
+    });
+
+    root.querySelectorAll(".meal-swap-reset").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setSwapOverride(day, btn.dataset.resetSlot, null);
+        closeDrawer();
         renderInner();
       });
     });
@@ -158,6 +229,10 @@ export function mountMeals(root, profile, plan) {
         renderInner();
       });
     });
+
+    if (swapSlot && templateBySlot[swapSlot]) {
+      openDrawer(swapSlot, templateBySlot[swapSlot]);
+    }
   }
 
   renderInner();

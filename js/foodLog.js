@@ -61,3 +61,17 @@ export function toggleMealEaten(slot, name, kcal, plan) {
 export function isMealEaten(slot) {
   return getFoodLog().some((e) => e.mealId === slot);
 }
+
+/** Free-form log line from Tools / food lookup (multiple entries allowed). */
+export function appendCustomFoodToLog(name, kcal, protein, carbs, fat) {
+  const log = getFoodLog();
+  log.push({
+    mealId: `food_${Date.now()}`,
+    name,
+    kcal: Math.round(kcal),
+    protein: Math.round(protein * 10) / 10,
+    carbs: Math.round(carbs * 10) / 10,
+    fat: Math.round(fat * 10) / 10,
+  });
+  setFoodLog(log);
+}
