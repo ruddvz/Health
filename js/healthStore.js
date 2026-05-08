@@ -15,6 +15,8 @@ const defaultState = {
   grocery: {
     lists: [],
     activeListId: null,
+    /** User-added lines (e.g. from templates) merged into Current list */
+    manualItems: [],
   },
   workout: {
     log: [],

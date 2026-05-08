@@ -1,12 +1,38 @@
 import { t } from "../i18n.js";
 import { FOODS } from "../data/foods.js";
-import { appendCustomFoodToLog } from "../foodLog.js";
+import { appendCustomFoodToLog, todayKey } from "../foodLog.js";
+import { getHealthState, setHealthState } from "../healthStore.js";
 
 const CAT_KEYS = ["all", "protein", "carbs", "veg", "fruit", "dairy", "indian", "pantry"];
+
+const HABIT_ICONS = ["✓", "💧", "🏃", "📖", "🧘", "🍎", "💤", "⚡"];
+
+let toolsUiTab = "food";
+
+function habitUid() {
+  return `h-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function renderHeatmap(completions) {
+  const set = new Set(completions || []);
+  const cells = [];
+  for (let i = 55; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dt = d.toISOString().slice(0, 10);
+    const ok = set.has(dt);
+    cells.push(
+      `<div class="hm-cell" title="${dt}" style="background:${ok ? "var(--accent-lime)" : "var(--surface-mid)"};border-radius:3px;aspect-ratio:1"></div>`
+    );
+  }
+  return `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;width:100%;max-width:280px;margin-top:8px">${cells.join("")}</div>`;
+}
 
 export function mountTools(root, profile, plan) {
   let query = "";
   let catFilter = "all";
+  let newHabitName = "";
+  let newHabitIcon = HABIT_ICONS[0];
 
   function filteredList() {
     const q = query.trim().toLowerCase();
@@ -17,7 +43,131 @@ export function mountTools(root, profile, plan) {
     return list.slice(0, 36);
   }
 
+  function toggleHabitDay(habitId) {
+    const s = getHealthState();
+    const habits = s.habits?.habits || [];
+    const h = habits.find((x) => x.id === habitId);
+    if (!h) return;
+    const d = todayKey();
+    const comp = new Set(h.completions || []);
+    if (comp.has(d)) comp.delete(d);
+    else comp.add(d);
+    h.completions = [...comp];
+    setHealthState(s);
+  }
+
+  function addHabit() {
+    const name = newHabitName.trim();
+    if (!name) return;
+    const s = getHealthState();
+    const habits = [...(s.habits?.habits || [])];
+    habits.unshift({
+      id: habitUid(),
+      name,
+      icon: newHabitIcon,
+      completions: [],
+    });
+    s.habits.habits = habits.slice(0, 24);
+    setHealthState(s);
+    newHabitName = "";
+  }
+
+  function deleteHabit(id) {
+    const s = getHealthState();
+    s.habits.habits = (s.habits.habits || []).filter((h) => h.id !== id);
+    setHealthState(s);
+  }
+
   function renderInner() {
+    const topTabs = `
+      <div class="tabs" style="margin-bottom:12px">
+        <button type="button" class="tab ${toolsUiTab === "food" ? "active" : ""}" data-tools-tab="food">${t("tools.tab_food")}</button>
+        <button type="button" class="tab ${toolsUiTab === "habits" ? "active" : ""}" data-tools-tab="habits">${t("tools.tab_habits")}</button>
+      </div>`;
+
+    if (toolsUiTab === "habits") {
+      const habits = getHealthState().habits?.habits || [];
+      const today = todayKey();
+      const habitCards = habits
+        .map((h) => {
+          const done = (h.completions || []).includes(today);
+          return `
+        <div class="glass" style="padding:14px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+            <div>
+              <span style="font-size:1.2rem;margin-right:6px">${h.icon || "✓"}</span>
+              <strong>${h.name}</strong>
+              <div class="step-sub">${t("habits.tap_toggle")}</div>
+            </div>
+            <button type="button" class="btn btn-ghost" style="width:auto;padding:6px 10px" data-del-habit="${h.id}">${t("habits.delete")}</button>
+          </div>
+          ${renderHeatmap(h.completions)}
+          <button type="button" class="btn ${done ? "btn-primary" : "btn-outline"}" style="margin-top:12px;width:100%" data-toggle-habit="${h.id}">
+            ${done ? t("habits.done_today") : t("habits.mark_today")}
+          </button>
+        </div>`;
+        })
+        .join("");
+
+      const iconPick = HABIT_ICONS.map(
+        (ic) =>
+          `<button type="button" class="chip ${newHabitIcon === ic ? "selected" : ""}" data-pick-icon="${ic}" style="font-size:1.1rem">${ic}</button>`
+      ).join("");
+
+      root.innerHTML = `
+      <div class="page-enter">
+        ${topTabs}
+        <div class="page-header">
+          <div class="ph-eyebrow">// ${t("habits.eyebrow")}</div>
+          <div class="ph-title">${t("habits.title")}</div>
+          <div class="ph-desc">${t("habits.desc")}</div>
+        </div>
+        <div class="glass" style="padding:14px;margin-bottom:12px">
+          <label class="label">${t("habits.new_name")}</label>
+          <input type="text" class="field" id="habit-name-inp" placeholder="${t("habits.new_ph")}" />
+          <div class="step-sub" style="margin:10px 0 6px">${t("habits.pick_icon")}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">${iconPick}</div>
+          <button type="button" class="btn btn-primary" style="margin-top:12px" id="habit-add-btn">${t("habits.add")}</button>
+        </div>
+        ${habits.length ? habitCards : `<div class="empty-hint">${t("habits.empty")}</div>`}
+      </div>`;
+      const inp = root.querySelector("#habit-name-inp");
+      if (inp) inp.value = newHabitName;
+      inp?.addEventListener("input", (e) => {
+        newHabitName = e.target.value;
+      });
+      root.querySelectorAll("[data-pick-icon]").forEach((b) => {
+        b.addEventListener("click", () => {
+          newHabitIcon = b.dataset.pickIcon || HABIT_ICONS[0];
+          mountTools(root, profile, plan);
+        });
+      });
+      root.querySelector("#habit-add-btn")?.addEventListener("click", () => {
+        newHabitName = root.querySelector("#habit-name-inp")?.value || "";
+        addHabit();
+        mountTools(root, profile, plan);
+      });
+      root.querySelectorAll("[data-toggle-habit]").forEach((b) => {
+        b.addEventListener("click", () => {
+          toggleHabitDay(b.dataset.toggleHabit);
+          mountTools(root, profile, plan);
+        });
+      });
+      root.querySelectorAll("[data-del-habit]").forEach((b) => {
+        b.addEventListener("click", () => {
+          deleteHabit(b.dataset.delHabit);
+          mountTools(root, profile, plan);
+        });
+      });
+      root.querySelectorAll("[data-tools-tab]").forEach((b) => {
+        b.addEventListener("click", () => {
+          toolsUiTab = b.dataset.toolsTab;
+          mountTools(root, profile, plan);
+        });
+      });
+      return;
+    }
+
     const results = filteredList();
     const catsRow = CAT_KEYS.map(
       (c) =>
@@ -26,6 +176,7 @@ export function mountTools(root, profile, plan) {
 
     root.innerHTML = `
       <div class="page-enter">
+        ${topTabs}
         <div class="page-header">
           <div class="ph-eyebrow">// ${t("tools.eyebrow")}</div>
           <div class="ph-title">${t("tools.title")}</div>
@@ -91,6 +242,13 @@ export function mountTools(root, profile, plan) {
           btn.disabled = true;
           setTimeout(() => renderInner(), 900);
         }
+      });
+    });
+
+    root.querySelectorAll("[data-tools-tab]").forEach((b) => {
+      b.addEventListener("click", () => {
+        toolsUiTab = b.dataset.toolsTab;
+        mountTools(root, profile, plan);
       });
     });
   }
