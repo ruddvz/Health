@@ -69,6 +69,56 @@
         </div>
 
         <div class="settings-block">
+          <span class="label" id="lbl-prefs">App preferences</span>
+          <p class="step-sub" id="settings-prefs-sub"></p>
+        </div>
+
+        <div class="settings-block">
+          <span class="label" id="lbl-theme">Theme</span>
+          <div class="train-day-grid" id="theme-grid">
+            <button type="button" class="train-day-btn glass" data-theme="dark">Dark</button>
+            <button type="button" class="train-day-btn glass" data-theme="light">Light</button>
+            <button type="button" class="train-day-btn glass" data-theme="auto">Auto</button>
+          </div>
+        </div>
+
+        <div class="settings-block">
+          <span class="label" id="lbl-units">Units</span>
+          <div class="train-day-grid" id="units-grid">
+            <button type="button" class="train-day-btn glass" data-units="metric">Metric</button>
+            <button type="button" class="train-day-btn glass" data-units="imperial">Imperial</button>
+          </div>
+        </div>
+
+        <div class="settings-block">
+          <span class="label" id="lbl-weekstart">Week starts</span>
+          <div class="train-day-grid" id="weekstart-grid">
+            <button type="button" class="train-day-btn glass" data-weekstart="monday">Mon</button>
+            <button type="button" class="train-day-btn glass" data-weekstart="sunday">Sun</button>
+          </div>
+        </div>
+
+        <div class="settings-block">
+          <label class="label" for="edit-water-goal" id="lbl-water-goal">Water goal (glasses)</label>
+          <input class="field settings-field" type="number" id="edit-water-goal" min="4" max="16" step="1" />
+        </div>
+
+        <div class="settings-block">
+          <label class="label" for="edit-cal-override" id="lbl-cal-override">Calorie goal override</label>
+          <input class="field settings-field" type="number" id="edit-cal-override" min="800" max="6000" step="50" placeholder="" />
+        </div>
+
+        <div class="settings-block">
+          <button type="button" class="btn btn-outline" id="settings-notify-btn"></button>
+          <p class="step-sub" id="settings-notify-hint"></p>
+        </div>
+
+        <div class="settings-block">
+          <span class="label" id="lbl-about">About</span>
+          <p class="step-sub" id="settings-about-body"></p>
+        </div>
+
+        <div class="settings-block">
           <span class="label" id="lbl-lang">Language</span>
           <div class="lang-grid settings-lang-grid">
             <button type="button" class="glass lang-card" data-set-lang="en"><h2>English</h2></button>

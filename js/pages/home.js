@@ -8,7 +8,9 @@ import {
   updateBuiltinHabitLabels,
   isBuiltinHabitDone,
   toggleBuiltinHabit,
+  syncWaterHabitFromGlasses,
 } from "../dashboardHabits.js";
+import { getHealthState } from "../healthStore.js";
 
 const WATER_KEY = "np_water_";
 const CHECKIN_KEY = "np_checkin_";
@@ -188,6 +190,8 @@ export function mountHome(root, profile, plan) {
     return { ...bm, name: sw || bm.name };
   });
 
+  const glassGoal = getHealthState().settings?.waterGoal ?? 8;
+
   ensureBuiltinHabitSlots({
     workout: "🏋️",
     prep: "🥡",
@@ -198,13 +202,16 @@ export function mountHome(root, profile, plan) {
     workout: isWorkout ? "Hit the gym" : "Active rest / walk",
     prep: "Meals prepped / packed",
     supps: "Supplements taken",
-    water: "3L water goal",
+    water: t("home.water_goal_lbl", { n: glassGoal }),
   });
 
-  const streak   = updateStreak();
-  let water      = getWater();
-  const checkin  = getCheckin();
-  const GLASSES  = 8;
+  const streak = updateStreak();
+  let water = getWater();
+  syncWaterHabitFromGlasses(water, glassGoal);
+  const checkin = getCheckin();
+  const GLASSES = glassGoal;
+
+  const calGoal = getHealthState().settings?.calorieGoal ?? plan.targetCalories ?? 0;
 
   const { weekNum } = phaseForWeek(plan);
   const totalWeeks  = profile.durationWeeks || 16;
@@ -234,7 +241,7 @@ export function mountHome(root, profile, plan) {
     { id: "workout",   label: isWorkout ? "Hit the gym" : "Active rest / walk", icon: "🏋️" },
     { id: "prep",      label: "Meals prepped / packed",                          icon: "🥡" },
     { id: "supps",     label: "Supplements taken",                               icon: "💊" },
-    { id: "water",     label: "3L water goal",                                   icon: "💧" },
+    { id: "water", label: t("home.water_goal_lbl", { n: GLASSES }), icon: "💧" },
   ];
 
   const habitHTML = habits.map((h) => {
@@ -323,17 +330,17 @@ export function mountHome(root, profile, plan) {
       <div class="progress-card">
         <div class="progress-card-head">
           <span class="progress-card-title">Plan Progress</span>
-          <span class="progress-card-label">Week ${weekNum} of ${totalWeeks} · ${food.kcal}/${plan.targetCalories ?? 0} ${t("home.kcal_today")}</span>
+          <span class="progress-card-label">Week ${weekNum} of ${totalWeeks} · ${food.kcal}/${calGoal || 0} ${t("home.kcal_today")}</span>
         </div>
         <div class="progress-week-bar">
           <div class="progress-week-fill" style="width:${weekPct}%"></div>
         </div>
         <div class="cal-donut-row">
-          ${renderCalorieDonut(food.kcal, plan.targetCalories)}
+          ${renderCalorieDonut(food.kcal, calGoal)}
           <div>
-            <div class="cal-donut-kcal">${Math.max(0, (plan.targetCalories || 0) - Math.round(food.kcal))}</div>
+            <div class="cal-donut-kcal">${Math.max(0, (calGoal || 0) - Math.round(food.kcal))}</div>
             <div class="cal-donut-lbl">${t("home.kcal_remaining")}</div>
-            <div class="cal-donut-sub">${Math.round(food.kcal)} / ${plan.targetCalories ?? 0} kcal</div>
+            <div class="cal-donut-sub">${Math.round(food.kcal)} / ${calGoal || 0} kcal</div>
           </div>
         </div>
         <div class="progress-ticks">
@@ -542,11 +549,19 @@ export function mountHome(root, profile, plan) {
       water = idx < water ? idx : idx + 1;
       water = Math.max(0, Math.min(GLASSES, water));
       setWater(water);
+      syncWaterHabitFromGlasses(water, GLASSES);
       root.querySelectorAll(".water-glass").forEach((g, i) => {
         g.classList.toggle("filled", i < water);
       });
       const cnt = document.getElementById("water-count");
       if (cnt) cnt.textContent = `${water}/${GLASSES}`;
+      const wHabit = root.querySelector('[data-habit="water"]');
+      if (wHabit) {
+        const on = isBuiltinHabitDone("water");
+        wHabit.classList.toggle("done", on);
+        const chk = wHabit.querySelector(".habit-check");
+        if (chk) chk.textContent = on ? "✓" : "";
+      }
     });
   });
 

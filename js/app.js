@@ -8,7 +8,8 @@ import {
   importLocalBackup,
   clearAllAppStorage,
 } from "./store.js";
-import { initHealthState } from "./healthStore.js";
+import { initHealthState, getHealthState, setHealthState } from "./healthStore.js";
+import { applyThemeFromHealthStore } from "./themeApply.js";
 import { generatePlan } from "./plangen.js";
 import { t } from "./i18n.js";
 import { mountHome } from "./pages/home.js";
@@ -19,9 +20,10 @@ import { mountProgress } from "./pages/progress.js";
 import { mountGrocery } from "./pages/grocery.js";
 import { mountSupps } from "./pages/supps.js";
 import { mountTools } from "./pages/tools.js";
-import { maybeAskNotifications } from "./notifications.js";
+import { maybeAskNotifications, requestPushPermission, scheduleLocalReminders } from "./notifications.js";
 
 initHealthState();
+applyThemeFromHealthStore();
 
 const ROUTE_IDS = ["home", "phases", "meals", "workout", "progress", "grocery", "supps", "tools"];
 
@@ -222,6 +224,27 @@ function populateSettingsFields() {
   if (wEl) wEl.value = profile.weight_kg ?? "";
   if (cEl) cEl.value = profile.city ?? "";
   syncTrainDayButtons(profile);
+  syncPreferenceChips();
+}
+
+function syncPreferenceChips() {
+  const st = getHealthState().settings || {};
+  const theme = st.theme || "auto";
+  document.querySelectorAll("#theme-grid [data-theme]").forEach((b) => {
+    b.classList.toggle("active", b.dataset.theme === theme);
+  });
+  const units = st.units || "metric";
+  document.querySelectorAll("#units-grid [data-units]").forEach((b) => {
+    b.classList.toggle("active", b.dataset.units === units);
+  });
+  const ws = st.weekStart || "monday";
+  document.querySelectorAll("#weekstart-grid [data-weekstart]").forEach((b) => {
+    b.classList.toggle("active", b.dataset.weekstart === ws);
+  });
+  const wg = document.getElementById("edit-water-goal");
+  if (wg) wg.value = String(st.waterGoal ?? 8);
+  const co = document.getElementById("edit-cal-override");
+  if (co) co.value = st.calorieGoal != null && st.calorieGoal !== "" ? String(st.calorieGoal) : "";
 }
 
 function translateSettingsChrome(panel) {
@@ -231,6 +254,36 @@ function translateSettingsChrome(panel) {
   const saveEl = document.getElementById("settings-save");
   if (titleEl) titleEl.textContent = t("settings.title");
   if (subEl) subEl.textContent = t("settings.subtitle");
+  document.getElementById("settings-prefs-sub") && (document.getElementById("settings-prefs-sub").textContent = t("settings.prefs_sub"));
+  document.getElementById("lbl-prefs") && (document.getElementById("lbl-prefs").textContent = t("settings.prefs_title"));
+  document.getElementById("lbl-theme") && (document.getElementById("lbl-theme").textContent = t("settings.theme_lbl"));
+  document.getElementById("lbl-units") && (document.getElementById("lbl-units").textContent = t("settings.units_lbl"));
+  document.getElementById("lbl-weekstart") && (document.getElementById("lbl-weekstart").textContent = t("settings.week_lbl"));
+  document.getElementById("lbl-water-goal") && (document.getElementById("lbl-water-goal").textContent = t("settings.water_goal_lbl"));
+  document.getElementById("lbl-cal-override") && (document.getElementById("lbl-cal-override").textContent = t("settings.cal_override_lbl"));
+  document.getElementById("edit-cal-override") && (document.getElementById("edit-cal-override").placeholder = t("settings.cal_override_ph"));
+  document.getElementById("lbl-about") && (document.getElementById("lbl-about").textContent = t("settings.about_lbl"));
+  const aboutBody = document.getElementById("settings-about-body");
+  if (aboutBody) aboutBody.textContent = t("settings.about_body");
+  const notifyBtn = document.getElementById("settings-notify-btn");
+  if (notifyBtn) notifyBtn.textContent = t("settings.notify_btn");
+  const notifyHint = document.getElementById("settings-notify-hint");
+  if (notifyHint) notifyHint.textContent = t("settings.notify_hint");
+
+  document.querySelectorAll("#theme-grid [data-theme]").forEach((b) => {
+    const k = b.dataset.theme;
+    if (k === "dark") b.textContent = t("settings.theme_dark");
+    if (k === "light") b.textContent = t("settings.theme_light");
+    if (k === "auto") b.textContent = t("settings.theme_auto");
+  });
+  document.querySelectorAll("#units-grid [data-units]").forEach((b) => {
+    if (b.dataset.units === "metric") b.textContent = t("settings.units_metric");
+    if (b.dataset.units === "imperial") b.textContent = t("settings.units_imperial");
+  });
+  document.querySelectorAll("#weekstart-grid [data-weekstart]").forEach((b) => {
+    if (b.dataset.weekstart === "monday") b.textContent = t("settings.week_mon");
+    if (b.dataset.weekstart === "sunday") b.textContent = t("settings.week_sun");
+  });
   if (closeEl) closeEl.textContent = t("settings.close");
   if (saveEl) saveEl.textContent = t("settings.save");
   document.getElementById("lbl-weight") && (document.getElementById("lbl-weight").textContent = t("settings.weight_lbl"));
@@ -357,11 +410,29 @@ function setupSettings() {
     });
   });
 
-  panel?.querySelectorAll(".train-day-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      panel.querySelectorAll(".train-day-btn").forEach((x) => x.classList.remove("active"));
-      btn.classList.add("active");
+  function wireExclusiveGroup(containerSel, itemSel) {
+    panel?.querySelectorAll(`${containerSel} ${itemSel}`).forEach((btn) => {
+      btn.addEventListener("click", () => {
+        panel.querySelectorAll(`${containerSel} ${itemSel}`).forEach((x) => x.classList.remove("active"));
+        btn.classList.add("active");
+      });
     });
+  }
+  wireExclusiveGroup("#edit-train-days", ".train-day-btn");
+  wireExclusiveGroup("#theme-grid", ".train-day-btn");
+  wireExclusiveGroup("#units-grid", ".train-day-btn");
+  wireExclusiveGroup("#weekstart-grid", ".train-day-btn");
+
+  document.getElementById("settings-notify-btn")?.addEventListener("click", async () => {
+    const ok = await requestPushPermission();
+    if (ok) {
+      const h = getHealthState();
+      h.settings = { ...h.settings, notificationsEnabled: true };
+      setHealthState(h);
+      scheduleLocalReminders();
+    }
+    const hint = document.getElementById("settings-notify-hint");
+    if (hint) hint.textContent = t("settings.notify_hint");
   });
 
   document.getElementById("settings-save")?.addEventListener("click", () => {
@@ -370,9 +441,28 @@ function setupSettings() {
     const next = { ...profile };
     const kg = parseFloat(document.getElementById("edit-weight")?.value || "");
     if (Number.isFinite(kg) && kg >= 30 && kg <= 300) next.weight_kg = kg;
-    const activeTrain = panel?.querySelector(".train-day-btn.active");
+    const activeTrain = panel?.querySelector("#edit-train-days .train-day-btn.active");
     if (activeTrain) next.trainingDays = +activeTrain.dataset.train;
     next.city = document.getElementById("edit-city")?.value?.trim() || "";
+
+    const h = getHealthState();
+    const th = panel?.querySelector("#theme-grid .train-day-btn.active");
+    if (th?.dataset.theme) h.settings.theme = th.dataset.theme;
+    const un = panel?.querySelector("#units-grid .train-day-btn.active");
+    if (un?.dataset.units) h.settings.units = un.dataset.units;
+    const ws = panel?.querySelector("#weekstart-grid .train-day-btn.active");
+    if (ws?.dataset.weekstart) h.settings.weekStart = ws.dataset.weekstart;
+    const wg = parseInt(document.getElementById("edit-water-goal")?.value || "", 10);
+    if (Number.isFinite(wg) && wg >= 4 && wg <= 16) h.settings.waterGoal = wg;
+    const calRaw = document.getElementById("edit-cal-override")?.value?.trim();
+    if (!calRaw) h.settings.calorieGoal = null;
+    else {
+      const c = parseInt(calRaw, 10);
+      if (Number.isFinite(c) && c >= 800 && c <= 6000) h.settings.calorieGoal = c;
+    }
+    setHealthState(h);
+    applyThemeFromHealthStore();
+
     setProfile(next);
     const prevPlan = getPlan();
     setPlan(generatePlan(next, { preserveMetaFrom: prevPlan }));

@@ -129,6 +129,55 @@
   }
 }
 
+/* Explicit theme on <html> (Plan0 §8.8) — wins over OS preference */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-base: #0a0f0d;
+  --bg-surface: #111a15;
+  --text-primary: #f2f7f4;
+  --bg: var(--bg-base);
+  --bg-gradient:
+    radial-gradient(ellipse 120% 70% at 50% -15%, rgba(61, 219, 122, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 50% at 100% 110%, rgba(42, 184, 98, 0.08) 0%, transparent 50%);
+  --surface:        rgba(17, 26, 21, 0.88);
+  --surface-low:    rgba(61, 219, 122, 0.04);
+  --surface-mid:    rgba(61, 219, 122, 0.07);
+  --surface-high:   rgba(61, 219, 122, 0.11);
+  --surface-raised: rgba(61, 219, 122, 0.15);
+  --nav: rgba(10, 15, 13, 0.96);
+  --border:     rgba(61, 219, 122, 0.1);
+  --border-mid: rgba(61, 219, 122, 0.18);
+  --text:       var(--text-primary);
+  --text-dim:   #8fa897;
+  --text-muted: rgba(143, 168, 151, 0.55);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.40);
+  --shadow-card:  0 4px 20px rgba(0, 0, 0, 0.30);
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg-base: #f4f7f5;
+  --bg-surface: #ffffff;
+  --text-primary: #0a0f0d;
+  --bg: var(--bg-base);
+  --bg-gradient:
+    radial-gradient(ellipse 120% 80% at 50% -10%, rgba(61, 219, 122, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 90% 50% at 0% 100%, rgba(0, 0, 0, 0.03) 0%, transparent 45%);
+  --surface:        rgba(255, 255, 255, 0.9);
+  --surface-low:    rgba(61, 219, 122, 0.05);
+  --surface-mid:    rgba(61, 219, 122, 0.08);
+  --surface-high:   rgba(61, 219, 122, 0.12);
+  --surface-raised: rgba(61, 219, 122, 0.16);
+  --nav:        rgba(255, 255, 255, 0.94);
+  --border:     rgba(10, 15, 13, 0.08);
+  --border-mid: rgba(10, 15, 13, 0.14);
+  --text:       var(--text-primary);
+  --text-dim:   rgba(10, 15, 13, 0.55);
+  --text-muted: rgba(10, 15, 13, 0.38);
+  --shadow-glass: 0 8px 28px rgba(0, 0, 0, 0.08);
+  --shadow-card:  0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
 /* ── Global reset ── */
 *,
 *::before,

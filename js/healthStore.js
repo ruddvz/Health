@@ -36,6 +36,10 @@ const defaultState = {
     waterGoal: 8,
     cupMl: 250,
     calorieGoal: null,
+    theme: "auto",
+    units: "metric",
+    weekStart: "monday",
+    notificationsEnabled: false,
   },
 };
 

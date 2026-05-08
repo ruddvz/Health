@@ -101,6 +101,7 @@ const STRINGS = {
       photo_sub: "Front · Side · Back. Same lighting as last time.",
       photo_dismiss: "Dismiss reminder",
       daily_quote: "Today",
+      water_goal_lbl: "{n} glasses / day",
     },
     progress: {
       eyebrow: "Your progress",
@@ -316,11 +317,30 @@ const STRINGS = {
     },
     notify: {
       water_title: "Water check-in",
-      water_body: "You're at {n}/8 glasses — close the gap before bed.",
+      water_body: "You're at {n}/{g} glasses — close the gap before bed.",
     },
     settings: {
       title: "Settings",
-      subtitle: "Language & plan",
+      subtitle: "Profile, preferences & data",
+      prefs_title: "App preferences",
+      prefs_sub: "Theme, units, week start, and daily targets apply across the app.",
+      theme_lbl: "Theme",
+      theme_dark: "Dark",
+      theme_light: "Light",
+      theme_auto: "Auto",
+      units_lbl: "Units",
+      units_metric: "Metric",
+      units_imperial: "Imperial",
+      week_lbl: "Week starts",
+      week_mon: "Monday",
+      week_sun: "Sunday",
+      water_goal_lbl: "Water goal (glasses)",
+      cal_override_lbl: "Calorie goal override",
+      cal_override_ph: "Leave empty to use plan target",
+      notify_btn: "Enable reminders",
+      notify_hint: "Uses this browser’s notification permission. Meal and water nudges schedule for today only.",
+      about_lbl: "About",
+      about_body: "Health v1 — offline-first. Data stays in this browser unless you export it.",
       close: "Close",
       save: "Save changes",
       weight_lbl: "Current weight (kg)",
@@ -544,7 +564,7 @@ const STRINGS = {
     },
     notify: {
       water_title: "Water reminder",
-      water_body: "Abhi {n}/8 glasses — thoda aur pi lo.",
+      water_body: "Abhi {n}/{g} glasses — thoda aur pi lo.",
     },
     settings: {
       title: "Settings",
@@ -772,7 +792,7 @@ const STRINGS = {
     },
     notify: {
       water_title: "Water reminder",
-      water_body: "Have {n}/8 glass — ochhu pi lo.",
+      water_body: "Have {n}/{g} glass — ochhu pi lo.",
     },
     settings: {
       title: "Settings",

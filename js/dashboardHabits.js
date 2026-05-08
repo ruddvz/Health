@@ -68,6 +68,32 @@ export function isBuiltinHabitDone(id) {
   return !!getCheckinLegacy()[id];
 }
 
+/** Keep dashboard “water” habit aligned with glass count vs daily goal. */
+export function syncWaterHabitFromGlasses(waterCount, glassGoal) {
+  const d = todayKey();
+  const goal = Math.max(1, Number(glassGoal) || 8);
+  const wantDone = waterCount >= goal;
+
+  const s = getHealthState();
+  const habits = [...(s.habits.habits || [])];
+  let h = habits.find((x) => x.id === "water");
+  if (!h) {
+    h = { id: "water", name: "Water", icon: "💧", completions: [] };
+    habits.push(h);
+  }
+  const set = new Set(h.completions || []);
+  if (wantDone) set.add(d);
+  else set.delete(d);
+  h.completions = [...set];
+  s.habits.habits = habits;
+  setHealthState(s);
+
+  const cur = getCheckinLegacy();
+  if (wantDone) cur.water = true;
+  else delete cur.water;
+  saveCheckinLegacy(cur);
+}
+
 export function toggleBuiltinHabit(id) {
   if (!BUILTIN_HABIT_IDS.includes(id)) return;
   const d = todayKey();
