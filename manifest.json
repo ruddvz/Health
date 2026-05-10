@@ -4,8 +4,8 @@
   "description": "Your personalised nutrition and fitness plan",
   "start_url": "/Health/",
   "display": "standalone",
-  "background_color": "#F2F2F7",
-  "theme_color": "#F2F2F7",
+  "background_color": "#0a0f0d",
+  "theme_color": "#0a0f0d",
   "orientation": "portrait",
   "icons": [
     {

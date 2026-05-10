@@ -1,4 +1,4 @@
-const CACHE = "health-v5";
+const CACHE = "health-v6";
 const BASE = "/Health";
 const ASSETS = [
   `${BASE}/`,
