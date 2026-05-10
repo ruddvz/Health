@@ -66,6 +66,27 @@
         color: var(--lbl1);
         background: var(--bg);
         min-height: 100dvh;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .copy-prompt-hint {
+        margin: 10px 0 0;
+        font-size: 14px;
+        color: var(--lbl2);
+        line-height: 1.45;
+        text-align: center;
       }
 
       button,
@@ -152,7 +173,8 @@
         flex: 1;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
-        padding: 12px 0 calc(var(--sticky-h) + env(safe-area-inset-bottom, 0px) + 24px);
+        padding: 12px 0 calc(var(--sticky-h) + env(safe-area-inset-bottom, 0px) + 28px);
+        scroll-padding-bottom: calc(var(--sticky-h) + env(safe-area-inset-bottom, 0px) + 16px);
       }
 
       #screen-prompt .prompt-scroll {
@@ -945,6 +967,7 @@
 
       .app-body-scroll.app-panels-stack {
         position: relative;
+        scroll-padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px) + 12px);
       }
 
       .app-panel {
@@ -2050,7 +2073,14 @@
         .tab-btn,
         .stepper button,
         .prep-step-card,
-        .grocery-row {
+        .grocery-row,
+        .btn-primary-full,
+        .btn-secondary-full,
+        .btn-dashed,
+        .sticky-bar button,
+        .icon-btn,
+        #btn-pwa-install,
+        #btn-pwa-install-dismiss {
           transition: none !important;
         }
 
@@ -2526,11 +2556,14 @@
       <div id="screen-prompt" class="screen" aria-hidden="true">
         <header class="prompt-header">
           <button type="button" class="icon-btn" id="btn-back-prompt" aria-label="Back to intake form">←</button>
-          <h1 class="prompt-title">Your Claude prompt</h1>
+          <h1 class="prompt-title" id="prompt-main-heading" tabindex="-1">Your Claude prompt</h1>
         </header>
         <div class="prompt-scroll">
           <textarea id="prompt-text" class="prompt-box" readonly spellcheck="false" aria-label="Generated Claude prompt"></textarea>
           <button type="button" class="btn-primary-full" id="btn-copy-prompt">Copy Prompt</button>
+          <p id="copy-prompt-hint" class="copy-prompt-hint" hidden>
+            Text selected — use your browser’s copy command if the clipboard did not update.
+          </p>
           <button type="button" class="btn-secondary-full" id="btn-open-claude">Open Claude</button>
           <p class="divider-label">When you have your JSON ready:</p>
           <button type="button" class="btn-dashed" id="btn-upload-plan">Upload My Plan</button>
@@ -2539,7 +2572,7 @@
             <span class="upload-spinner" aria-hidden="true"></span>
             Reading file…
           </p>
-          <div id="json-error-card" class="error-card" hidden role="alert">
+          <div id="json-error-card" class="error-card" hidden role="status" aria-live="polite" aria-atomic="true">
             <p class="error-card-title">This JSON doesn't look right.</p>
             <p class="error-card-body">
               Make sure you copied the entire response from Claude including the opening { and closing }. Try again.
@@ -2569,6 +2602,8 @@
             </button>
           </div>
           <div id="app-menu-dropdown" class="app-menu-dropdown" hidden role="menu">
+            <button type="button" class="app-menu-item" role="menuitem" id="menu-edit-intake">Edit intake form</button>
+            <button type="button" class="app-menu-item" role="menuitem" id="menu-export-plan">Export plan JSON</button>
             <button type="button" class="app-menu-item" role="menuitem" id="menu-reupload">Re-upload plan</button>
           </div>
         </header>
@@ -2950,6 +2985,33 @@ Important instructions:
         const LS_ACTIVE_TAB = "health_active_tab";
         const LS_PREP_DONE = "health_prep_done";
         const LS_GROCERY_CHECKED = "health_grocery_checked";
+        const PLAN_SCHEMA_VERSION = 1;
+        const LS_FLOW_ENGAGED = "health_flow_engaged";
+        const SS_SEEN_PROMPT = "health_seen_prompt";
+
+        let pwaInstallDeferred = null;
+
+        function userEligibleForInstallBanner() {
+          try {
+            if (localStorage.getItem(LS_FLOW_ENGAGED) === "1") return true;
+            if (localStorage.getItem("health_plan")) return true;
+          } catch (_) {}
+          try {
+            if (sessionStorage.getItem(SS_SEEN_PROMPT) === "1") return true;
+          } catch (_) {}
+          return false;
+        }
+
+        function maybeShowPwaInstallBanner() {
+          const banner = $("#pwa-install-banner");
+          if (!banner || banner.hidden === false) return;
+          if (!pwaInstallDeferred) return;
+          try {
+            if (localStorage.getItem("health_pwa_install_dismissed") === "1") return;
+          } catch (_) {}
+          if (!userEligibleForInstallBanner()) return;
+          banner.hidden = false;
+        }
 
         let mealsUiState = { day: "workout", phaseIndex: 0 };
         let mealsPlanRef = null;
@@ -3402,6 +3464,16 @@ Important instructions:
           if (missing.length > 0) {
             return { valid: false, error: `Missing sections: ${missing.join(", ")}` };
           }
+          const meta = json.meta;
+          if (meta && meta.plan_schema_version != null) {
+            const sv = Number(meta.plan_schema_version);
+            if (!Number.isNaN(sv) && sv > PLAN_SCHEMA_VERSION) {
+              return {
+                valid: false,
+                error: `This plan uses schema version ${sv}. This app supports up to ${PLAN_SCHEMA_VERSION}. Update the app or export a compatible plan.`,
+              };
+            }
+          }
           if (!Array.isArray(json.phases) || json.phases.length === 0) {
             return { valid: false, error: "Phases array is empty or missing" };
           }
@@ -3409,6 +3481,116 @@ Important instructions:
             return { valid: false, error: "Meal plan must have workout_day and rest_day" };
           }
           return { valid: true };
+        }
+
+        function normalizePlanForStorage(json) {
+          try {
+            const out = JSON.parse(JSON.stringify(json));
+            out.meta = { ...(out.meta || {}), plan_schema_version: PLAN_SCHEMA_VERSION };
+            return out;
+          } catch (_) {
+            return json;
+          }
+        }
+
+        function hydrateStateFromSavedForm() {
+          const fd = getSavedFormPayload();
+          if (!fd || typeof fd !== "object") return false;
+          const n = defaultState();
+          n.name = fd.name != null ? String(fd.name) : "";
+          n.age = fd.age != null ? String(fd.age) : "";
+          n.sex = fd.sex || "";
+          n.weight = fd.weight != null ? String(fd.weight) : "";
+          n.weightUnit = fd.weightUnit === "lbs" ? "lbs" : "kg";
+          n.heightUnit = fd.heightUnit === "ftin" ? "ftin" : "cm";
+          n.heightCm = fd.heightCm != null ? String(fd.heightCm) : "";
+          n.heightFt = fd.heightFt != null ? String(fd.heightFt) : "";
+          n.heightIn = fd.heightIn != null ? String(fd.heightIn) : "";
+          n.bodyFat = fd.bodyFat != null ? String(fd.bodyFat) : "";
+          n.goal = fd.goal || "";
+          n.timeline = fd.timelineWeeks != null ? String(fd.timelineWeeks) : "";
+          n.targetWeight = fd.targetWeight != null ? String(fd.targetWeight) : "";
+          n.urgency = fd.urgency || "";
+          if (typeof fd.trainingDays === "number" && fd.trainingDays >= 1 && fd.trainingDays <= 7) {
+            n.trainingDays = fd.trainingDays;
+          }
+          n.trainingLocation = fd.trainingLocation || "";
+          n.fitnessLevel = fd.fitnessLevel || "";
+          n.injuries = fd.injuries != null ? String(fd.injuries) : "";
+          n.dietaryPreference = fd.dietaryPreference || "";
+          n.foodDislikes = fd.foodDislikes != null ? String(fd.foodDislikes) : "";
+          n.mealsPerDay = fd.mealsPerDay != null ? String(fd.mealsPerDay) : "";
+          n.cookingTime = fd.cookingTime || "";
+          n.mealPrep = fd.mealPrep === true ? true : fd.mealPrep === false ? false : null;
+          n.equipment = Array.isArray(fd.equipment) ? [...fd.equipment] : [];
+          n.supplementsOwned = Array.isArray(fd.supplementsOwned) ? [...fd.supplementsOwned] : [];
+          n.supplementBudget = fd.supplementBudget || "";
+          n.otherSupplements = fd.otherSupplements != null ? String(fd.otherSupplements) : "";
+          n.country = fd.country || "";
+          n.city = fd.city != null ? String(fd.city) : "";
+          n.activityLevel = fd.activityLevel || "";
+          if (typeof fd.sleepHours === "number" && fd.sleepHours >= 4 && fd.sleepHours <= 10) {
+            n.sleepHours = fd.sleepHours;
+          }
+          n.stressLevel = fd.stressLevel || "";
+          n.challenges = Array.isArray(fd.challenges) ? [...fd.challenges] : [];
+          state = n;
+          saveState();
+          return true;
+        }
+
+        function exportPlanJsonFile() {
+          let raw = null;
+          try {
+            raw = localStorage.getItem("health_plan");
+          } catch (_) {}
+          if (!raw && window.healthPlan) {
+            try {
+              raw = JSON.stringify(normalizePlanForStorage(window.healthPlan));
+            } catch (_) {}
+          }
+          if (!raw) {
+            alert("No saved plan to export.");
+            return;
+          }
+          try {
+            const blob = new Blob([raw], { type: "application/json" });
+            const a = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            a.href = url;
+            a.download = "health-plan.json";
+            a.rel = "noopener";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          } catch (_) {
+            alert("Could not export the file.");
+          }
+        }
+
+        function focusStageTarget(stage) {
+          requestAnimationFrame(() => {
+            let el = null;
+            if (stage === "form") el = $("#inp-name");
+            else if (stage === "prompt") el = $("#btn-copy-prompt");
+            else if (stage === "app") el = $("#btn-app-menu");
+            if (el && typeof el.focus === "function") {
+              try {
+                el.focus({ preventScroll: true });
+              } catch (_) {
+                el.focus();
+              }
+            }
+          });
+        }
+
+        function registerServiceWorker() {
+          if (!("serviceWorker" in navigator)) return;
+          try {
+            const url = new URL("sw.js", window.location.href);
+            navigator.serviceWorker.register(url).catch(() => {});
+          } catch (_) {}
         }
 
         function stripJsonFence(text) {
@@ -4747,6 +4929,26 @@ Important instructions:
               menuBtn.setAttribute("aria-expanded", "false");
             });
             menuDd.addEventListener("click", (e) => e.stopPropagation());
+            const editIntake = $("#menu-edit-intake");
+            const exportPlan = $("#menu-export-plan");
+            if (editIntake) {
+              editIntake.addEventListener("click", () => {
+                menuDd.hidden = true;
+                menuBtn.setAttribute("aria-expanded", "false");
+                hydrateStateFromSavedForm();
+                syncDomFromState();
+                clearValidation();
+                updateProgress();
+                setStage("form");
+              });
+            }
+            if (exportPlan) {
+              exportPlan.addEventListener("click", () => {
+                menuDd.hidden = true;
+                menuBtn.setAttribute("aria-expanded", "false");
+                exportPlanJsonFile();
+              });
+            }
             if (reup) {
               reup.addEventListener("click", () => {
                 menuDd.hidden = true;
@@ -4766,12 +4968,24 @@ Important instructions:
           $("#screen-form").setAttribute("aria-hidden", stage === "form" ? "false" : "true");
           $("#screen-prompt").setAttribute("aria-hidden", stage === "prompt" ? "false" : "true");
           $("#screen-app").setAttribute("aria-hidden", stage === "app" ? "false" : "true");
+          if (stage === "prompt") {
+            try {
+              sessionStorage.setItem(SS_SEEN_PROMPT, "1");
+            } catch (_) {}
+          }
+          if (stage === "app") {
+            try {
+              localStorage.setItem(LS_FLOW_ENGAGED, "1");
+            } catch (_) {}
+          }
           if (persist !== false) {
             try {
               localStorage.setItem("health_active_screen", stage);
             } catch (_) {}
           }
           if (stage === "app") initAppView();
+          maybeShowPwaInstallBanner();
+          focusStageTarget(stage);
         }
 
         function restoreStage() {
@@ -4788,7 +5002,11 @@ Important instructions:
               const json = JSON.parse(rawPlan);
               const v = validatePlan(json);
               if (v.valid) {
-                window.healthPlan = json;
+                const normalized = normalizePlanForStorage(json);
+                window.healthPlan = normalized;
+                try {
+                  localStorage.setItem("health_plan", JSON.stringify(normalized));
+                } catch (_) {}
                 setStage("app", false);
                 return;
               }
@@ -4806,7 +5024,6 @@ Important instructions:
         }
 
         function wirePwaInstallPrompt() {
-          let deferredPrompt = null;
           const banner = $("#pwa-install-banner");
           const btnInstall = $("#btn-pwa-install");
           const btnDismiss = $("#btn-pwa-install-dismiss");
@@ -4814,15 +5031,12 @@ Important instructions:
 
           window.addEventListener("beforeinstallprompt", (e) => {
             e.preventDefault();
-            deferredPrompt = e;
-            try {
-              if (localStorage.getItem("health_pwa_install_dismissed") === "1") return;
-            } catch (_) {}
-            banner.hidden = false;
+            pwaInstallDeferred = e;
+            maybeShowPwaInstallBanner();
           });
 
           window.addEventListener("appinstalled", () => {
-            deferredPrompt = null;
+            pwaInstallDeferred = null;
             banner.hidden = true;
           });
 
@@ -4834,12 +5048,12 @@ Important instructions:
           });
 
           btnInstall.addEventListener("click", async () => {
-            if (!deferredPrompt) return;
+            if (!pwaInstallDeferred) return;
             try {
-              deferredPrompt.prompt();
-              await deferredPrompt.userChoice;
+              pwaInstallDeferred.prompt();
+              await pwaInstallDeferred.userChoice;
             } catch (_) {}
-            deferredPrompt = null;
+            pwaInstallDeferred = null;
             banner.hidden = true;
           });
         }
@@ -4850,17 +5064,27 @@ Important instructions:
           });
 
           $("#btn-copy-prompt").addEventListener("click", async () => {
+            const hint = $("#copy-prompt-hint");
             const ta = $("#prompt-text");
             const text = ta.value;
+            if (hint) hint.hidden = true;
+            let clipboardOk = false;
             try {
-              await navigator.clipboard.writeText(text);
-            } catch (_) {
+              if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+                await navigator.clipboard.writeText(text);
+                clipboardOk = true;
+              }
+            } catch (_) {}
+            if (!clipboardOk) {
               ta.focus();
               ta.select();
               try {
-                document.execCommand("copy");
-              } catch (__) {}
+                clipboardOk = document.execCommand("copy");
+              } catch (_) {
+                clipboardOk = false;
+              }
             }
+            if (hint) hint.hidden = clipboardOk;
             const btn = $("#btn-copy-prompt");
             const prev = btn.textContent;
             btn.textContent = "Copied!";
@@ -4904,10 +5128,11 @@ Important instructions:
                     $("#json-error-card").hidden = false;
                     return;
                   }
+                  const normalized = normalizePlanForStorage(json);
                   try {
-                    localStorage.setItem("health_plan", JSON.stringify(json));
+                    localStorage.setItem("health_plan", JSON.stringify(normalized));
                   } catch (_) {}
-                  window.healthPlan = json;
+                  window.healthPlan = normalized;
                   setStage("app");
                 } catch (err) {
                   $("#upload-loading").hidden = true;
@@ -5164,6 +5389,7 @@ Important instructions:
           wirePwaInstallPrompt();
         }
 
+        registerServiceWorker();
         loadState();
         wire();
         syncDomFromState();
