@@ -3,10 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0A0F0D" />
+    <meta name="theme-color" content="#F2F2F7" />
     <title>Offline — Health</title>
     <style>
-      * {
+      *,
+      *::before,
+      *::after {
         box-sizing: border-box;
       }
       body {
@@ -16,29 +18,39 @@
         align-items: center;
         justify-content: center;
         padding: 24px;
-        font-family: system-ui, -apple-system, sans-serif;
-        background: #0a0f0d;
-        color: #f2f7f4;
+        padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+        padding-top: calc(24px + env(safe-area-inset-top, 0px));
+        font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
+        background: #f2f2f7;
+        color: #000;
         text-align: center;
       }
+      .card {
+        max-width: 320px;
+        padding: 24px 20px;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+      }
       h1 {
-        font-size: 1.35rem;
+        font-size: 1.25rem;
         font-weight: 700;
         margin: 0 0 12px;
-        color: #3ddb7a;
+        letter-spacing: -0.02em;
+        color: #34c759;
       }
       p {
         margin: 0;
-        line-height: 1.55;
-        color: #8fa897;
-        max-width: 320px;
+        line-height: 1.5;
+        font-size: 15px;
+        color: rgba(60, 60, 67, 0.65);
       }
     </style>
   </head>
   <body>
-    <div>
+    <div class="card">
       <h1>You are offline</h1>
-      <p>Health keeps your data on this device. Connect to the internet once, open the app, then everything works without a connection.</p>
+      <p>Health keeps your data on this device. Connect once to load the app, then your plan and checklists stay available from cache.</p>
     </div>
   </body>
 </html>
