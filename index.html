@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#F2F2F7" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>Health — Personalised Plan</title>
     <meta name="description" content="Build your personalised health plan with Claude." />
     <link rel="manifest" href="manifest.json" />
@@ -280,6 +281,7 @@
 
       .btn-dashed:active {
         background: var(--card-pressed);
+        transform: scale(0.98);
       }
 
       .error-card {
@@ -312,10 +314,30 @@
       }
 
       .upload-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
         text-align: center;
         font-size: 15px;
         color: var(--lbl2);
         margin-top: 12px;
+      }
+
+      .upload-spinner {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid var(--sep2);
+        border-top-color: var(--blue);
+        animation: uploadSpin 0.65s linear infinite;
+        flex-shrink: 0;
+      }
+
+      @keyframes uploadSpin {
+        to {
+          transform: rotate(360deg);
+        }
       }
 
       .steps-list {
@@ -358,6 +380,90 @@
         top: 0;
         z-index: 5;
         background: linear-gradient(to bottom, var(--bg) 70%, transparent);
+      }
+
+      .pwa-install-banner {
+        margin: 0 20px 10px;
+        padding: 12px 14px;
+        border-radius: var(--r-card);
+        background: var(--card);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--sep2);
+      }
+
+      .pwa-install-banner[hidden] {
+        display: none !important;
+      }
+
+      .pwa-install-title {
+        margin: 0 0 4px;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .pwa-install-text {
+        margin: 0 0 12px;
+        font-size: 14px;
+        color: var(--lbl2);
+        line-height: 1.4;
+      }
+
+      .pwa-install-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .pwa-install-actions button {
+        font: inherit;
+        cursor: pointer;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 15px;
+        font-weight: 600;
+        border: none;
+      }
+
+      #btn-pwa-install {
+        background: var(--blue);
+        color: #fff;
+      }
+
+      #btn-pwa-install:active {
+        opacity: 0.85;
+        transform: scale(0.98);
+      }
+
+      #btn-pwa-install-dismiss {
+        background: var(--bg2);
+        color: var(--blue);
+      }
+
+      #btn-pwa-install-dismiss:active {
+        opacity: 0.85;
+        transform: scale(0.98);
+      }
+
+      .form-about-footer {
+        text-align: center;
+        padding: 16px 24px 32px;
+      }
+
+      .form-about-label {
+        margin: 0 0 4px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--lbl3);
+      }
+
+      .form-about-line {
+        margin: 0;
+        font-size: 13px;
+        color: var(--lbl2);
+        line-height: 1.4;
       }
 
       .dots {
@@ -465,6 +571,20 @@
         color: var(--lbl3);
       }
 
+      .input-plain:focus-visible,
+      textarea.input-plain:focus-visible,
+      select.input-plain:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.38);
+        border-radius: 6px;
+      }
+
+      .height-split input:focus-visible {
+        outline: none;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.28);
+      }
+
       textarea.input-plain {
         text-align: left;
         width: 100%;
@@ -498,11 +618,16 @@
         color: var(--lbl1);
         cursor: pointer;
         white-space: nowrap;
+        transition: transform 0.1s ease;
       }
 
       .seg button[aria-pressed="true"] {
         background: #fff;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      }
+
+      .seg button:active {
+        transform: scale(0.98);
       }
 
       .seg.compact button {
@@ -735,7 +860,8 @@
         font-size: 10px;
         font-weight: 500;
         letter-spacing: 0.2px;
-        cursor: default;
+        cursor: pointer;
+        transition: opacity 0.15s, transform 0.1s;
       }
 
       .tab-btn svg {
@@ -751,6 +877,7 @@
 
       .tab-btn:active {
         opacity: 0.85;
+        transform: scale(0.96);
       }
 
       /* Screen 3 — shell & Home */
@@ -816,17 +943,31 @@
         padding-right: 20px;
       }
 
-      .app-panel {
-        animation: appFade 0.22s ease;
+      .app-body-scroll.app-panels-stack {
+        position: relative;
       }
 
-      @keyframes appFade {
-        from {
-          opacity: 0.55;
-        }
-        to {
-          opacity: 1;
-        }
+      .app-panel {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        box-sizing: border-box;
+        transition: opacity 0.22s ease, visibility 0.22s ease;
+      }
+
+      .app-panel.is-active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        position: relative;
+        top: auto;
+        left: auto;
+        z-index: 1;
       }
 
       .home-hero {
@@ -985,6 +1126,7 @@
         text-align: left;
         cursor: pointer;
         color: var(--lbl1);
+        transition: transform 0.1s ease;
       }
 
       .quick-card:active {
@@ -1212,12 +1354,17 @@
         font-weight: 600;
         cursor: pointer;
         color: var(--lbl1);
+        transition: transform 0.1s ease;
       }
 
       .phase-pill.on {
         border-color: var(--blue);
         background: var(--blue-bg);
         color: var(--blue);
+      }
+
+      .phase-pill:active {
+        transform: scale(0.98);
       }
 
       .meals-plan-note {
@@ -1422,10 +1569,11 @@
         cursor: pointer;
         border: 2px solid transparent;
         text-align: left;
+        transition: transform 0.1s ease;
       }
 
       .prep-step-card:active {
-        transform: scale(0.99);
+        transform: scale(0.98);
       }
 
       .prep-step-card.done {
@@ -1527,10 +1675,11 @@
         cursor: pointer;
         border: 2px solid transparent;
         text-align: left;
+        transition: transform 0.1s ease;
       }
 
       .grocery-row:active {
-        transform: scale(0.99);
+        transform: scale(0.98);
       }
 
       .grocery-row.done {
@@ -1889,6 +2038,26 @@
         color: var(--lbl2);
         line-height: 1.45;
       }
+
+      @media (prefers-reduced-motion: reduce) {
+        .screen,
+        .app-panel,
+        .dot,
+        .pick-card,
+        .quick-card,
+        .chip,
+        .phase-pill,
+        .tab-btn,
+        .stepper button,
+        .prep-step-card,
+        .grocery-row {
+          transition: none !important;
+        }
+
+        .upload-spinner {
+          animation: none !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1903,6 +2072,15 @@
             <span class="dot" data-i="3"></span>
             <span class="dot" data-i="4"></span>
             <span class="dot" data-i="5"></span>
+          </div>
+        </div>
+
+        <div id="pwa-install-banner" class="pwa-install-banner" hidden>
+          <p class="pwa-install-title">Install app</p>
+          <p class="pwa-install-text">Add Health to your home screen for quick access and offline use after the first visit.</p>
+          <div class="pwa-install-actions">
+            <button type="button" id="btn-pwa-install">Install</button>
+            <button type="button" id="btn-pwa-install-dismiss">Not now</button>
           </div>
         </div>
 
@@ -2333,7 +2511,10 @@
             </div>
           </section>
 
-          <p style="text-align: center; font-size: 13px; color: var(--lbl2); padding: 16px 24px 32px">Your data never leaves your device.</p>
+          <footer class="form-about-footer">
+            <p class="form-about-label">About this app</p>
+            <p class="form-about-line">Your data never leaves your device.</p>
+          </footer>
         </main>
 
         <div class="sticky-bar">
@@ -2354,7 +2535,10 @@
           <p class="divider-label">When you have your JSON ready:</p>
           <button type="button" class="btn-dashed" id="btn-upload-plan">Upload My Plan</button>
           <input type="file" id="input-plan-json" accept=".json,application/json" hidden />
-          <p id="upload-loading" class="upload-loading" hidden>Reading file…</p>
+          <p id="upload-loading" class="upload-loading" hidden>
+            <span class="upload-spinner" aria-hidden="true"></span>
+            Reading file…
+          </p>
           <div id="json-error-card" class="error-card" hidden role="alert">
             <p class="error-card-title">This JSON doesn't look right.</p>
             <p class="error-card-body">
@@ -2389,8 +2573,8 @@
           </div>
         </header>
 
-        <div class="screen-scroll app-body-scroll">
-          <div id="panel-home" class="app-panel">
+        <div class="screen-scroll app-body-scroll app-panels-stack">
+          <div id="panel-home" class="app-panel is-active" aria-hidden="false">
             <div class="home-hero">
               <h2 class="home-greeting" id="home-greeting">Good morning</h2>
               <p class="home-sub" id="home-subline"></p>
@@ -2440,10 +2624,10 @@
             <div class="water-banner" id="home-water">3L of water today</div>
           </div>
 
-          <div id="panel-phases" class="app-panel" hidden>
+          <div id="panel-phases" class="app-panel" aria-hidden="true" inert="">
             <div id="phases-mount"></div>
           </div>
-          <div id="panel-meals" class="app-panel" hidden>
+          <div id="panel-meals" class="app-panel" aria-hidden="true" inert="">
             <div class="meals-tab-inner">
               <p class="tab-section-label">Day type</p>
               <div class="seg compact meals-day-toggle" role="group" aria-label="Workout or rest day meals">
@@ -2457,11 +2641,11 @@
               <div id="meals-summary-mount"></div>
             </div>
           </div>
-          <div id="panel-prep" class="app-panel" hidden>
+          <div id="panel-prep" class="app-panel" aria-hidden="true" inert="">
             <div id="prep-mount"></div>
             <button type="button" class="btn-secondary-full prep-clear-all" id="btn-prep-clear">Clear all</button>
           </div>
-          <div id="panel-grocery" class="app-panel" hidden>
+          <div id="panel-grocery" class="app-panel" aria-hidden="true" inert="">
             <div class="grocery-tab-inner">
               <p class="tab-section-label">View</p>
               <div class="seg compact grocery-view-toggle" role="group" aria-label="Grocery list or budget swaps">
@@ -2480,7 +2664,7 @@
               <button type="button" class="btn-secondary-full grocery-clear-all" id="btn-grocery-clear">Clear all checks</button>
             </div>
           </div>
-          <div id="panel-supps" class="app-panel" hidden>
+          <div id="panel-supps" class="app-panel" aria-hidden="true" inert="">
             <div id="supps-mount"></div>
           </div>
         </div>
@@ -3448,7 +3632,8 @@ Important instructions:
 
           const tips = plan.tips || [];
           const ti = dailyTipIndex(plan);
-          $("#home-tip").textContent = tips.length ? tips[ti] : "Stay consistent — small steps add up.";
+          const tipText = tips.length && tips[ti] != null && String(tips[ti]).trim() !== "" ? tips[ti] : null;
+          $("#home-tip").textContent = tipText || "Stay consistent — small steps add up.";
 
           const wl = plan.water_target_litres;
           $("#home-water").textContent =
@@ -3846,7 +4031,7 @@ Important instructions:
 
         function maybeTryVibrate() {
           try {
-            if (navigator.vibrate) navigator.vibrate(10);
+            if (navigator.vibrate) navigator.vibrate([10]);
           } catch (_) {}
         }
 
@@ -4502,7 +4687,12 @@ Important instructions:
             const panel = $("#panel-" + id);
             const btn = $(`#screen-app .tab-bar button[data-tab="${id}"]`);
             const on = id === tabId;
-            if (panel) panel.hidden = !on;
+            if (panel) {
+              panel.classList.toggle("is-active", on);
+              panel.setAttribute("aria-hidden", on ? "false" : "true");
+              if (on) panel.removeAttribute("inert");
+              else panel.setAttribute("inert", "");
+            }
             if (btn) {
               btn.classList.toggle("on", on);
               btn.setAttribute("aria-current", on ? "page" : "false");
@@ -4615,6 +4805,45 @@ Important instructions:
           setStage("form", false);
         }
 
+        function wirePwaInstallPrompt() {
+          let deferredPrompt = null;
+          const banner = $("#pwa-install-banner");
+          const btnInstall = $("#btn-pwa-install");
+          const btnDismiss = $("#btn-pwa-install-dismiss");
+          if (!banner || !btnInstall || !btnDismiss) return;
+
+          window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            try {
+              if (localStorage.getItem("health_pwa_install_dismissed") === "1") return;
+            } catch (_) {}
+            banner.hidden = false;
+          });
+
+          window.addEventListener("appinstalled", () => {
+            deferredPrompt = null;
+            banner.hidden = true;
+          });
+
+          btnDismiss.addEventListener("click", () => {
+            banner.hidden = true;
+            try {
+              localStorage.setItem("health_pwa_install_dismissed", "1");
+            } catch (_) {}
+          });
+
+          btnInstall.addEventListener("click", async () => {
+            if (!deferredPrompt) return;
+            try {
+              deferredPrompt.prompt();
+              await deferredPrompt.userChoice;
+            } catch (_) {}
+            deferredPrompt = null;
+            banner.hidden = true;
+          });
+        }
+
         function wirePromptFlow() {
           $("#btn-back-prompt").addEventListener("click", () => {
             setStage("form");
@@ -4663,33 +4892,37 @@ Important instructions:
             $("#upload-loading").hidden = false;
             $("#json-error-card").hidden = true;
             $("#json-error-detail").textContent = "";
-            const reader = new FileReader();
-            reader.onload = () => {
-              $("#upload-loading").hidden = true;
-              try {
-                const json = parsePlanText(String(reader.result || ""));
-                const v = validatePlan(json);
-                if (!v.valid) {
-                  $("#json-error-detail").textContent = v.error || "";
-                  $("#json-error-card").hidden = false;
-                  return;
-                }
+            const runRead = () => {
+              const reader = new FileReader();
+              reader.onload = () => {
+                $("#upload-loading").hidden = true;
                 try {
-                  localStorage.setItem("health_plan", JSON.stringify(json));
-                } catch (_) {}
-                window.healthPlan = json;
-                setStage("app");
-              } catch (err) {
-                $("#json-error-detail").textContent = err && err.message ? err.message : "Could not parse JSON.";
+                  const json = parsePlanText(String(reader.result || ""));
+                  const v = validatePlan(json);
+                  if (!v.valid) {
+                    $("#json-error-detail").textContent = v.error || "";
+                    $("#json-error-card").hidden = false;
+                    return;
+                  }
+                  try {
+                    localStorage.setItem("health_plan", JSON.stringify(json));
+                  } catch (_) {}
+                  window.healthPlan = json;
+                  setStage("app");
+                } catch (err) {
+                  $("#upload-loading").hidden = true;
+                  $("#json-error-detail").textContent = err && err.message ? err.message : "Could not parse JSON.";
+                  $("#json-error-card").hidden = false;
+                }
+              };
+              reader.onerror = () => {
+                $("#upload-loading").hidden = true;
+                $("#json-error-detail").textContent = "Could not read the file.";
                 $("#json-error-card").hidden = false;
-              }
+              };
+              reader.readAsText(file);
             };
-            reader.onerror = () => {
-              $("#upload-loading").hidden = true;
-              $("#json-error-detail").textContent = "Could not read the file.";
-              $("#json-error-card").hidden = false;
-            };
-            reader.readAsText(file);
+            requestAnimationFrame(() => requestAnimationFrame(runRead));
           });
         }
 
@@ -4928,6 +5161,7 @@ Important instructions:
 
           wirePromptFlow();
           wireAppChrome();
+          wirePwaInstallPrompt();
         }
 
         loadState();
