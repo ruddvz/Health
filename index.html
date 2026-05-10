@@ -1380,6 +1380,265 @@
         color: var(--lbl2);
         line-height: 1.45;
       }
+
+      /* Prep tab */
+      .prep-clear-all {
+        margin-top: 16px;
+      }
+
+      .prep-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .prep-main-title {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .prep-time-badge {
+        flex-shrink: 0;
+        padding: 6px 12px;
+        border-radius: var(--r-chip);
+        font-size: 13px;
+        font-weight: 600;
+        background: var(--teal-bg);
+        color: #0878a3;
+      }
+
+      .prep-step-card {
+        display: flex;
+        gap: 14px;
+        padding: 16px 14px;
+        margin-bottom: 12px;
+        border-radius: var(--r-card);
+        background: var(--card);
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        border: 2px solid transparent;
+        text-align: left;
+      }
+
+      .prep-step-card:active {
+        transform: scale(0.99);
+      }
+
+      .prep-step-card.done {
+        opacity: 0.52;
+      }
+
+      .prep-step-card.done .prep-step-detail,
+      .prep-step-card.done .prep-step-name,
+      .prep-step-card.done .prep-step-meta {
+        text-decoration: line-through;
+      }
+
+      .prep-num {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--green);
+        color: #fff;
+        font-size: 17px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .prep-step-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prep-step-name {
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .prep-step-detail {
+        margin: 0 0 10px;
+        font-size: 15px;
+        color: var(--lbl2);
+        line-height: 1.45;
+      }
+
+      .prep-step-meta {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--teal);
+      }
+
+      .prep-subsection-title {
+        margin: 24px 0 12px;
+        font-size: 17px;
+        font-weight: 700;
+      }
+
+      .prep-tips-card {
+        margin-top: 20px;
+        padding: 16px;
+        border-radius: var(--r-card);
+        background: var(--card);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .prep-tips-card h3 {
+        margin: 0 0 12px;
+        font-size: 15px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--lbl2);
+      }
+
+      .prep-tip-line {
+        margin: 0 0 10px;
+        font-size: 15px;
+        color: var(--lbl2);
+        line-height: 1.45;
+      }
+
+      .prep-tip-line:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Grocery tab */
+      .grocery-clear-all {
+        margin-top: 16px;
+      }
+
+      .grocery-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 14px 12px;
+        margin-bottom: 8px;
+        border-radius: var(--r-inner);
+        background: var(--card);
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        border: 2px solid transparent;
+        text-align: left;
+      }
+
+      .grocery-row:active {
+        transform: scale(0.99);
+      }
+
+      .grocery-row.done {
+        opacity: 0.48;
+      }
+
+      .grocery-row.done .grocery-item-name,
+      .grocery-row.done .grocery-item-qty,
+      .grocery-row.done .grocery-item-notes {
+        text-decoration: line-through;
+      }
+
+      .grocery-cb {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        border: 2px solid var(--sep);
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 800;
+        color: transparent;
+      }
+
+      .grocery-row.done .grocery-cb {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .grocery-item-text {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .grocery-item-name {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .grocery-item-qty {
+        font-size: 14px;
+        color: var(--lbl2);
+        margin-top: 4px;
+      }
+
+      .grocery-item-notes {
+        font-size: 13px;
+        color: var(--lbl3);
+        margin-top: 4px;
+      }
+
+      .swap-card {
+        padding: 14px;
+        margin-bottom: 10px;
+        border-radius: var(--r-inner);
+        background: var(--card);
+        border: 1px solid var(--sep2);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .swap-original {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .swap-arrow {
+        font-size: 13px;
+        color: var(--lbl2);
+        margin: 4px 0;
+      }
+
+      .swap-target {
+        font-size: 15px;
+        color: var(--green);
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .swap-meta {
+        font-size: 13px;
+        color: var(--lbl2);
+        line-height: 1.4;
+      }
+
+      .grocery-store-tip {
+        margin-top: 20px;
+        padding: 16px;
+        border-radius: var(--r-card);
+        background: var(--blue-bg);
+        border: 1px solid rgba(0, 122, 255, 0.22);
+        font-size: 15px;
+        line-height: 1.45;
+        color: var(--lbl1);
+      }
+
+      .grocery-store-tip strong {
+        display: block;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--blue);
+        margin-bottom: 8px;
+      }
     </style>
   </head>
   <body>
@@ -1949,15 +2208,26 @@
             </div>
           </div>
           <div id="panel-prep" class="app-panel" hidden>
-            <div class="tab-placeholder-inner">
-              <p class="tab-placeholder-title">Prep</p>
-              <p class="tab-placeholder-text">Batch prep steps will appear here in the next update.</p>
-            </div>
+            <div id="prep-mount"></div>
+            <button type="button" class="btn-secondary-full prep-clear-all" id="btn-prep-clear">Clear all</button>
           </div>
           <div id="panel-grocery" class="app-panel" hidden>
-            <div class="tab-placeholder-inner">
-              <p class="tab-placeholder-title">Grocery</p>
-              <p class="tab-placeholder-text">Your grocery list will appear here in the next update.</p>
+            <div class="grocery-tab-inner">
+              <p class="tab-section-label">View</p>
+              <div class="seg compact grocery-view-toggle" role="group" aria-label="Grocery list or budget swaps">
+                <button type="button" data-grocery-view="standard" aria-pressed="true">Standard list</button>
+                <button type="button" data-grocery-view="budget" aria-pressed="false">Budget swaps</button>
+              </div>
+              <div id="grocery-standard-block">
+                <p class="tab-section-label">Category</p>
+                <div class="phase-pill-strip" id="grocery-cat-pills" role="tablist" aria-label="Grocery category"></div>
+                <div id="grocery-list-mount"></div>
+              </div>
+              <div id="grocery-budget-block" hidden>
+                <div id="grocery-swaps-mount"></div>
+              </div>
+              <div id="grocery-tip-mount"></div>
+              <button type="button" class="btn-secondary-full grocery-clear-all" id="btn-grocery-clear">Clear all checks</button>
             </div>
           </div>
           <div id="panel-supps" class="app-panel" hidden>
@@ -2247,9 +2517,14 @@ Important instructions:
 
         const TAB_IDS = ["home", "phases", "meals", "prep", "grocery", "supps"];
         const LS_ACTIVE_TAB = "health_active_tab";
+        const LS_PREP_DONE = "health_prep_done";
+        const LS_GROCERY_CHECKED = "health_grocery_checked";
 
         let mealsUiState = { day: "workout", phaseIndex: 0 };
         let mealsPlanRef = null;
+
+        let groceryUiState = { view: "standard", cat: "protein" };
+        let groceryPlanRef = null;
 
         const EQUIPMENT = ["Instant Pot", "Air Fryer", "Stovetop", "Oven", "Microwave", "BBQ"];
         const SUPP_ITEMS = [
@@ -3322,6 +3597,404 @@ Important instructions:
           sumMount.appendChild(summary);
         }
 
+        function maybeTryVibrate() {
+          try {
+            if (navigator.vibrate) navigator.vibrate(10);
+          } catch (_) {}
+        }
+
+        function planSig(plan) {
+          if (!plan) return "unknown";
+          const m = plan.meta || {};
+          const u = plan.user || {};
+          const d = String(m.generated_date || "")
+            .replace(/\|/g, "")
+            .slice(0, 24);
+          const n = String(m.generated_for || u.name || "user")
+            .replace(/\|/g, "")
+            .replace(/\s+/g, "_")
+            .slice(0, 40);
+          return `${d}_${n}`;
+        }
+
+        function loadDoneSet(lsKey) {
+          try {
+            const raw = localStorage.getItem(lsKey);
+            const arr = raw ? JSON.parse(raw) : [];
+            return new Set(Array.isArray(arr) ? arr : []);
+          } catch (_) {
+            return new Set();
+          }
+        }
+
+        function saveDoneSet(lsKey, set) {
+          try {
+            localStorage.setItem(lsKey, JSON.stringify([...set]));
+          } catch (_) {}
+        }
+
+        function removeKeysWithPrefix(set, prefix) {
+          return new Set([...set].filter((k) => !String(k).startsWith(prefix)));
+        }
+
+        function clearAllPrepForPlan(plan) {
+          const prefix = `prep|${planSig(plan)}|`;
+          saveDoneSet(LS_PREP_DONE, removeKeysWithPrefix(loadDoneSet(LS_PREP_DONE), prefix));
+        }
+
+        function clearAllGroceryForPlan(plan) {
+          const prefix = `groc|${planSig(plan)}|`;
+          saveDoneSet(LS_GROCERY_CHECKED, removeKeysWithPrefix(loadDoneSet(LS_GROCERY_CHECKED), prefix));
+        }
+
+        function prepStepCardEl(st, storageKey, isDone, displayNum) {
+          const card = document.createElement("article");
+          card.className = "prep-step-card" + (isDone ? " done" : "");
+          card.dataset.prepToggle = storageKey;
+          card.setAttribute("role", "button");
+          card.setAttribute("aria-pressed", isDone ? "true" : "false");
+          card.tabIndex = 0;
+          const num = document.createElement("div");
+          num.className = "prep-num";
+          num.textContent = String(displayNum);
+          const body = document.createElement("div");
+          body.className = "prep-step-body";
+          const title = document.createElement("div");
+          title.className = "prep-step-name";
+          title.textContent = st.name || "Step";
+          body.appendChild(title);
+          if (st.detail) {
+            const det = document.createElement("p");
+            det.className = "prep-step-detail";
+            det.textContent = st.detail;
+            body.appendChild(det);
+          }
+          const meta = document.createElement("div");
+          meta.className = "prep-step-meta";
+          const parts = [];
+          if (st.time_minutes != null) parts.push(`${st.time_minutes} min`);
+          if (st.equipment) parts.push(String(st.equipment));
+          meta.textContent = parts.join(" · ");
+          body.appendChild(meta);
+          card.appendChild(num);
+          card.appendChild(body);
+          return card;
+        }
+
+        function emptyTabMsg(text) {
+          const p = document.createElement("p");
+          p.className = "empty-tab-msg";
+          p.textContent = text;
+          return p;
+        }
+
+        function renderPrepTab() {
+          const mount = $("#prep-mount");
+          const plan = window.healthPlan;
+          if (!mount) return;
+          mount.textContent = "";
+          if (!plan) {
+            mount.appendChild(emptyTabMsg("No plan loaded."));
+            return;
+          }
+          const pg = plan.prep_guide;
+          if (!pg) {
+            mount.appendChild(emptyTabMsg("No meal prep guide in this plan."));
+            return;
+          }
+          const sig = planSig(plan);
+          const done = loadDoneSet(LS_PREP_DONE);
+
+          const header = document.createElement("div");
+          header.className = "prep-header-row";
+          const h = document.createElement("h2");
+          h.className = "prep-main-title";
+          h.textContent = "Sunday batch cook";
+          header.appendChild(h);
+          if (pg.total_minutes != null) {
+            const badge = document.createElement("span");
+            badge.className = "prep-time-badge";
+            const tm = fmtRoundNum(pg.total_minutes);
+            badge.textContent = `~${tm != null ? tm : pg.total_minutes} min total`;
+            header.appendChild(badge);
+          }
+          mount.appendChild(header);
+
+          const sun = pg.sunday_steps || [];
+          if (!sun.length) {
+            mount.appendChild(emptyTabMsg("No Sunday prep steps in this plan."));
+          } else {
+            sun.forEach((st, i) => {
+              const stepNum = st.step != null ? st.step : i + 1;
+              const key = `prep|${sig}|sun|${stepNum}`;
+              mount.appendChild(prepStepCardEl(st, key, done.has(key), stepNum));
+            });
+          }
+
+          const wed = pg.wednesday_topup || [];
+          if (wed.length) {
+            const wh = document.createElement("h3");
+            wh.className = "prep-subsection-title";
+            wh.textContent = "Wednesday top-up";
+            mount.appendChild(wh);
+            wed.forEach((st, i) => {
+              const stepNum = st.step != null ? st.step : i + 1;
+              const key = `prep|${sig}|wed|${stepNum}`;
+              mount.appendChild(prepStepCardEl(st, key, done.has(key), stepNum));
+            });
+          }
+
+          const tips = pg.tips || [];
+          if (tips.length) {
+            const box = document.createElement("div");
+            box.className = "prep-tips-card";
+            const th = document.createElement("h3");
+            th.textContent = "Prep tips";
+            box.appendChild(th);
+            tips.forEach((t) => {
+              const p = document.createElement("p");
+              p.className = "prep-tip-line";
+              p.textContent = t;
+              box.appendChild(p);
+            });
+            mount.appendChild(box);
+          }
+        }
+
+        function renderGroceryTab() {
+          const plan = window.healthPlan;
+          const listMount = $("#grocery-list-mount");
+          const swapsMount = $("#grocery-swaps-mount");
+          const tipMount = $("#grocery-tip-mount");
+          const stdBlock = $("#grocery-standard-block");
+          const budgetBlock = $("#grocery-budget-block");
+          const pills = $("#grocery-cat-pills");
+          if (!listMount || !swapsMount || !tipMount || !pills) return;
+
+          if (groceryPlanRef !== plan) {
+            groceryPlanRef = plan;
+            groceryUiState = { view: "standard", cat: "protein" };
+          }
+
+          $$("#panel-grocery [data-grocery-view]").forEach((btn) => {
+            const on = btn.dataset.groceryView === groceryUiState.view;
+            btn.setAttribute("aria-pressed", on ? "true" : "false");
+          });
+
+          const showBudget = groceryUiState.view === "budget";
+          if (stdBlock) stdBlock.hidden = showBudget;
+          if (budgetBlock) budgetBlock.hidden = !showBudget;
+
+          if (!plan) {
+            pills.textContent = "";
+            listMount.textContent = "";
+            swapsMount.textContent = "";
+            tipMount.textContent = "";
+            listMount.appendChild(emptyTabMsg("No plan loaded."));
+            return;
+          }
+
+          const g = plan.grocery;
+          if (!g) {
+            pills.textContent = "";
+            listMount.textContent = "";
+            swapsMount.textContent = "";
+            tipMount.textContent = "";
+            listMount.appendChild(emptyTabMsg("No grocery list in this plan."));
+            return;
+          }
+
+          const sig = planSig(plan);
+          const done = loadDoneSet(LS_GROCERY_CHECKED);
+
+          if (showBudget) {
+            pills.textContent = "";
+            listMount.textContent = "";
+            swapsMount.textContent = "";
+            const swaps = g.budget_swaps || [];
+            if (!swaps.length) {
+              swapsMount.appendChild(emptyTabMsg("No budget swaps in this plan."));
+            } else {
+              swaps.forEach((sw) => {
+                const card = document.createElement("div");
+                card.className = "swap-card";
+                const o = document.createElement("div");
+                o.className = "swap-original";
+                o.textContent = sw.original || "";
+                const arr = document.createElement("div");
+                arr.className = "swap-arrow";
+                arr.textContent = "↓ Swap for";
+                const t = document.createElement("div");
+                t.className = "swap-target";
+                t.textContent = sw.swap || "";
+                card.appendChild(o);
+                card.appendChild(arr);
+                card.appendChild(t);
+                if (sw.saving || sw.trade_off) {
+                  const meta = document.createElement("div");
+                  meta.className = "swap-meta";
+                  meta.textContent = [sw.saving, sw.trade_off].filter(Boolean).join(" · ");
+                  card.appendChild(meta);
+                }
+                swapsMount.appendChild(card);
+              });
+            }
+          } else {
+            swapsMount.textContent = "";
+            const cats = ["protein", "carbs", "veg", "fat", "pantry"];
+            if (!cats.includes(groceryUiState.cat)) groceryUiState.cat = "protein";
+            pills.textContent = "";
+            cats.forEach((cat) => {
+              const b = document.createElement("button");
+              b.type = "button";
+              b.className = "phase-pill" + (groceryUiState.cat === cat ? " on" : "");
+              b.dataset.groceryCat = cat;
+              b.setAttribute("role", "tab");
+              b.setAttribute("aria-selected", groceryUiState.cat === cat ? "true" : "false");
+              b.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+              pills.appendChild(b);
+            });
+            listMount.textContent = "";
+            const items = g[groceryUiState.cat] || [];
+            if (!items.length) {
+              listMount.appendChild(emptyTabMsg("No items in this category."));
+            } else {
+              items.forEach((it, idx) => {
+                const key = `groc|${sig}|${groceryUiState.cat}|${idx}`;
+                const isDone = done.has(key);
+                const row = document.createElement("div");
+                row.className = "grocery-row" + (isDone ? " done" : "");
+                row.dataset.groceryToggle = key;
+                row.setAttribute("role", "checkbox");
+                row.setAttribute("aria-checked", isDone ? "true" : "false");
+                row.tabIndex = 0;
+                const cb = document.createElement("span");
+                cb.className = "grocery-cb";
+                cb.textContent = isDone ? "✓" : "";
+                cb.setAttribute("aria-hidden", "true");
+                const txt = document.createElement("div");
+                txt.className = "grocery-item-text";
+                const nm = document.createElement("div");
+                nm.className = "grocery-item-name";
+                nm.textContent = it.name || "Item";
+                txt.appendChild(nm);
+                if (it.qty) {
+                  const q = document.createElement("div");
+                  q.className = "grocery-item-qty";
+                  q.textContent = String(it.qty);
+                  txt.appendChild(q);
+                }
+                if (it.notes) {
+                  const n = document.createElement("div");
+                  n.className = "grocery-item-notes";
+                  n.textContent = String(it.notes);
+                  txt.appendChild(n);
+                }
+                row.appendChild(cb);
+                row.appendChild(txt);
+                listMount.appendChild(row);
+              });
+            }
+          }
+
+          tipMount.textContent = "";
+          if (g.store_tip) {
+            const tip = document.createElement("div");
+            tip.className = "grocery-store-tip";
+            const strong = document.createElement("strong");
+            strong.textContent = "Store tip";
+            tip.appendChild(strong);
+            tip.appendChild(document.createTextNode(g.store_tip));
+            tipMount.appendChild(tip);
+          }
+        }
+
+        function wirePrepInteractions() {
+          const panel = $("#panel-prep");
+          if (!panel || panel.dataset.wiredPrep === "1") return;
+          panel.dataset.wiredPrep = "1";
+          panel.addEventListener("click", (e) => {
+            const card = e.target.closest(".prep-step-card[data-prep-toggle]");
+            if (!card) return;
+            const key = card.dataset.prepToggle;
+            const set = loadDoneSet(LS_PREP_DONE);
+            if (set.has(key)) set.delete(key);
+            else set.add(key);
+            saveDoneSet(LS_PREP_DONE, set);
+            const on = set.has(key);
+            card.classList.toggle("done", on);
+            card.setAttribute("aria-pressed", on ? "true" : "false");
+            maybeTryVibrate();
+          });
+          panel.addEventListener("keydown", (e) => {
+            const card = e.target.closest(".prep-step-card[data-prep-toggle]");
+            if (!card) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              card.click();
+            }
+          });
+          const clr = $("#btn-prep-clear");
+          if (clr) {
+            clr.addEventListener("click", () => {
+              const pl = window.healthPlan;
+              if (!pl) return;
+              clearAllPrepForPlan(pl);
+              renderPrepTab();
+            });
+          }
+        }
+
+        function wireGroceryInteractions() {
+          const panel = $("#panel-grocery");
+          if (!panel || panel.dataset.wiredGrocery === "1") return;
+          panel.dataset.wiredGrocery = "1";
+          panel.addEventListener("click", (e) => {
+            const viewBtn = e.target.closest("[data-grocery-view]");
+            if (viewBtn) {
+              groceryUiState.view = viewBtn.dataset.groceryView === "budget" ? "budget" : "standard";
+              renderGroceryTab();
+              return;
+            }
+            const catBtn = e.target.closest("[data-grocery-cat]");
+            if (catBtn) {
+              groceryUiState.cat = catBtn.dataset.groceryCat || "protein";
+              renderGroceryTab();
+              return;
+            }
+            const row = e.target.closest(".grocery-row[data-grocery-toggle]");
+            if (!row) return;
+            const key = row.dataset.groceryToggle;
+            const set = loadDoneSet(LS_GROCERY_CHECKED);
+            if (set.has(key)) set.delete(key);
+            else set.add(key);
+            saveDoneSet(LS_GROCERY_CHECKED, set);
+            const on = set.has(key);
+            row.classList.toggle("done", on);
+            row.setAttribute("aria-checked", on ? "true" : "false");
+            const cb = row.querySelector(".grocery-cb");
+            if (cb) cb.textContent = on ? "✓" : "";
+            maybeTryVibrate();
+          });
+          panel.addEventListener("keydown", (e) => {
+            const row = e.target.closest(".grocery-row[data-grocery-toggle]");
+            if (!row) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              row.click();
+            }
+          });
+          const gclr = $("#btn-grocery-clear");
+          if (gclr) {
+            gclr.addEventListener("click", () => {
+              const pl = window.healthPlan;
+              if (!pl) return;
+              clearAllGroceryForPlan(pl);
+              renderGroceryTab();
+            });
+          }
+        }
+
         function wireMealsInteractions() {
           const panel = $("#panel-meals");
           if (!panel || panel.dataset.wiredMeals === "1") return;
@@ -3360,6 +4033,8 @@ Important instructions:
           if (tabId === "home") renderHomeTab();
           if (tabId === "phases") renderPhasesTab();
           if (tabId === "meals") renderMealsTab();
+          if (tabId === "prep") renderPrepTab();
+          if (tabId === "grocery") renderGroceryTab();
           if (persist !== false) {
             try {
               localStorage.setItem(LS_ACTIVE_TAB, tabId);
@@ -3378,6 +4053,8 @@ Important instructions:
 
         function wireAppChrome() {
           wireMealsInteractions();
+          wirePrepInteractions();
+          wireGroceryInteractions();
           $$("#screen-app .tab-bar [data-tab]").forEach((btn) => {
             btn.addEventListener("click", () => switchTab(btn.getAttribute("data-tab")));
           });
