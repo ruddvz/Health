@@ -3344,7 +3344,7 @@ Generate a complete personalised plan as one JSON object that matches the schema
 OUTPUT FORMAT — STRICT (the intake app copies from chat text only):
 - Reply with plain text only: the complete JSON object. The first character of your entire message must be { and the last character must be }.
 - Do NOT use Claude Artifacts, Canvas, side documents, or file attachments for this plan — the user must be able to select-all and copy JSON from the normal chat transcript.
-- Do NOT wrap the JSON in markdown code fences (no triple-backtick ``` blocks) and do not add headings or commentary before or after the JSON.
+- Do NOT wrap the JSON in markdown code fences (no fenced blocks with three grave-accent characters) and do not add headings or commentary before or after the JSON.
 
 Important instructions:
 - All calorie and macro calculations must be based on the person's actual TDEE 
