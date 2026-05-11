@@ -140,6 +140,21 @@
         border: 0;
       }
 
+      /*
+       * File picker: avoid the HTML `hidden` attribute (display:none) — Safari/iOS often blocks
+       * programmatic input.click() for hidden file inputs even inside a user gesture chain.
+       */
+      .file-input-overlay-trigger {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 1px;
+        height: 1px;
+        opacity: 0.02;
+        font-size: 0;
+        z-index: 1;
+      }
+
       .copy-prompt-hint {
         margin: 10px 0 0;
         font-size: 14px;
@@ -1157,6 +1172,18 @@
       .field.is-invalid .pick-card,
       .field.is-invalid .choice-tile .choice-tile-body {
         outline: 1px solid rgba(255, 59, 48, 0.35);
+      }
+
+      /*
+       * Intake footer lives outside #screen-form so position:fixed is viewport-relative.
+       * Ancestors with transform (#screen-form for slide transitions) break fixed positioning + taps on iOS.
+       */
+      #intake-sticky-footer {
+        display: none;
+      }
+
+      #screen-root[data-stage="form"] #intake-sticky-footer {
+        display: block;
       }
 
       /* Sticky CTA — iOS-style bottom sheet + pill buttons */
@@ -2607,6 +2634,15 @@
   </head>
   <body>
     <div id="screen-root" data-stage="form">
+      <!-- Hidden file input at root: must NOT use the hidden attribute — iOS/WebKit often ignores programmatic .click() on display:none file inputs. -->
+      <input
+        type="file"
+        id="input-plan-json"
+        class="file-input-overlay-trigger"
+        accept=".json,application/json,.txt,text/plain"
+        tabindex="-1"
+        title=""
+      />
       <!-- Screen 1 -->
       <div id="screen-form" class="screen" aria-hidden="false" data-intake-step="0">
         <div class="progress-wrap">
@@ -3075,20 +3111,20 @@
             </div>
           </section>
         </main>
+      </div>
 
-        <div class="sticky-bar">
-          <div class="sticky-bar-sheet">
-            <div class="sticky-json-strip">
-              <button type="button" class="btn-intake-json-pill btn-form-upload-trigger" id="btn-intake-upload-json">
-                <span class="btn-intake-json-ico" aria-hidden="true">⇪</span>
-                Upload plan JSON
-              </button>
-            </div>
-            <div class="sticky-bar-row">
-              <button type="button" id="btn-intake-back" class="btn-intake-back" hidden>Back</button>
-              <button type="button" id="btn-intake-next" class="btn-intake-next">Continue</button>
-              <button type="button" id="btn-generate" disabled hidden>Generate My Plan</button>
-            </div>
+      <div id="intake-sticky-footer" class="sticky-bar">
+        <div class="sticky-bar-sheet">
+          <div class="sticky-json-strip">
+            <button type="button" class="btn-intake-json-pill btn-form-upload-trigger" id="btn-intake-upload-json">
+              <span class="btn-intake-json-ico" aria-hidden="true">⇪</span>
+              Upload plan JSON
+            </button>
+          </div>
+          <div class="sticky-bar-row">
+            <button type="button" id="btn-intake-back" class="btn-intake-back" hidden>Back</button>
+            <button type="button" id="btn-intake-next" class="btn-intake-next">Continue</button>
+            <button type="button" id="btn-generate" disabled hidden>Generate My Plan</button>
           </div>
         </div>
       </div>
@@ -3108,7 +3144,6 @@
           <button type="button" class="btn-secondary-full" id="btn-open-claude">Open Claude</button>
           <p class="divider-label">When you have your JSON ready:</p>
           <button type="button" class="btn-dashed" id="btn-upload-plan">Upload My Plan</button>
-          <input type="file" id="input-plan-json" accept=".json,application/json" hidden />
           <p id="upload-loading" class="upload-loading" hidden>
             <span class="upload-spinner" aria-hidden="true"></span>
             Reading file…
@@ -5739,6 +5774,10 @@ Important instructions:
           $("#screen-form").setAttribute("aria-hidden", stage === "form" ? "false" : "true");
           $("#screen-prompt").setAttribute("aria-hidden", stage === "prompt" ? "false" : "true");
           $("#screen-app").setAttribute("aria-hidden", stage === "app" ? "false" : "true");
+          const intakeFt = $("#intake-sticky-footer");
+          if (intakeFt) {
+            intakeFt.setAttribute("aria-hidden", stage === "form" ? "false" : "true");
+          }
           if (stage === "prompt") {
             try {
               sessionStorage.setItem(SS_SEEN_PROMPT, "1");
@@ -6186,9 +6225,11 @@ Important instructions:
 
           wirePromptFlow();
 
-          const stickySheet = $("#screen-form .sticky-bar-sheet");
+          const stickySheet = $("#intake-sticky-footer .sticky-bar-sheet");
           if (stickySheet) {
-            stickySheet.addEventListener("click", (e) => {
+            stickySheet.addEventListener(
+              "click",
+              (e) => {
               const btn = e.target.closest("button");
               if (!btn || !stickySheet.contains(btn)) return;
 
@@ -6230,7 +6271,9 @@ Important instructions:
                 $("#prompt-text").value = prompt;
                 setStage("prompt");
               }
-            });
+            },
+              true
+            );
           }
 
           wireAppChrome();
