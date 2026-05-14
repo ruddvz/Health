@@ -4,6 +4,15 @@
 
 ### Added
 
+- **normalizePlanV1ToV2** on ingest/save: bumps `plan_schema_version`, fills `schedule.meal_times` and protein `daily_totals` when derivable.
+- **Today**: schedule-sorted timeline, macro strip vs phase, Sunday prep / Monday check-in reminders, smarter “up next” meal from clock order.
+- **Meals**: **Cook mode** overlay (ingredient checkboxes, steps from description, 5/10/15 min timers), **Swaps** when JSON includes `swaps`, optional **backup / emergency** meals when listed.
+- **Training**: on-device **rest countdown** (60/90/120s) when `weekly_split` exists.
+- **Progress**: waist logging, weekly check-in notes, soft **Insights** from recent logs.
+- **Intake**: allergies field + medication/condition checkbox; prompt profile includes them.
+- **More → Appearance**: **Light mode** toggle (`localStorage`).
+- Sample `samples/rudra-plan-v2-normalized.json`; **validatePlan** rejects duplicate phase ids.
+
 - Five-tab navigation: **Today**, **Meals**, **Training**, **Progress**, and **More** (phases, prep, grocery, supplements live under More).
 - **Training** tab rendering `training.weekly_split` when present; helpful fallback when only `training_note` exists.
 - **Progress** tab with local weight log and JSON export from the More hub.

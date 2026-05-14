@@ -151,15 +151,15 @@ Polished on phone/tablet/desktop; first screen understandable in ~5 seconds; sam
 |------|--------|
 | This roadmap file | Added |
 | PR-1 baseline | Landed on `cursor/health-plan-and-safety-8dc9` (merged into subsequent work) |
-| PR-2 schema / migration / enrichment | `enrichPlanForApp`, warnings expanded, `plan_schema_version` 2 on save; sample `samples/minimal-plan-v2.json` |
-| PR-3 design system | Partial: new components (today hero, more hub, training/progress/macro cards, snackbar); full token remap still optional |
-| PR-4 intake / prompt | Optional schedule clocks, skip-to-JSON, paste JSON + apply, prompt tail for schema v2 |
-| PR-5 Today dashboard | Renamed Home → Today, “Up next” meal card, existing schedule + warnings retained |
-| PR-6 Meals 2.0 | Macro gap “Suggested add-ons” card |
-| PR-7 Training | Tab + `weekly_split` renderer + fallback copy |
-| PR-8 Progress | Weight log + local JSON export (More hub) |
-| PR-9 Grocery / prep / supps | Price disclaimer, prep food-safety card, supplement copy softening |
-| PR-10 PWA / docs / QA | `sw.js` v10 + update snackbar; `CHANGELOG.md`, `docs/QA_CHECKLIST.md`, README |
+| PR-2 schema / migration / enrichment | `normalizePlanV1ToV2`, `enrichPlanForApp`, duplicate phase id errors, wake/sleep vs meal warnings, `schema_version` 2.0 on save; samples `samples/minimal-plan-v2.json`, `samples/rudra-plan-v2-normalized.json` |
+| PR-3 design system | Design tokens (`--ds-*`), light mode (`data-theme="light"`), new cook overlay + training timer styles |
+| PR-4 intake / prompt | Allergies + medication flag, schedule clocks, skip-to-JSON, paste JSON, prompt tail |
+| PR-5 Today dashboard | Schedule-sorted timeline, macro strip vs phase, Sunday prep + Monday check-in reminders, smarter “up next” meal |
+| PR-6 Meals 2.0 | Swaps (`details`), cook mode overlay, backup / emergency meal list when JSON provides it |
+| PR-7 Training | `weekly_split` + on-device rest countdown |
+| PR-8 Progress | Waist + check-in notes, soft “insights” from logs, weight export unchanged |
+| PR-9 Grocery / prep / supps | (unchanged this pass) price disclaimer, prep food-safety, supplement tone |
+| PR-10 PWA / docs / QA | Offline page uses system fonts only; SW snackbar retained |
 
 Branch: `cursor/health-pr2-pr10-8dc9`
 

@@ -4,7 +4,7 @@
     "generated_for": "Sample",
     "generated_date": "2026-05-14",
     "goal_label": "Sample plan",
-    "plan_schema_version": 1,
+    "plan_schema_version": 2,
     "app_schema_hint": "2.0"
   },
   "user": {

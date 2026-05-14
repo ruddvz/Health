@@ -23,7 +23,7 @@ A mobile web app that turns a personalised Claude-generated health plan into a *
 
 ## Sample JSON
 
-See `samples/minimal-plan-v2.json` for a small valid plan that includes `training.weekly_split` (for UI smoke tests).
+See `samples/minimal-plan-v2.json` for a small valid plan that includes `training.weekly_split` (for UI smoke tests). For a richer **schema v2** example with night-shift `schedule`, swaps, and safety fields, use `samples/rudra-plan-v2-normalized.json`.
 
 ## Tech & privacy
 

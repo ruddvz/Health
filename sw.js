@@ -1,4 +1,4 @@
-const CACHE = "health-v10";
+const CACHE = "health-v11";
 const BASE = "/Health";
 
 const ASSETS = [
