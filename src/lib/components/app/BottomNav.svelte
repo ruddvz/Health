@@ -47,13 +47,16 @@
 <style>
 	.nav {
 		position: fixed;
-		left: 0;
-		right: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: min(100vw, 430px);
 		bottom: 0;
 		z-index: 30;
-		padding-bottom: var(--safe-bottom);
+		padding: 8px 12px calc(8px + var(--safe-bottom));
+		box-sizing: border-box;
 		background: rgba(11, 11, 11, 0.92);
-		backdrop-filter: blur(12px);
+		backdrop-filter: blur(18px) saturate(160%);
+		-webkit-backdrop-filter: blur(18px) saturate(160%);
 		border-top: 1px solid var(--line-1);
 	}
 
@@ -87,7 +90,8 @@
 
 	.tab.active {
 		color: var(--red);
-		background: var(--red-soft);
+		background: transparent;
+		box-shadow: inset 0 -2px 0 0 var(--red);
 	}
 
 	.label {

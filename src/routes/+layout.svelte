@@ -20,9 +20,9 @@
 	<meta name="theme-color" content="#0b0b0b" />
 	<meta
 		name="description"
-		content="Private offline health plan companion. Local only — no server."
+		content="PRIVATE. OFFLINE. PERSONAL. Local-only health plan on your device."
 	/>
-	<title>Health — Personal Plan</title>
+	<title>HEALTH — Personal Plan</title>
 </svelte:head>
 
 <TopStatusBar weekLabel="WEEK 01" dayMode="workout" />
