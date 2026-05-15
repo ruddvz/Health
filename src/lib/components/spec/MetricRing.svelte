@@ -51,7 +51,13 @@
 	.prog {
 		stroke: var(--red);
 		stroke-linecap: round;
-		transition: stroke-dashoffset 0.35s ease;
+		transition: stroke-dashoffset var(--motion-slow) var(--motion-ease);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.prog {
+			transition: none;
+		}
 	}
 
 	.center {
@@ -66,18 +72,23 @@
 	}
 
 	.val {
-		font-size: 13px;
+		font-size: 22px;
 		font-weight: 650;
 		color: var(--text-1);
-		font-family: var(--font-mono);
+		font-family: var(--font-ui);
+		letter-spacing: -0.015em;
 		line-height: 1.1;
 	}
 
 	.sub {
 		margin-top: 2px;
-		font-size: 8px;
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		font-family: var(--font-mono);
 		color: var(--text-3);
-		max-width: 64px;
+		max-width: 72px;
 		line-height: 1.2;
 	}
 </style>

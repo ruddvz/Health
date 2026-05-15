@@ -4,7 +4,6 @@
 	import { browser } from '$app/environment';
 	import RedActionButton from '$lib/components/nothing/RedActionButton.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import { LS_PLAN } from '$lib/constants/storage';
 	import {
 		activeDayType,
@@ -99,7 +98,6 @@
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<StatusStrip />
 	<ScreenHeaderBlock title="SETTINGS" subtitle="Data, calendar & backups" />
 
 	<p class="mono-caps lab">Calendar</p>

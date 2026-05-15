@@ -1,17 +1,26 @@
-/* Nothing OS–inspired utility layer: borders, mono labels, press states */
+/* Surfaces: spec gradient + Apple-style continuous corners (squircle) where supported */
 
 .nothing-surface {
 	background: linear-gradient(180deg, #181818 0%, #111111 100%);
 	border: 1px solid rgba(255, 255, 255, 0.12);
-	border-radius: var(--radius-md);
+	border-radius: var(--radius-widget);
 	box-shadow: var(--shadow-card);
+	overflow: hidden;
 }
 
 .nothing-surface-2 {
 	background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-1) 100%);
 	border: 1px solid var(--line-1);
-	border-radius: var(--radius-md);
+	border-radius: var(--radius-widget);
 	box-shadow: var(--shadow-card);
+	overflow: hidden;
+}
+
+@supports (corner-shape: squircle) {
+	.nothing-surface,
+	.nothing-surface-2 {
+		corner-shape: squircle;
+	}
 }
 
 .mono-caps {
@@ -25,11 +34,21 @@
 
 .pressable {
 	transition:
-		transform 0.08s ease,
-		background 0.12s ease,
-		border-color 0.12s ease;
+		transform var(--motion-fast) var(--motion-ease),
+		background var(--motion-base) var(--motion-ease),
+		border-color var(--motion-base) var(--motion-ease);
 }
 
 .pressable:active {
-	transform: scale(0.98);
+	transform: scale(0.985);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pressable {
+		transition: none;
+	}
+
+	.pressable:active {
+		transform: none;
+	}
 }

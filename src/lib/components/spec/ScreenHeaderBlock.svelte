@@ -31,7 +31,7 @@
 		align-items: flex-start;
 		justify-content: space-between;
 		gap: var(--space-3);
-		margin-bottom: var(--space-3);
+		margin-bottom: 14px;
 	}
 
 	.left {
@@ -47,10 +47,10 @@
 	.title {
 		margin: 0;
 		font-family: var(--font-mono);
-		font-size: 1.55rem;
+		font-size: 31px;
 		font-weight: 700;
-		letter-spacing: 0.08em;
-		line-height: 1.15;
+		letter-spacing: 0.075em;
+		line-height: calc(36 / 31);
 		text-transform: uppercase;
 		color: var(--text-1);
 		white-space: pre-line;
@@ -59,7 +59,7 @@
 	.sub {
 		margin: var(--space-2) 0 0;
 		font-size: 14px;
-		line-height: 1.45;
+		line-height: calc(21 / 14);
 		color: var(--text-2);
 	}
 

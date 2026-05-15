@@ -1,10 +1,8 @@
 <script lang="ts">
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<StatusStrip />
 	<ScreenHeaderBlock title="PRIVACY" subtitle="100% local by design" />
 
 	<section class="block nothing-surface">

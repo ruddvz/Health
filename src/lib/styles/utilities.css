@@ -1,7 +1,8 @@
+/* card_gap 12px from shared_layout_patterns */
 .stack {
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-4);
+	gap: var(--space-3);
 }
 
 .row {
@@ -28,4 +29,43 @@
 
 .pt-safe {
 	padding-top: max(var(--space-2), var(--safe-top));
+}
+
+/* Minimum 44×44 touch target (accessibility_requirements) */
+.touch-target {
+	min-width: 44px;
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.icon-header-btn {
+	min-width: 44px;
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin: -10px -6px -10px 0;
+	padding: 0;
+	border: 1px solid var(--line-1);
+	border-radius: var(--radius-md);
+	background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+	color: var(--text-2);
+	cursor: pointer;
+	text-decoration: none;
+	transition:
+		background var(--motion-base) var(--motion-ease),
+		color var(--motion-base) var(--motion-ease);
+}
+
+.icon-header-btn:hover {
+	background: var(--surface-hover);
+	color: var(--text-1);
+}
+
+@supports (corner-shape: squircle) {
+	.icon-header-btn {
+		corner-shape: squircle;
+	}
 }

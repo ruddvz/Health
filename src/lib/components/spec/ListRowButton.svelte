@@ -24,7 +24,7 @@
 		min-height: 58px;
 		padding: var(--space-3) var(--space-4);
 		margin-bottom: var(--space-2);
-		border-radius: var(--radius-md);
+		border-radius: var(--radius-list);
 		border: 1px solid var(--line-1);
 		background: var(--surface-1);
 		color: var(--text-1);
@@ -32,6 +32,12 @@
 		font-weight: 600;
 		cursor: pointer;
 		text-align: left;
+	}
+
+	@supports (corner-shape: squircle) {
+		.row {
+			corner-shape: squircle;
+		}
 	}
 
 	.ico {

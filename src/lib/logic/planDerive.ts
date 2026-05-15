@@ -164,3 +164,19 @@ export function greeting(): string {
 	if (h < 17) return 'Good afternoon';
 	return 'Good evening';
 }
+
+/** Converts `HH:mm` (onboarding / plan) to a localized 12h label (e.g. 10:00 PM). */
+export function formatTimeFromHHMM(hhmm: string | undefined | null): string | null {
+	if (!hhmm || typeof hhmm !== 'string') return null;
+	const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm.trim());
+	if (!m) return null;
+	const h = Math.min(23, Math.max(0, parseInt(m[1], 10)));
+	const min = Math.min(59, Math.max(0, parseInt(m[2], 10)));
+	const d = new Date();
+	d.setHours(h, min, 0, 0);
+	return new Intl.DateTimeFormat(undefined, {
+		hour: 'numeric',
+		minute: '2-digit',
+		hour12: true
+	}).format(d);
+}

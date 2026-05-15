@@ -118,7 +118,7 @@
 	<ListRowButton label="Paste JSON" chevron onclick={() => (pasteOpen = true)} />
 	<DashedUploadButton label="Upload Plan File" onclick={openPicker} />
 
-	<p class="helper mono-caps">Your uploaded plan is stored only in this browser.</p>
+	<p class="helper">Your uploaded plan is stored only in this browser.</p>
 
 	{#if error}
 		<InlineErrorCard title="Import blocked" body={error} />
@@ -150,9 +150,10 @@
 
 	.helper {
 		margin: var(--space-3) 0 0;
-		font-size: 9px;
+		font-size: 12px;
+		line-height: calc(17 / 12);
+		font-weight: 400;
 		color: var(--text-3);
-		line-height: 1.5;
 	}
 
 	.sr {
@@ -189,10 +190,16 @@
 		position: relative;
 		width: min(100vw, 430px);
 		padding: var(--space-4);
-		border-radius: 18px 18px 0 0;
+		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 		border: 1px solid var(--line-1);
 		max-height: 90dvh;
 		overflow: auto;
+	}
+
+	@supports (corner-shape: squircle) {
+		.sheet {
+			corner-shape: squircle;
+		}
 	}
 
 	.h {

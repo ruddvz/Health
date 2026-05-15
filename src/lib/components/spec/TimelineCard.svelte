@@ -82,6 +82,6 @@
 	}
 
 	.row[data-state='done'] .st {
-		color: var(--ok);
+		color: var(--success);
 	}
 </style>
