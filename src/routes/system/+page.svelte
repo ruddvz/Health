@@ -3,11 +3,9 @@
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
 	import SettingsRowLink from '$lib/components/spec/SettingsRowLink.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<StatusStrip />
 	<ScreenHeaderBlock title="SYSTEM" />
 
 	<SectionLabel text="PRIVACY & DATA" />

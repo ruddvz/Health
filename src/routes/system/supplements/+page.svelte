@@ -7,7 +7,6 @@
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
 	import SupplementCard from '$lib/components/spec/SupplementCard.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import { getSupplementSchedule } from '$lib/logic/planDerive';
 	import { persistProgress, plan, progress } from '$lib/stores/healthApp';
 	import { get } from 'svelte/store';
@@ -39,7 +38,6 @@
 
 {#if $plan}
 	<main class="screen px-screen pt-safe stack">
-		<StatusStrip />
 		<ScreenHeaderBlock title="SUPPLEMENTS" />
 
 		<SectionLabel text="TODAY'S SCHEDULE" />

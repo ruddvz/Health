@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import { newId } from '$lib/logic/id';
 	import { getTrainingDay } from '$lib/logic/planDerive';
 	import { persistProgress, plan, progress } from '$lib/stores/healthApp';
@@ -134,7 +133,6 @@
 
 {#if $plan}
 	<main class="screen px-screen pt-safe stack">
-		<StatusStrip />
 		<ScreenHeaderBlock title="SESSION" subtitle={String(day?.name ?? 'Workout')} />
 
 		{#if current}

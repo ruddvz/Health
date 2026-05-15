@@ -29,7 +29,6 @@
 		margin-bottom: var(--space-3);
 		text-align: left;
 		cursor: pointer;
-		border: 1px solid rgba(255, 255, 255, 0.12);
 	}
 
 	.e {

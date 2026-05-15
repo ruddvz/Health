@@ -34,17 +34,29 @@
 		margin-bottom: var(--space-3);
 	}
 
+	@supports (corner-shape: squircle) {
+		.seg {
+			corner-shape: squircle;
+		}
+	}
+
 	.btn {
 		flex: 1;
 		border: none;
 		background: transparent;
 		padding: 8px 10px;
-		border-radius: 10px;
+		border-radius: 9px;
 		font-size: 13px;
 		font-weight: 600;
 		color: var(--text-2);
 		cursor: pointer;
 		min-height: 38px;
+	}
+
+	@supports (corner-shape: squircle) {
+		.btn {
+			corner-shape: squircle;
+		}
 	}
 
 	.btn.on {

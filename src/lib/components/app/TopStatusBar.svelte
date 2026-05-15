@@ -6,38 +6,94 @@
 	let { weekLabel = 'WEEK —', dayMode = 'workout' }: Props = $props();
 
 	const modeLabel = $derived(dayMode === 'workout' ? 'WORKOUT DAY' : 'REST DAY');
+
+	let clock = $state('');
+	$effect(() => {
+		const tick = () => {
+			clock = new Intl.DateTimeFormat(undefined, {
+				hour: 'numeric',
+				minute: '2-digit',
+				hour12: false
+			}).format(new Date());
+		};
+		tick();
+		const id = setInterval(tick, 30000);
+		return () => clearInterval(id);
+	});
 </script>
 
-<div class="strip mono-caps" role="status">
-	<span>Private</span>
-	<span class="sep" aria-hidden="true">·</span>
-	<span>Offline</span>
-	<span class="sep" aria-hidden="true">·</span>
-	<span>Personal</span>
-	<span class="sep" aria-hidden="true">·</span>
-	<span>{weekLabel}</span>
-	<span class="sep" aria-hidden="true">·</span>
-	<span>{modeLabel}</span>
+<div class="bar" role="status" aria-live="off">
+	<div class="l mono-caps">
+		<span class="clock">{clock}</span>
+		<span class="dot" aria-hidden="true">·</span>
+		<span>Local</span>
+		<span class="dot" aria-hidden="true">·</span>
+		<span class="brand">HEALTH</span>
+	</div>
+	<div class="r mono-caps">
+		<span class="tag">Private</span>
+		<span class="dot" aria-hidden="true">·</span>
+		<span class="tag">Offline</span>
+		<span class="dot" aria-hidden="true">·</span>
+		<span class="tag">Personal</span>
+		<span class="dot" aria-hidden="true">·</span>
+		<span>{weekLabel}</span>
+		<span class="dot" aria-hidden="true">·</span>
+		<span>{modeLabel}</span>
+	</div>
 </div>
 
 <style>
-	.strip {
+	.bar {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		justify-content: center;
-		gap: var(--space-2);
-		padding: var(--space-2) var(--space-3);
+		justify-content: space-between;
+		gap: var(--space-2) var(--space-3);
+		min-height: 28px;
+		padding: var(--space-2) max(var(--space-4), env(safe-area-inset-left)) var(--space-2)
+			max(var(--space-4), env(safe-area-inset-right));
 		border-bottom: 1px solid var(--line-1);
-		background: rgba(0, 0, 0, 0.35);
+		background: color-mix(in srgb, var(--bg) 82%, transparent);
+		backdrop-filter: blur(16px) saturate(140%);
+		-webkit-backdrop-filter: blur(16px) saturate(140%);
 		color: var(--text-3);
-		font-size: 9px;
-		letter-spacing: 0.14em;
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: 0.12em;
 		text-transform: uppercase;
+		font-family: var(--font-mono);
 	}
 
-	.sep {
-		color: var(--line-2);
+	.l,
+	.r {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-2);
+		min-width: 0;
+	}
+
+	.r {
+		justify-content: flex-end;
+		text-align: right;
+	}
+
+	.clock {
+		color: var(--text-2);
+		letter-spacing: 0.06em;
+	}
+
+	.brand {
+		color: var(--text-2);
+	}
+
+	.tag {
+		color: var(--text-3);
+	}
+
+	.dot {
+		opacity: 0.45;
 		user-select: none;
 	}
 </style>

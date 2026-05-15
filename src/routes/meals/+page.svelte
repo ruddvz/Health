@@ -7,7 +7,6 @@
 	import QuickFixSheet from '$lib/components/spec/QuickFixSheet.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SecondaryButton from '$lib/components/spec/SecondaryButton.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import TargetGapCard from '$lib/components/spec/TargetGapCard.svelte';
 	import { logicalDateKey } from '$lib/logic/dateKey';
 	import { plannedMacrosFromMeals } from '$lib/logic/dayTotals';
@@ -143,7 +142,6 @@
 
 {#if $plan}
 	<main class="screen px-screen pt-safe stack">
-		<StatusStrip />
 		<ScreenHeaderBlock title="MEALS" />
 
 		<ChipRow

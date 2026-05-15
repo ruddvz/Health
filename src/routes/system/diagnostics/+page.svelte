@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import { LS_PLAN } from '$lib/constants/storage';
 	import { importWarnings } from '$lib/stores/healthApp';
 	import { parsePlanJsonText } from '$lib/validation/planV2';
@@ -19,7 +18,6 @@
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<StatusStrip />
 	<ScreenHeaderBlock title="DIAGNOSTICS" subtitle="Plan health" />
 
 	{#if diag.error}

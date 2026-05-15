@@ -5,15 +5,16 @@
 	import MetricRing from '$lib/components/spec/MetricRing.svelte';
 	import MetricTile from '$lib/components/spec/MetricTile.svelte';
 	import NextActionCard from '$lib/components/spec/NextActionCard.svelte';
+	import PhaseRow from '$lib/components/spec/PhaseRow.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SegmentedControl from '$lib/components/spec/SegmentedControl.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import TimelineCard from '$lib/components/spec/TimelineCard.svelte';
 	import { consumedTotalsForToday, waterLitersForDay } from '$lib/logic/dayTotals';
 	import { logicalDateKey } from '$lib/logic/dateKey';
-	import { getMealSlotState, mealSlotKey } from '$lib/logic/mealSlots';
+	import { getMealSlotState } from '$lib/logic/mealSlots';
 	import {
+		formatTimeFromHHMM,
 		getMealsForDay,
 		getPhaseLabel,
 		getTrainingDay,
@@ -22,19 +23,22 @@
 	} from '$lib/logic/planDerive';
 	import {
 		activeDayType,
+		onboarding,
 		persistActiveDayType,
 		persistProgress,
 		plan,
 		progress,
 		settings
 	} from '$lib/stores/healthApp';
-	import type { DayType, MealSlotStatus } from '$lib/types/planV2';
+	import type { DayType } from '$lib/types/planV2';
 	import { get } from 'svelte/store';
 
 	let phaseIndex = $state(0);
 
 	const logDay = $derived(logicalDateKey(new Date(), $settings));
 	const dayT = $derived($activeDayType as DayType);
+
+	const phaseCount = $derived($plan && Array.isArray($plan.phases) ? $plan.phases.length : 1);
 
 	const totals = $derived(consumedTotalsForToday($plan, dayT, phaseIndex, $progress, $settings));
 	const meals = $derived(getMealsForDay($plan, dayT));
@@ -45,15 +49,6 @@
 	const calProg = $derived(
 		totals.targets.kcal > 0 ? Math.min(1, totals.kcal / totals.targets.kcal) : 0
 	);
-
-	function setSlot(slot: number, s: 'pending' | MealSlotStatus) {
-		const cur = get(progress);
-		const k = mealSlotKey(logDay, dayT, slot);
-		const nextMap = { ...(cur.mealSlotStatus ?? {}) };
-		if (s === 'pending') delete nextMap[k];
-		else nextMap[k] = s;
-		persistProgress({ ...cur, mealSlotStatus: nextMap });
-	}
 
 	const timeline = $derived.by(() => {
 		const items: {
@@ -81,9 +76,10 @@
 			});
 		}
 		const td = getTrainingDay($plan, 0);
+		const trainTime = formatTimeFromHHMM($onboarding.lifestyle.training_time) ?? '10:00 PM';
 		if (td && typeof td.name === 'string' && dayT === 'workout') {
 			items.push({
-				time: '6:00 PM',
+				time: trainTime,
 				title: 'Train',
 				subtitle: String(td.name),
 				state: pendingIdx < 0 ? 'next' : 'upcoming'
@@ -126,11 +122,36 @@
 
 {#if $plan}
 	<main class="screen px-screen pt-safe stack">
-		<StatusStrip />
-		<ScreenHeaderBlock title="TODAY" subtitle="{greeting()}, {getUserName($plan)}" />
+		<ScreenHeaderBlock title="TODAY" subtitle="{greeting()}, {getUserName($plan)}">
+			{#snippet right()}
+				<a
+					class="icon-header-btn"
+					href={resolve('/system/settings')}
+					aria-label="Day and app settings"
+				>
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+						<path
+							d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
+							stroke="currentColor"
+							stroke-width="1.6"
+						/>
+						<path
+							d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.54V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.54 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.54-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.54-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.54V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.54 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c0 .66.39 1.26 1 1.54H21a2 2 0 1 1 0 4h-.09c-.61.28-1 .88-1 1.54Z"
+							stroke="currentColor"
+							stroke-width="1.2"
+							stroke-linejoin="round"
+						/>
+					</svg>
+				</a>
+			{/snippet}
+		</ScreenHeaderBlock>
 
-		<div class="phase mono-caps">{getPhaseLabel($plan, phaseIndex)}</div>
-		<p class="hint mono-caps">Logical day {logDay} · adjust time zone in Settings</p>
+		<PhaseRow
+			label={getPhaseLabel($plan, phaseIndex)}
+			{phaseCount}
+			{phaseIndex}
+			onPhaseChange={(i) => (phaseIndex = i)}
+		/>
 
 		<SegmentedControl
 			options={[
@@ -148,7 +169,7 @@
 			onclick={() => goto(resolve('/train'))}
 		/>
 
-		<SectionLabel text="MACROS (LOGGED MEALS + EXTRAS)" />
+		<SectionLabel text="MACROS" />
 
 		<div class="rings">
 			<MetricRing
@@ -194,36 +215,6 @@
 			/>
 		</div>
 
-		<SectionLabel text="MEAL INTAKE" />
-		{#each meals as m (mealSlotKey(logDay, dayT, m.slot))}
-			<div class="slot nothing-surface">
-				<div class="slot-head">
-					<p class="mono-caps t">Meal {m.slot}</p>
-					<p class="name">{m.name}</p>
-					<p class="meta mono-caps">{m.time} · {m.kcal} kcal</p>
-				</div>
-				<div class="slot-actions" role="group" aria-label="Mark meal {m.slot}">
-					<button
-						type="button"
-						class="sb pressable"
-						data-on={getMealSlotState($progress, logDay, dayT, m.slot) === 'logged'}
-						onclick={() => setSlot(m.slot, 'logged')}>Log</button
-					>
-					<button
-						type="button"
-						class="sb pressable"
-						data-on={getMealSlotState($progress, logDay, dayT, m.slot) === 'skipped'}
-						onclick={() => setSlot(m.slot, 'skipped')}>Skip</button
-					>
-					<button
-						type="button"
-						class="sb ghost pressable"
-						onclick={() => setSlot(m.slot, 'pending')}>Reset</button
-					>
-				</div>
-			</div>
-		{/each}
-
 		<SectionLabel text="TIMELINE" />
 		<TimelineCard items={timeline} />
 	</main>
@@ -233,18 +224,6 @@
 	.screen {
 		flex: 1;
 		padding-bottom: var(--space-6);
-	}
-
-	.phase {
-		margin: 0 0 var(--space-1);
-		font-size: 10px;
-		color: var(--text-2);
-	}
-
-	.hint {
-		margin: 0 0 var(--space-2);
-		font-size: 8px;
-		color: var(--text-3);
 	}
 
 	.rings {
@@ -274,65 +253,21 @@
 	}
 
 	.mini {
-		width: 34px;
-		height: 30px;
-		border-radius: var(--radius-xs);
+		width: 44px;
+		height: 44px;
+		border-radius: var(--radius-sm);
 		border: 1px solid var(--line-2);
 		background: rgba(0, 0, 0, 0.35);
 		color: var(--text-1);
 		font-weight: 800;
+		font-size: 18px;
+		line-height: 1;
 		cursor: pointer;
 	}
 
-	.slot {
-		padding: var(--space-3);
-		margin-bottom: var(--space-2);
-	}
-
-	.slot-head .t {
-		margin: 0;
-		font-size: 9px;
-		color: var(--text-3);
-	}
-
-	.name {
-		margin: 4px 0 0;
-		font-size: 15px;
-		font-weight: 650;
-		color: var(--text-1);
-	}
-
-	.meta {
-		margin: 6px 0 0;
-		font-size: 9px;
-		color: var(--text-2);
-	}
-
-	.slot-actions {
-		display: flex;
-		gap: 8px;
-		margin-top: var(--space-3);
-	}
-
-	.sb {
-		flex: 1;
-		min-height: 36px;
-		border-radius: var(--radius-xs);
-		border: 1px solid var(--line-1);
-		background: rgba(0, 0, 0, 0.35);
-		color: var(--text-2);
-		font-size: 11px;
-		font-weight: 650;
-		cursor: pointer;
-	}
-
-	.sb[data-on='true'] {
-		border-color: var(--red-line);
-		color: var(--text-1);
-		box-shadow: inset 0 0 0 1px rgba(255, 42, 42, 0.22);
-	}
-
-	.sb.ghost {
-		flex: 0.55;
+	@supports (corner-shape: squircle) {
+		.mini {
+			corner-shape: squircle;
+		}
 	}
 </style>

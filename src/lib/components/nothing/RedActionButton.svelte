@@ -31,15 +31,21 @@
 		border-radius: var(--radius-sm);
 		background: var(--red);
 		color: #ffffff;
-		font-family: var(--font-mono);
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
+		font-family: var(--font-ui);
+		font-size: 12px;
+		font-weight: 650;
+		letter-spacing: 0.02em;
+		text-transform: none;
 		cursor: pointer;
 		box-shadow:
 			inset 0 1px 0 rgba(255, 255, 255, 0.18),
 			var(--shadow-red-glow);
+	}
+
+	@supports (corner-shape: squircle) {
+		.btn {
+			corner-shape: squircle;
+		}
 	}
 
 	.btn:disabled {

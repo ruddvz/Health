@@ -6,7 +6,6 @@
 	import RedActionButton from '$lib/components/nothing/RedActionButton.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import WorkoutHeroCard from '$lib/components/spec/WorkoutHeroCard.svelte';
 	import { getTrainingDay } from '$lib/logic/planDerive';
 	import { liftStatsFromSessions, recentSessions } from '$lib/logic/workoutHistory';
@@ -40,7 +39,6 @@
 
 {#if $plan}
 	<main class="screen px-screen pt-safe stack">
-		<StatusStrip />
 		<ScreenHeaderBlock title="TRAIN" />
 
 		{#if day}
