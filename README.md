@@ -61,13 +61,20 @@ Asset URLs use the `/Health` base in production builds.
 
 Pushes to `main` run `.github/workflows/pages.yml`: `npm ci`, `npm run build`, publish **`build/`**.
 
+### PWA / service worker
+
+After a deploy, the browser may keep an older service worker until it checks for updates. If something looks stale, reload once or wait a few minutes. The build runs `npm run verify:sw` to ensure `build/sw.js` precaches the app shell and key routes (see `scripts/verify-sw-precache.mjs`).
+
 ## Tests and checks
 
 ```bash
 npm test
 npm run check
 npm run lint
+npm run build && npm run verify:sw
 ```
+
+The last line is optional locally; **GitHub Actions** runs `verify:sw` after every production build.
 
 ## SvelteKit roadmap
 

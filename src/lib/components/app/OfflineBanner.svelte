@@ -1,20 +1,74 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { base } from '$app/paths';
+	import { onMount } from 'svelte';
 
-	let online = $state(browser ? navigator.onLine : true);
+	const pingUrl = `${base ? `${base.replace(/\/$/, '')}/` : '/'}_app/version.json`;
+
+	let navigatorOnline = $state(browser ? navigator.onLine : true);
+	let reachOk = $state(true);
+	let consecutiveFails = 0;
 
 	function onOnline() {
-		online = true;
+		navigatorOnline = true;
+		void probe();
 	}
 	function onOffline() {
-		online = false;
+		navigatorOnline = false;
+		reachOk = false;
+		consecutiveFails = 0;
 	}
+
+	async function probe() {
+		if (!browser || !navigator.onLine) return;
+		try {
+			const res = await fetch(pingUrl, {
+				cache: 'no-store',
+				signal: AbortSignal.timeout(4500)
+			});
+			if (res.ok) {
+				consecutiveFails = 0;
+				reachOk = true;
+			} else {
+				consecutiveFails += 1;
+				if (consecutiveFails >= 2) reachOk = false;
+			}
+		} catch {
+			consecutiveFails += 1;
+			if (consecutiveFails >= 2) reachOk = false;
+		}
+	}
+
+	const showBanner = $derived(!navigatorOnline || (navigatorOnline && !reachOk));
+
+	onMount(() => {
+		if (!browser) return;
+
+		void probe();
+
+		const interval = window.setInterval(() => void probe(), 60_000);
+		const onVis = () => {
+			if (document.visibilityState === 'visible') void probe();
+		};
+		document.addEventListener('visibilitychange', onVis);
+
+		return () => {
+			clearInterval(interval);
+			document.removeEventListener('visibilitychange', onVis);
+		};
+	});
 </script>
 
 <svelte:window ononline={onOnline} onoffline={onOffline} />
 
-{#if !online}
-	<div class="banner mono-caps" role="alert">Network offline — plan data stays on device</div>
+{#if showBanner}
+	<div class="banner mono-caps" role="status">
+		{#if !navigatorOnline}
+			Network offline — plan data stays on device
+		{:else}
+			Can’t reach this site — plan data stays on device. Check connection, then try again.
+		{/if}
+	</div>
 {/if}
 
 <style>

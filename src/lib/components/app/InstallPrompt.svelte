@@ -13,9 +13,27 @@
 
 	let deferred: InstallableEvent | null = null;
 	let canInstall = $state(false);
+	let userEngaged = $state(false);
+	let delayElapsed = $state(false);
+
+	const showInstallUi = $derived(
+		canInstall && !closeInstallHint && (userEngaged || delayElapsed) && !needRefresh
+	);
 
 	onMount(() => {
 		if (!browser) return;
+
+		let swUpdateInterval: ReturnType<typeof setInterval> | undefined;
+
+		const delayTimer = window.setTimeout(() => {
+			delayElapsed = true;
+		}, 12_000);
+
+		function onFirstEngagement() {
+			userEngaged = true;
+			window.removeEventListener('pointerdown', onFirstEngagement, true);
+		}
+		window.addEventListener('pointerdown', onFirstEngagement, true);
 
 		function onBip(e: Event) {
 			e.preventDefault();
@@ -27,11 +45,20 @@
 		import('virtual:pwa-register')
 			.then(({ registerSW }) => {
 				registerSW({
+					immediate: true,
 					onNeedRefresh() {
 						needRefresh = true;
 					},
 					onOfflineReady() {
 						offlineReady = true;
+					},
+					onRegisteredSW(_url, registration) {
+						if (!registration) return;
+						if (swUpdateInterval) clearInterval(swUpdateInterval);
+						const fourHours = 4 * 60 * 60 * 1000;
+						swUpdateInterval = setInterval(() => {
+							void registration.update();
+						}, fourHours);
 					}
 				});
 			})
@@ -39,7 +66,12 @@
 				/* virtual module only under Vite */
 			});
 
-		return () => window.removeEventListener('beforeinstallprompt', onBip);
+		return () => {
+			if (swUpdateInterval) clearInterval(swUpdateInterval);
+			clearTimeout(delayTimer);
+			window.removeEventListener('pointerdown', onFirstEngagement, true);
+			window.removeEventListener('beforeinstallprompt', onBip);
+		};
 	});
 
 	async function installClick() {
@@ -58,6 +90,7 @@
 {#if needRefresh}
 	<div class="toast nothing-surface-2" role="status">
 		<p class="mono-caps title">Update ready</p>
+		<p class="subtle">Reload to pick up the latest app shell from the server.</p>
 		<button type="button" class="link pressable" onclick={reloadClick}>Reload app</button>
 	</div>
 {/if}
@@ -66,7 +99,7 @@
 	<p class="hint mono-caps">Offline cache ready</p>
 {/if}
 
-{#if canInstall && !closeInstallHint}
+{#if showInstallUi}
 	<div class="toast install nothing-surface-2">
 		<p class="mono-caps title">Install</p>
 		<p class="sub">Add to home screen for full-screen use.</p>
@@ -94,6 +127,13 @@
 	.title {
 		margin: 0 0 var(--space-2);
 		color: var(--red);
+	}
+
+	.subtle {
+		margin: 0 0 var(--space-3);
+		font-size: 12px;
+		line-height: 1.4;
+		color: var(--text-2);
 	}
 
 	.link {
