@@ -10,8 +10,10 @@
 		isWebAuthnAvailable
 	} from '$lib/security/rpOrigin';
 	import { registerPlatformLock } from '$lib/security/webauthnLocal';
+	import { lockSetupIncompleteMessage } from '$lib/security/setupValidation';
 	import type { HealthSecurityConfig, LockMethod } from '$lib/security/types';
 	import {
+		enablePinLock,
 		lockNow,
 		persistSecurity,
 		removePasskeyFromDevice,
@@ -71,23 +73,35 @@
 			errorMsg = 'PINs do not match.';
 			return;
 		}
-		const pinCred = await hashPin(setupPin);
 		const cur = get(securityConfig);
-		const next: HealthSecurityConfig = {
-			...cur,
-			enabled: true,
-			pin: pinCred,
-			method: cur.webauthn ? 'pin+biometric' : 'pin'
-		};
-		persistSecurity(next, { keepUnlocked: true });
+		if (cur.recoveryCodeHashes.length < 1) {
+			errorMsg = 'Generate recovery codes before saving your PIN.';
+			return;
+		}
+		const r = await enablePinLock({
+			recoveryPin: setupPin,
+			recoveryCodeHashes: cur.recoveryCodeHashes,
+			withPasskey: !!cur.webauthn,
+			keepUnlocked: true
+		});
+		if (!r.ok) {
+			errorMsg = r.error;
+			return;
+		}
 		setupPin = '';
 		setupPinConfirm = '';
-		statusMsg = 'PIN enabled. Generate recovery codes if you have not yet.';
+		statusMsg = 'Recovery PIN saved. Plan data is encrypted on this device.';
 	}
 
 	async function enableBiometric() {
 		errorMsg = null;
 		statusMsg = null;
+		const cur = get(securityConfig);
+		const incomplete = lockSetupIncompleteMessage(cur);
+		if (incomplete && !cur.webauthn) {
+			errorMsg = incomplete;
+			return;
+		}
 		if (!isWebAuthnAvailable()) {
 			errorMsg = 'WebAuthn is not supported in this browser.';
 			return;
@@ -96,20 +110,23 @@
 			errorMsg = 'No platform authenticator (Face ID / Touch ID) was detected.';
 			return;
 		}
+		if (!cur.pin || cur.recoveryCodeHashes.length < 1) {
+			errorMsg = 'Set recovery PIN and generate recovery codes before adding a passkey.';
+			return;
+		}
 		const reg = await registerPlatformLock('local');
 		if (!reg.ok) {
 			errorMsg = reg.error;
 			return;
 		}
-		const cur = get(securityConfig);
 		const next: HealthSecurityConfig = {
 			...cur,
 			enabled: true,
 			webauthn: reg.meta,
-			method: cur.pin ? 'pin+biometric' : 'biometric'
+			method: 'pin+biometric'
 		};
-		persistSecurity(next);
-		statusMsg = 'Biometric lock enabled on this device.';
+		persistSecurity(next, { keepUnlocked: true });
+		statusMsg = 'Passkey enabled on this device.';
 	}
 
 	async function generateRecovery() {

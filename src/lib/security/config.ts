@@ -33,6 +33,7 @@ export function normalizeSecurityConfig(raw: unknown): HealthSecurityConfig {
 				? Math.floor(o.autoLockMinutes)
 				: base.autoLockMinutes,
 		lockOnColdStart: o.lockOnColdStart !== false,
+		encryptionEnabled: o.encryptionEnabled === true,
 		updatedAt: typeof o.updatedAt === 'string' ? o.updatedAt : base.updatedAt
 	};
 	if (o.pin && typeof o.pin === 'object') {

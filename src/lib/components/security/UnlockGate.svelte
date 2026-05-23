@@ -2,11 +2,13 @@
 	import { resolve } from '$app/paths';
 	import PinPad from '$lib/components/security/PinPad.svelte';
 	import {
+		needsPinToDecryptVault,
 		securityConfig,
 		unlockWithBiometric,
 		unlockWithPin,
 		unlockWithRecoveryCode
 	} from '$lib/stores/healthLock';
+	import { pinLockoutMessage } from '$lib/security/pinRateLimit';
 	import { isPlatformAuthenticatorAvailable } from '$lib/security/rpOrigin';
 
 	let pin = $state('');
@@ -29,6 +31,11 @@
 	);
 
 	async function submitPin() {
+		const lockMsg = pinLockoutMessage();
+		if (lockMsg) {
+			error = lockMsg;
+			return;
+		}
 		if (pin.length < 4) {
 			error = 'Enter your full PIN.';
 			return;
@@ -72,6 +79,9 @@
 
 		{#if error}
 			<p class="err" role="alert">{error}</p>
+		{/if}
+		{#if needsPinToDecryptVault()}
+			<p class="hint">Enter your recovery PIN to load encrypted plan data.</p>
 		{/if}
 
 		{#if mode === 'recovery'}
@@ -165,6 +175,12 @@
 		margin: 0 0 var(--space-4);
 		font-size: 14px;
 		line-height: 1.5;
+		color: var(--text-2);
+	}
+
+	.hint {
+		margin: 0 0 var(--space-3);
+		font-size: 13px;
 		color: var(--text-2);
 	}
 

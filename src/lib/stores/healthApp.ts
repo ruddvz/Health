@@ -10,7 +10,9 @@ import {
 	LS_SETTINGS
 } from '$lib/constants/storage';
 import { defaultOnboardingState, normalizeOnboarding } from '$lib/logic/onboardingState';
-import { clearAllSecurityData } from '$lib/stores/healthLock';
+import { loadSecurityConfig } from '$lib/security/config';
+import { isVaultEncrypted } from '$lib/security/vault';
+import { hydrateFromVaultSnapshot } from '$lib/stores/vaultBridge';
 import type { DayType, OnboardingState, PlanV2, ProgressV2 } from '$lib/types/planV2';
 import { parsePlanJsonText } from '$lib/validation/planV2';
 
@@ -19,7 +21,6 @@ export const importWarnings = writable<string[]>([]);
 export const activeDayType = writable<DayType>('workout');
 export const progress = writable<ProgressV2>({});
 export const settings = writable<Record<string, unknown>>({});
-
 export const onboarding = writable<OnboardingState>(defaultOnboardingState());
 
 function readJson<T>(key: string, fallback: T): T {
@@ -38,9 +39,29 @@ function writeJson(key: string, value: unknown) {
 	localStorage.setItem(key, JSON.stringify(value));
 }
 
+async function shouldSkipPlaintextHydrate(): Promise<boolean> {
+	if (!browser) return false;
+	const cfg = loadSecurityConfig();
+	if (!cfg.encryptionEnabled) return false;
+	return isVaultEncrypted();
+}
+
 /** Hydrate all persisted slices (call once from root layout onMount). */
-export function hydrateFromLocalStorage() {
+export async function hydrateFromLocalStorage() {
 	if (!browser) return;
+
+	if (await shouldSkipPlaintextHydrate()) {
+		const { hasVaultDek } = await import('$lib/stores/healthLock');
+		if (!hasVaultDek()) {
+			plan.set(null);
+			importWarnings.set([]);
+			progress.set({});
+			settings.set({});
+			onboarding.set(defaultOnboardingState());
+			activeDayType.set('workout');
+		}
+		return;
+	}
 
 	const rawPlan = localStorage.getItem(LS_PLAN);
 	if (rawPlan) {
@@ -72,30 +93,58 @@ export function hydrateFromLocalStorage() {
 	onboarding.set(normalizeOnboarding(obRaw));
 }
 
+export { hydrateFromVaultSnapshot } from '$lib/stores/vaultBridge';
+
 export function persistOnboarding(state: OnboardingState) {
-	writeJson(LS_ONBOARDING, state);
 	onboarding.set(state);
+	void persistSlice('onboarding', state);
 }
 
 export function persistActiveDayType(dt: DayType) {
-	localStorage.setItem(LS_ACTIVE_DAY_TYPE, dt);
 	activeDayType.set(dt);
+	void persistSlice('activeDayType', dt);
 }
 
 export function persistProgress(p: ProgressV2) {
-	writeJson(LS_PROGRESS, p);
 	progress.set(p);
+	void persistSlice('progress', p);
 }
 
 export function persistSettings(s: Record<string, unknown>) {
-	writeJson(LS_SETTINGS, s);
 	settings.set(s);
+	void persistSlice('settings', s);
 }
 
 export function savePlan(p: PlanV2, warnings: string[]) {
-	writeJson(LS_PLAN, p);
 	plan.set(p);
 	importWarnings.set(warnings);
+	void persistSlice('plan', p);
+}
+
+async function persistSlice(key: 'plan' | 'progress' | 'onboarding' | 'settings' | 'activeDayType', value: unknown) {
+	if (!browser) return;
+	const cfg = loadSecurityConfig();
+	const { hasVaultDek, getVaultDek } = await import('$lib/stores/healthLock');
+	if (cfg.encryptionEnabled && hasVaultDek()) {
+		const dek = getVaultDek();
+		if (dek) {
+			const { persistVaultSlice } = await import('$lib/security/vault');
+			await persistVaultSlice(dek, key, value);
+			return;
+		}
+	}
+	const lsMap = {
+		plan: LS_PLAN,
+		progress: LS_PROGRESS,
+		onboarding: LS_ONBOARDING,
+		settings: LS_SETTINGS,
+		activeDayType: LS_ACTIVE_DAY_TYPE
+	} as const;
+	if (key === 'activeDayType') {
+		localStorage.setItem(LS_ACTIVE_DAY_TYPE, String(value));
+	} else {
+		writeJson(lsMap[key], value);
+	}
 }
 
 export function clearAllLocalHealthData() {
@@ -117,7 +166,7 @@ export function clearAllLocalHealthData() {
 	progress.set({});
 	settings.set({});
 	onboarding.set(defaultOnboardingState());
-	void clearAllSecurityData();
+	void import('$lib/stores/healthLock').then((m) => m.clearAllSecurityData());
 }
 
 export function getPlan(): PlanV2 | null {

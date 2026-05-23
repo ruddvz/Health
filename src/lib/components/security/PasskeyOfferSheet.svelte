@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { validatePinFormat } from '$lib/security/crypto';
 	import { createRecoveryCodeSet } from '$lib/security/recoveryCodes';
 	import { isPlatformAuthenticatorAvailable } from '$lib/security/rpOrigin';
-	import { enablePasskeyLock, persistSecurity, securityConfig } from '$lib/stores/healthLock';
-	import { get } from 'svelte/store';
+	import { enablePasskeyLock } from '$lib/stores/healthLock';
 
 	interface Props {
 		ondecline: () => void;
@@ -26,8 +26,16 @@
 	async function enable() {
 		busy = true;
 		error = null;
+		const pinErr = validatePinFormat(recoveryPin.trim());
+		if (pinErr) {
+			error = pinErr;
+			busy = false;
+			return;
+		}
+		const { codes, configHashes } = await createRecoveryCodeSet();
 		const r = await enablePasskeyLock({
-			recoveryPin: recoveryPin.trim() || undefined,
+			recoveryPin: recoveryPin.trim(),
+			recoveryCodeHashes: configHashes,
 			keepUnlocked: true
 		});
 		busy = false;
@@ -35,9 +43,6 @@
 			error = r.error;
 			return;
 		}
-		const { codes, configHashes } = await createRecoveryCodeSet();
-		const cur = get(securityConfig);
-		persistSecurity({ ...cur, recoveryCodeHashes: configHashes }, { keepUnlocked: true });
 		codesShown = codes;
 	}
 
@@ -51,7 +56,8 @@
 		<h2 id="offer-title" class="title">Protect your health plan</h2>
 		<p class="body">
 			Use Face ID, Touch ID, Windows Hello, or your device passcode to unlock this app. Your plan
-			stays on this device. Health does not upload your meals, weight, supplements, or progress data.
+			stays on this device and is encrypted on-device. Health does not upload your meals, weight,
+			supplements, or progress data.
 		</p>
 
 		{#if error}
@@ -68,17 +74,18 @@
 			<button type="button" class="primary pressable" onclick={continueToApp}>Continue to app</button>
 		{:else}
 			<label class="field">
-				<span class="mono-caps">Recovery PIN (optional, 4–8 digits)</span>
+				<span class="mono-caps">Recovery PIN (required, 4–8 digits)</span>
 				<input
 					class="inp"
 					type="password"
 					inputmode="numeric"
 					maxlength="8"
-					placeholder="If biometrics fail"
+					placeholder="Decrypts your plan on this device"
 					bind:value={recoveryPin}
 					disabled={busy}
 				/>
 			</label>
+			<p class="hint">Required for encrypted storage. Passkey unlocks the app; PIN loads encrypted data.</p>
 			<button
 				type="button"
 				class="primary pressable"
@@ -125,6 +132,13 @@
 		font-size: 14px;
 		line-height: 1.55;
 		color: var(--text-2);
+	}
+
+	.hint {
+		margin: 0 0 var(--space-3);
+		font-size: 12px;
+		color: var(--text-3);
+		line-height: 1.45;
 	}
 
 	.err {

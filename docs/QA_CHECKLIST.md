@@ -35,3 +35,17 @@ Use after substantive UI or storage changes.
 ## Data
 
 - [ ] **Delete all local data** clears plan, progress list, and returns to intake.
+
+## Health Lock (passkey / Face ID)
+
+Test on **HTTPS** — use production when possible: `https://ruddvz.github.io/Health/` (passkeys bind to this origin; localhost is dev-only).
+
+- [ ] Import plan → **Protect your health plan** sheet appears → **Protect with passkey** requires recovery PIN → recovery codes shown once.
+- [ ] **Not now** skips lock and opens Today.
+- [ ] With lock on: open **Today** → **Unlock Health** → **Unlock with passkey** works on device with biometrics.
+- [ ] After passkey unlock on cold start with encryption: enter **recovery PIN** to load plan data.
+- [ ] Wrong PIN 5+ times → temporary lockout message.
+- [ ] **System → Security**: generate recovery codes, change recovery PIN, **Lock now**, **Remove passkey from this device**.
+- [ ] Recovery code unlock works (one-time).
+- [ ] Switch apps / background → auto-lock when set to “immediately when hidden”.
+- [ ] **Delete all local data** clears lock + encrypted vault.

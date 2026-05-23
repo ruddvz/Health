@@ -23,15 +23,20 @@
 	let { children } = $props();
 
 	onMount(() => {
-		hydrateFromLocalStorage();
+		void hydrateFromLocalStorage();
 		hydrateSecurity();
 
+		const onHide = () => lockOnHidden();
 		const onVis = () => {
 			if (document.visibilityState === 'hidden') lockOnHidden();
 			else touchSession();
 		};
+		window.addEventListener('pagehide', onHide);
 		document.addEventListener('visibilitychange', onVis);
-		return () => document.removeEventListener('visibilitychange', onVis);
+		return () => {
+			window.removeEventListener('pagehide', onHide);
+			document.removeEventListener('visibilitychange', onVis);
+		};
 	});
 
 	const path = $derived(normalizePathname(page.url.pathname));

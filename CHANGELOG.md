@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Health Lock (local passkey app lock)
+
+- **Phase 1**: WebAuthn platform passkey / Face ID / Touch ID app lock for the static GitHub Pages PWA — no backend, data stays on device.
+- Post-import **Protect your health plan** sheet; **Unlock Health** gate on app routes; **System → Security** for passkey, recovery PIN, recovery codes, auto-lock, remove passkey.
+- **AES-GCM encrypted vault** in IndexedDB for plan/progress/onboarding/settings when lock is enabled (recovery PIN required).
+- PIN attempt rate limiting; lock on tab hide / `pagehide`; GitHub Pages relying-party domain guidance.
+- See `docs/HEALTH_PASSKEY_SECURITY_IMPLEMENTATION.md` for Phase 2 (custom domain) and Phase 3 (server passkeys).
+
 ### SvelteKit rebuild (Phase 1)
 
 - Scaffold SvelteKit (TypeScript), `@sveltejs/adapter-static` with `build/` output and GitHub Pages base `/Health`, `vite-plugin-pwa` with Workbox precache, Nothing OS–inspired design tokens and shell (bottom nav, status strip, offline banner, install/update prompts).

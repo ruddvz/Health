@@ -35,6 +35,8 @@ export interface HealthSecurityConfig {
 	autoLockMinutes: number;
 	/** Lock again when the PWA is opened after being closed */
 	lockOnColdStart: boolean;
+	/** Plan/progress stored encrypted in IndexedDB (requires recovery PIN). */
+	encryptionEnabled?: boolean;
 	updatedAt: string;
 }
 
