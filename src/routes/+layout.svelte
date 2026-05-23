@@ -9,17 +9,34 @@
 	import AppShell from '$lib/components/app/AppShell.svelte';
 	import TopStatusBar from '$lib/components/app/TopStatusBar.svelte';
 	import InstallPrompt from '$lib/components/app/InstallPrompt.svelte';
+	import UnlockGate from '$lib/components/security/UnlockGate.svelte';
 	import { normalizePathname } from '$lib/paths';
+	import { isLockProtectedPath } from '$lib/security/routeLock';
 	import { activeDayType, hydrateFromLocalStorage, plan } from '$lib/stores/healthApp';
+	import {
+		hydrateSecurity,
+		lockOnHidden,
+		needsUnlockForPath,
+		touchSession
+	} from '$lib/stores/healthLock';
 
 	let { children } = $props();
 
 	onMount(() => {
 		hydrateFromLocalStorage();
+		hydrateSecurity();
+
+		const onVis = () => {
+			if (document.visibilityState === 'hidden') lockOnHidden();
+			else touchSession();
+		};
+		document.addEventListener('visibilitychange', onVis);
+		return () => document.removeEventListener('visibilitychange', onVis);
 	});
 
 	const path = $derived(normalizePathname(page.url.pathname));
 	const showNav = $derived(path !== '/' && path !== '/import');
+	const gated = $derived(isLockProtectedPath(path) && needsUnlockForPath(path, true));
 
 	const weekLabel = $derived.by(() => {
 		const p = $plan;
@@ -50,6 +67,10 @@
 	<TopStatusBar {weekLabel} dayMode={$activeDayType} />
 {/if}
 <AppShell {showNav}>
-	{@render children()}
+	{#if gated}
+		<UnlockGate />
+	{:else}
+		{@render children()}
+	{/if}
 </AppShell>
 <InstallPrompt />

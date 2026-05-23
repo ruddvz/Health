@@ -10,6 +10,12 @@
 
 	<SectionLabel text="PRIVACY & DATA" />
 	<SettingsRowLink
+		icon="KEY"
+		title="Health Lock"
+		subtitle="PIN, Face ID, recovery codes"
+		href={ROUTES.systemSecurity}
+	/>
+	<SettingsRowLink
 		icon="LOCK"
 		title="100% Local"
 		subtitle="Everything is stored on this device."

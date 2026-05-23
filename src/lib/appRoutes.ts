@@ -1,5 +1,6 @@
 /** Known in-app paths used by `SettingsRowLink` and similar (keeps `resolve()` type-safe). */
 export const ROUTES = {
+	systemSecurity: '/system/security',
 	systemPrivacy: '/system/privacy',
 	systemSettings: '/system/settings',
 	systemDiagnostics: '/system/diagnostics',

@@ -6,9 +6,11 @@ import {
 	LS_ONBOARDING,
 	LS_PLAN,
 	LS_PROGRESS,
+	LS_SECURITY,
 	LS_SETTINGS
 } from '$lib/constants/storage';
 import { defaultOnboardingState, normalizeOnboarding } from '$lib/logic/onboardingState';
+import { clearAllSecurityData } from '$lib/stores/healthLock';
 import type { DayType, OnboardingState, PlanV2, ProgressV2 } from '$lib/types/planV2';
 import { parsePlanJsonText } from '$lib/validation/planV2';
 
@@ -104,7 +106,8 @@ export function clearAllLocalHealthData() {
 		LS_GROCERY,
 		LS_SETTINGS,
 		LS_ACTIVE_DAY_TYPE,
-		LS_ONBOARDING
+		LS_ONBOARDING,
+		LS_SECURITY
 	]) {
 		localStorage.removeItem(k);
 	}
@@ -114,6 +117,7 @@ export function clearAllLocalHealthData() {
 	progress.set({});
 	settings.set({});
 	onboarding.set(defaultOnboardingState());
+	void clearAllSecurityData();
 }
 
 export function getPlan(): PlanV2 | null {

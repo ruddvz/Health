@@ -19,8 +19,8 @@
 
 		<h2 class="mono-caps h">Personal</h2>
 		<p class="p">
-			You control exports and deletion from Settings. Prefer device passcode and encrypted backups
-			for sensitive data.
+			You control exports and deletion from Settings. Optional Health Lock (PIN / Face ID) adds an
+			in-app privacy screen — still 100% on-device, with no HEALTH servers involved.
 		</p>
 	</section>
 </main>
