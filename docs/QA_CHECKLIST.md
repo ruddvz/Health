@@ -49,3 +49,9 @@ Test on **HTTPS** — use production when possible: `https://ruddvz.github.io/He
 - [ ] Recovery code unlock works (one-time).
 - [ ] Switch apps / background → auto-lock when set to “immediately when hidden”.
 - [ ] **Delete all local data** clears lock + encrypted vault.
+
+## Cloud passkey (Phase 3 — Vercel + Supabase)
+
+- [ ] `GET {PUBLIC_HEALTH_API_URL}/api/health/status` returns `{ ok: true }`.
+- [ ] Security → create cloud passkey → sign out → sign in.
+- [ ] Upload / download encrypted cloud backup with backup password.

@@ -3,7 +3,13 @@
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import { hashPin, validatePinFormat } from '$lib/security/crypto';
 	import { createRecoveryCodeSet } from '$lib/security/recoveryCodes';
-	import { getPasskeyServerCapability } from '$lib/security/passkeyServer.stub';
+	import CloudAccountPanel from '$lib/components/security/CloudAccountPanel.svelte';
+	import { getPasskeyServerCapability } from '$lib/security/passkeyServer';
+	import {
+		configuredOrigin,
+		configuredRpId,
+		deploymentMode,
+	} from '$lib/security/domainConfig';
 	import {
 		getRelyingPartyInfo,
 		isPlatformAuthenticatorAvailable,
@@ -294,9 +300,16 @@ function disableLock() {
 		<button type="button" class="btn pressable" onclick={saveAutoLockSettings}>Save auto-lock</button>
 	</section>
 
+	<CloudAccountPanel />
+
 	<section class="block nothing-surface">
-		<h2 class="mono-caps h">Synced passkeys (future)</h2>
-		<p class="p">{serverCap.reason}</p>
+		<h2 class="mono-caps h">Deployment notes</h2>
+		<p class="p">
+			Mode: <strong>{deploymentMode()}</strong>
+			{#if configuredRpId()} · Configured RP: <code>{configuredRpId()}</code>{/if}
+			{#if configuredOrigin()} · Origin: <code>{configuredOrigin()}</code>{/if}
+		</p>
+		<p class="p">{serverCap.available ? 'Cloud API ready.' : serverCap.reason}</p>
 	</section>
 
 	{#if statusMsg}

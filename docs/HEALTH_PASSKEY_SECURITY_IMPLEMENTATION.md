@@ -6,9 +6,9 @@
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| **1** | Local passkey app lock + encrypted vault | Implemented |
-| **2** | Custom domain (`health.example.com`) | Before mass passkey rollout |
-| **3** | Server passkeys + optional cloud sync | Future (Supabase / Workers + SimpleWebAuthn) |
+| **1** | Local passkey app lock + encrypted vault | ✅ Shipped |
+| **2** | Custom domain + env (`PUBLIC_HEALTH_RP_ID`) | ✅ Config + docs |
+| **3** | Server passkeys + encrypted cloud backup | ✅ API + UI (needs Vercel + Supabase deploy) |
 
 ## Phase 1 — What shipped
 
@@ -101,3 +101,16 @@ When extending Health Lock:
 2. Never store passkey private keys; only public credential metadata.
 3. Test on **HTTPS** production origin before release.
 4. Update this doc + CHANGELOG + QA checklist for behavior changes.
+
+
+## Phase 3 — Deploy checklist
+
+1. Apply `supabase/migrations/20260523120000_health_passkey_cloud.sql`
+2. Deploy repo to **Vercel** (`vercel.json` includes `/api/*` routes)
+3. Set env: `HEALTH_RP_ID`, `HEALTH_ORIGIN`, `SUPABASE_*`, `PUBLIC_HEALTH_API_URL`
+4. Rebuild static PWA with matching `PUBLIC_HEALTH_RP_ID` / `PUBLIC_HEALTH_ORIGIN`
+5. Security → **Cloud passkey account** → register / sign in / encrypted backup
+
+API routes: `/api/webauthn/register/options`, `verify`, `authenticate/options`, `verify`, `/api/health/backup`, `/api/health/status`
+
+Without Supabase credentials the API uses an in-memory store (dev/demo only).
