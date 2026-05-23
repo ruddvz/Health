@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import PasskeyOfferSheet from '$lib/components/security/PasskeyOfferSheet.svelte';
 	import DashedUploadButton from '$lib/components/spec/DashedUploadButton.svelte';
 	import InlineErrorCard from '$lib/components/spec/InlineErrorCard.svelte';
 	import JsonDropZone from '$lib/components/spec/JsonDropZone.svelte';
@@ -8,11 +10,12 @@
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import TextLinkButton from '$lib/components/spec/TextLinkButton.svelte';
-	import { MAX_PLAN_BYTES } from '$lib/constants/storage';
+	import { MAX_PLAN_BYTES, SS_OFFER_PASSKEY } from '$lib/constants/storage';
 	import { buildClaudePrompt, copyTextToClipboard } from '$lib/logic/buildClaudePrompt';
 	import { flattenGrocery } from '$lib/logic/planDerive';
 	import type { PlanV2 } from '$lib/types/planV2';
 	import { onboarding, persistProgress, progress, savePlan } from '$lib/stores/healthApp';
+	import { securityConfig } from '$lib/stores/healthLock';
 	import { get } from 'svelte/store';
 	import { parsePlanJsonText } from '$lib/validation/planV2';
 
@@ -23,6 +26,7 @@
 	let fileInput: HTMLInputElement | null = null;
 	let copyHint = $state<string | null>(null);
 	let copyTimer: ReturnType<typeof setTimeout> | null = null;
+	let showPasskeyOffer = $state(false);
 
 	const importTitle = 'Bring in your\nhealth plan';
 
@@ -51,7 +55,13 @@
 		}
 		savePlan(r.plan, r.warnings);
 		mergeGroceryCheckedIntoProgress(r.plan);
-		goto(resolve('/today'));
+		const lockOn = get(securityConfig).enabled;
+		if (!lockOn && browser) {
+			sessionStorage.setItem(SS_OFFER_PASSKEY, '1');
+			showPasskeyOffer = true;
+		} else {
+			goto(resolve('/today'));
+		}
 		return true;
 	}
 
@@ -116,6 +126,12 @@
 	function validatePaste() {
 		applyParsed(pasteText);
 		if (!error) pasteOpen = false;
+	}
+
+	function declinePasskeyOffer() {
+		showPasskeyOffer = false;
+		if (browser) sessionStorage.removeItem(SS_OFFER_PASSKEY);
+		goto(resolve('/today'));
 	}
 </script>
 
@@ -184,6 +200,10 @@
 		<InlineErrorCard title="Import blocked" body={error} />
 	{/if}
 </main>
+
+{#if showPasskeyOffer}
+	<PasskeyOfferSheet ondecline={declinePasskeyOffer} />
+{/if}
 
 {#if pasteOpen}
 	<div class="modal" role="presentation">

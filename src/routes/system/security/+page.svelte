@@ -14,8 +14,8 @@
 	import {
 		lockNow,
 		persistSecurity,
-		securityConfig,
-		unlockWithPin
+		removePasskeyFromDevice,
+		securityConfig
 	} from '$lib/stores/healthLock';
 	import { get } from 'svelte/store';
 
@@ -79,7 +79,7 @@
 			pin: pinCred,
 			method: cur.webauthn ? 'pin+biometric' : 'pin'
 		};
-		persistSecurity(next);
+		persistSecurity(next, { keepUnlocked: true });
 		setupPin = '';
 		setupPinConfirm = '';
 		statusMsg = 'PIN enabled. Generate recovery codes if you have not yet.';
@@ -116,22 +116,35 @@
 		errorMsg = null;
 		const { codes, configHashes } = await createRecoveryCodeSet();
 		const cur = get(securityConfig);
-		persistSecurity({ ...cur, recoveryCodeHashes: configHashes });
+		persistSecurity({ ...cur, recoveryCodeHashes: configHashes }, { keepUnlocked: true });
 		pendingRecoveryCodes = codes;
 		statusMsg = 'Save these codes now — they will not be shown again.';
 	}
 
 	function saveAutoLockSettings() {
 		const cur = get(securityConfig);
-		persistSecurity({
-			...cur,
-			autoLockMinutes: autoLock,
-			lockOnColdStart
-		});
+		persistSecurity(
+			{
+				...cur,
+				autoLockMinutes: autoLock,
+				lockOnColdStart
+			},
+			{ keepUnlocked: true }
+		);
 		statusMsg = 'Auto-lock settings saved.';
 	}
 
-	function disableLock() {
+	
+	function removePasskey() {
+		const ok = window.confirm(
+			'Remove the passkey registered on this device? You can still use your recovery PIN if set.'
+		);
+		if (!ok) return;
+		removePasskeyFromDevice();
+		statusMsg = 'Passkey removed from this device.';
+	}
+
+function disableLock() {
 		const ok = window.confirm('Turn off Health Lock on this device?');
 		if (!ok) return;
 		persistSecurity({
@@ -158,7 +171,16 @@
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<ScreenHeaderBlock title="SECURITY" subtitle="Health Lock · local passkeys" />
+	<ScreenHeaderBlock title="SECURITY" subtitle="Protect your health plan on this device" />
+
+	<section class="block nothing-surface hero">
+		<h2 class="title">Protect your health plan</h2>
+		<p class="p">
+			Use Face ID, Touch ID, Windows Hello, or your device passcode to unlock this app. Your plan
+			stays on this device. Health does not upload your meals, weight, supplements, or progress data.
+		</p>
+		<p class="p muted">Phase 1: local app lock only — no cloud accounts. Synced passkeys need a backend (Phase 3).</p>
+	</section>
 
 	<section class="block nothing-surface">
 		<h2 class="mono-caps h">Status</h2>
@@ -183,7 +205,7 @@
 	{/if}
 
 	<section class="block nothing-surface">
-		<h2 class="mono-caps h">Local Face ID lock</h2>
+		<h2 class="mono-caps h">Enable passkey lock</h2>
 		<p class="p">
 			Uses your device’s platform authenticator. This is a privacy screen for your local PWA — not
 			the same as a server-synced passkey backed by a cloud account.
@@ -194,12 +216,12 @@
 			disabled={!bioAvailable}
 			onclick={enableBiometric}
 		>
-			{bioAvailable ? 'Enable Face ID / Touch ID' : 'Biometrics unavailable'}
+			{bioAvailable ? 'Enable passkey on this device' : 'Passkey not available in this browser'}
 		</button>
 	</section>
 
 	<section class="block nothing-surface">
-		<h2 class="mono-caps h">PIN</h2>
+		<h2 class="mono-caps h">Change recovery PIN</h2>
 		<p class="p">4–8 digit PIN stored as a salted hash on this device only.</p>
 		<label class="field">
 			<span class="mono-caps">New PIN</span>
@@ -267,6 +289,13 @@
 		<p class="error" role="alert">{errorMsg}</p>
 	{/if}
 
+	
+	{#if $securityConfig.webauthn}
+		<button type="button" class="btn secondary pressable" onclick={removePasskey}>
+			Remove passkey from this device
+		</button>
+	{/if}
+
 	<p class="mono-caps lab">Actions</p>
 	<button type="button" class="btn secondary pressable" onclick={lockScreenNow}>Lock now</button>
 	{#if $securityConfig.enabled}
@@ -278,6 +307,12 @@
 	.screen {
 		flex: 1;
 		padding-bottom: var(--space-6);
+	}
+
+	.hero .title {
+		margin: 0 0 var(--space-2);
+		font-size: 18px;
+		font-weight: 700;
 	}
 
 	.block,

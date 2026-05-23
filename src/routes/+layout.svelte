@@ -16,7 +16,7 @@
 	import {
 		hydrateSecurity,
 		lockOnHidden,
-		needsUnlockForPath,
+		requiresUnlock,
 		touchSession
 	} from '$lib/stores/healthLock';
 
@@ -36,7 +36,7 @@
 
 	const path = $derived(normalizePathname(page.url.pathname));
 	const showNav = $derived(path !== '/' && path !== '/import');
-	const gated = $derived(isLockProtectedPath(path) && needsUnlockForPath(path, true));
+	const gated = $derived(isLockProtectedPath(path) && $requiresUnlock);
 
 	const weekLabel = $derived.by(() => {
 		const p = $plan;

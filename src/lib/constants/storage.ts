@@ -7,6 +7,8 @@ export const LS_ACTIVE_DAY_TYPE = 'health.v2.activeDayType';
 export const LS_ONBOARDING = 'health.v2.onboarding';
 /** Health Lock config (PIN hashes, WebAuthn credential id metadata, recovery hashes). */
 export const LS_SECURITY = 'health.v2.security';
+/** sessionStorage: show passkey offer after first plan import */
+export const SS_OFFER_PASSKEY = 'health.v2.offerPasskey';
 
 export const MAX_PLAN_BYTES = 2 * 1024 * 1024; /* 2 MB safety cap (spec: 2 MB file) */
 

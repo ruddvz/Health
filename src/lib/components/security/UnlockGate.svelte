@@ -64,8 +64,11 @@
 <div class="gate" role="dialog" aria-modal="true" aria-labelledby="lock-title">
 	<div class="inner nothing-surface">
 		<p class="mono-caps kicker">Health Lock</p>
-		<h1 id="lock-title" class="title">Unlock</h1>
-		<p class="sub">Your plan and logs stay on this device. Authenticate to continue.</p>
+		<h1 id="lock-title" class="title">Unlock Health</h1>
+		<p class="sub">
+			Use Face ID, Touch ID, Windows Hello, or your device passcode. Your plan stays on this device
+			— Health does not upload your meals, weight, supplements, or progress.
+		</p>
 
 		{#if error}
 			<p class="err" role="alert">{error}</p>
@@ -99,7 +102,7 @@
 		{:else}
 			{#if showBio}
 				<button type="button" class="bio pressable" disabled={busy} onclick={tryBio}>
-					Use Face ID / Touch ID
+					Unlock with passkey
 				</button>
 			{/if}
 			{#if showPin}
