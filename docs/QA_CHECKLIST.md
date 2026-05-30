@@ -11,6 +11,7 @@ Playwright covers a subset of this list (`npm run test:e2e` after build):
 - Today quick nav + privacy card; Phases drill-down (`e2e/plan-flow.spec.ts`)
 - Import paste invalid JSON error in modal (`e2e/import-paste.spec.ts`)
 - Passkey offer “Not now” → Today (`e2e/passkey-offer.spec.ts`)
+- Progress JSON export section in Settings (`e2e/progress-export.spec.ts`)
 
 Manual checks below remain required for HTTPS passkeys, service worker updates, and cloud backup.
 

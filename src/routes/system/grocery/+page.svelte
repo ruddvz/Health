@@ -48,6 +48,10 @@
 {#if $plan}
 	<main class="screen px-screen pt-safe stack">
 		<ScreenHeaderBlock title="GROCERY" />
+		<p class="disclaimer">
+			List prices and store totals in your plan are estimates — confirm at checkout. Promos vary by
+			region.
+		</p>
 		<ChipRow chips={['All', 'Store', 'Category']} selected={chip} onSelect={(c) => (chip = c)} />
 
 		{#if budgetSwaps.length}
@@ -90,6 +94,13 @@
 {/if}
 
 <style>
+	.disclaimer {
+		margin: 0 0 var(--space-3);
+		font-size: 13px;
+		line-height: 1.45;
+		color: var(--text-3);
+	}
+
 	.screen {
 		flex: 1;
 		padding-bottom: var(--space-6);

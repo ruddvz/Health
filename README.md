@@ -20,7 +20,7 @@ The snapshot in `legacy/` reflects the pre-SvelteKit feature set:
 
 - `samples/minimal-plan-v2.json` — small valid plan with `training.weekly_split` for smoke tests.
 - `samples/rudra-plan-v2-normalized.json` — richer schema v2 example (night-shift `schedule`, swaps, safety).
-- `static/samples/rudra-plan-v2.json` — placeholder used by the SvelteKit shell until import lands in Phase 2.
+- `static/samples/rudra-plan-v2.json` — optional static copy for offline demos (import via **Paste JSON** or file upload in the app).
 
 ## Tech & privacy
 
@@ -76,11 +76,9 @@ npm run build && npm run verify:sw
 
 The last line is optional locally; **GitHub Actions** runs `verify:sw` after every production build.
 
-## SvelteKit app (current)
+## SvelteKit roadmap
 
-The SvelteKit build includes intake, JSON import with validation, Today (macros, water, timeline, plan warnings), Meals (tracking, quick fix, cook mode, swaps), Train (session logging, rest timer), Progress (tabbed views), System hub (export, security, diagnostics), and optional Health Lock / cloud passkey backup when configured.
-
-Further polish and legacy parity items are tracked in **`docs/HEALTH_APP_REBUILD_PLAN.md`** and **`HEALTH_APP_EXECUTION_PLAN.md`**.
+Import/paste JSON, Zod validation, persistence, and full Today/Meals/Train/Progress behavior are tracked in **`docs/HEALTH_APP_REBUILD_PLAN.md`** (Phases 2–8). Until then, tab screens beyond basic layout are mostly placeholders.
 
 ## Reset data
 

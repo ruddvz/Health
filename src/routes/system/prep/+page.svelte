@@ -50,6 +50,15 @@
 			/>
 		{/each}
 
+		<section class="safety nothing-surface" aria-labelledby="prep-safety-h">
+			<h2 id="prep-safety-h" class="mono-caps safety-title">Food safety</h2>
+			<p class="safety-body">
+				Cool cooked food quickly, store in clean containers, and reheat until steaming hot
+				throughout. Follow local guidance for safe internal temperatures (e.g. poultry). When in
+				doubt, throw it out.
+			</p>
+		</section>
+
 		<TipCard
 			title="Prep Tip"
 			body={(Array.isArray(pg.tips) && pg.tips[0] && typeof pg.tips[0] === 'string'
@@ -60,6 +69,24 @@
 {/if}
 
 <style>
+	.safety {
+		padding: var(--space-4);
+		margin-top: var(--space-3);
+	}
+
+	.safety-title {
+		margin: 0 0 var(--space-2);
+		font-size: 10px;
+		color: var(--text-3);
+	}
+
+	.safety-body {
+		margin: 0;
+		font-size: 14px;
+		line-height: 1.45;
+		color: var(--text-2);
+	}
+
 	.screen {
 		flex: 1;
 		padding-bottom: var(--space-6);

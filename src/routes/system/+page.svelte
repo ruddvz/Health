@@ -23,6 +23,12 @@
 	/>
 	<SettingsRowLink
 		icon="OUT"
+		title="Export Progress"
+		subtitle="Weight, check-ins, workouts"
+		href={ROUTES.systemSettingsProgressExport}
+	/>
+	<SettingsRowLink
+		icon="OUT"
 		title="Export Plan"
 		subtitle="Save a backup of your plan."
 		href={ROUTES.systemSettingsExport}

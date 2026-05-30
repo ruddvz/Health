@@ -109,10 +109,26 @@
 				];
 	});
 
-	const nextTitle = $derived.by(() => {
+	const nextAction = $derived.by(() => {
+		for (let i = 0; i < meals.length; i++) {
+			const m = meals[i];
+			const st = getMealSlotState($progress, logDay, dayT, m.slot);
+			if (st === 'pending') {
+				return {
+					title: m.name,
+					subtitle: m.time ? `Meal ${m.slot} · ${m.time}` : `Meal ${m.slot}`,
+					href: '/meals' as const
+				};
+			}
+		}
 		const td = getTrainingDay($plan, 0);
-		if (dayT === 'workout' && td && typeof td.name === 'string') return String(td.name);
-		return 'Recovery day';
+		if (dayT === 'workout' && td && typeof td.name === 'string') {
+			return { title: String(td.name), subtitle: 'Start your workout', href: '/train' as const };
+		}
+		if (meals[0]) {
+			return { title: meals[0].name, subtitle: 'Next meal on your plan', href: '/meals' as const };
+		}
+		return { title: 'Recovery day', subtitle: 'Focus on recovery', href: '/train' as const };
 	});
 
 	function bumpWater(delta: number) {
@@ -177,10 +193,10 @@
 		/>
 
 		<NextActionCard
-			eyebrow="NEXT ACTION"
-			title={nextTitle}
-			subtitle={dayT === 'workout' ? 'Start your workout' : 'Focus on recovery'}
-			onclick={() => goto(resolve('/train'))}
+			eyebrow="UP NEXT"
+			title={nextAction.title}
+			subtitle={nextAction.subtitle}
+			onclick={() => goto(resolve(nextAction.href))}
 		/>
 
 		<SectionLabel text="MACROS" />

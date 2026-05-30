@@ -118,6 +118,16 @@
 		}
 	}
 
+	function exportProgressJson() {
+		if (!browser) return;
+		const blob = new Blob([JSON.stringify(get(progress), null, 2)], { type: 'application/json' });
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = 'health-progress.json';
+		a.click();
+		URL.revokeObjectURL(a.href);
+	}
+
 	function exportPlanOnly() {
 		const p = get(plan);
 		if (!p || !browser) return;
@@ -207,6 +217,15 @@
 		onboarding answers, and active day type. You can also export or import just the intake JSON.
 		Plan-only export matches the raw JSON you imported.
 	</p>
+	<p id="progress-export" class="mono-caps lab anchor">Progress data</p>
+	<p class="txt">
+		Weight entries, weekly check-ins, meal slots, water, workouts, and grocery checkmarks stored on
+		this device.
+	</p>
+	<button type="button" class="secondary pressable" onclick={exportProgressJson}>
+		Download progress JSON only
+	</button>
+
 	<p class="mono-caps sub">
 		Plan in browser: {browser ? (localStorage.getItem(LS_PLAN) ? 'present' : 'empty') : '—'}
 	</p>
