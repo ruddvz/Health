@@ -17,6 +17,8 @@
 		settings
 	} from '$lib/stores/healthApp';
 	import { get } from 'svelte/store';
+	import { onMount } from 'svelte';
+	import { setTheme, themeFromSettings, type ThemeMode } from '$lib/theme';
 
 	const ZONE_PRESETS = [
 		{ v: '', label: 'Device default' },
@@ -49,6 +51,14 @@
 					? Math.min(23, Math.max(0, Math.floor(Number(bh))))
 					: 0;
 	});
+
+	function appearanceMode(): ThemeMode {
+		return themeFromSettings($settings);
+	}
+
+	function setAppearance(mode: ThemeMode) {
+		setTheme(mode);
+	}
 
 	function saveCalendar() {
 		const tz = tzCustom.trim() || tzPreset.trim() || '';
@@ -119,6 +129,15 @@
 		URL.revokeObjectURL(a.href);
 	}
 
+	onMount(() => {
+		if (!browser) return;
+		const hash = window.location.hash.replace('#', '');
+		if (!hash) return;
+		requestAnimationFrame(() => {
+			document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		});
+	});
+
 	function wipe() {
 		const ok = window.confirm(
 			'Delete all local app data from this device? This cannot be undone unless you exported a backup.'
@@ -131,6 +150,25 @@
 
 <main class="screen px-screen pt-safe stack">
 	<ScreenHeaderBlock title="SETTINGS" subtitle="Data, calendar & backups" />
+
+	<p class="mono-caps lab">Appearance</p>
+	<p class="txt">Choose light or dark surfaces across the app.</p>
+	<div class="theme-row" role="group" aria-label="Theme">
+		<button
+			type="button"
+			class="theme-opt pressable"
+			class:active={appearanceMode() === 'dark'}
+			aria-pressed={appearanceMode() === 'dark'}
+			onclick={() => setAppearance('dark')}>Dark</button
+		>
+		<button
+			type="button"
+			class="theme-opt pressable"
+			class:active={appearanceMode() === 'light'}
+			aria-pressed={appearanceMode() === 'light'}
+			onclick={() => setAppearance('light')}>Light</button
+		>
+	</div>
 
 	<p class="mono-caps lab">Calendar</p>
 	<p class="txt">
@@ -163,7 +201,7 @@
 	<button type="button" class="save pressable" onclick={saveCalendar}>Save calendar settings</button
 	>
 
-	<p class="mono-caps lab">Export</p>
+	<p id="export" class="mono-caps lab anchor">Export</p>
 	<p class="txt">
 		Full backup includes your plan, progress logs (meals, water, workouts, check-ins), settings,
 		onboarding answers, and active day type. You can also export or import just the intake JSON.
@@ -190,7 +228,7 @@
 		Download plan JSON only
 	</button>
 
-	<p class="mono-caps lab danger">Danger zone</p>
+	<p id="danger" class="mono-caps lab danger anchor">Danger zone</p>
 	<p class="txt">
 		Clears keys: health.v2.plan, progress, grocery, settings, activeDayType, onboarding.
 	</p>
@@ -211,6 +249,10 @@
 
 	.lab.danger {
 		color: var(--red);
+	}
+
+	.anchor {
+		scroll-margin-top: calc(var(--safe-top) + 48px);
 	}
 
 	.txt {

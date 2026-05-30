@@ -3,6 +3,8 @@
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
 	import PlanWarningsCard from '$lib/components/spec/PlanWarningsCard.svelte';
+	import PrivacySafetyCard from '$lib/components/spec/PrivacySafetyCard.svelte';
+	import QuickNavGrid from '$lib/components/spec/QuickNavGrid.svelte';
 	import MetricRing from '$lib/components/spec/MetricRing.svelte';
 	import MetricTile from '$lib/components/spec/MetricTile.svelte';
 	import NextActionCard from '$lib/components/spec/NextActionCard.svelte';
@@ -14,6 +16,7 @@
 	import { consumedTotalsForToday, waterLitersForDay } from '$lib/logic/dayTotals';
 	import { logicalDateKey } from '$lib/logic/dateKey';
 	import { getMealSlotState } from '$lib/logic/mealSlots';
+	import { collectPlanWarnings } from '$lib/logic/planWarnings';
 	import {
 		formatTimeFromHHMM,
 		getMealsForDay,
@@ -49,7 +52,11 @@
 
 	const waterTarget = $derived(getWaterTargetLiters($plan, phaseIndex));
 	const waterL = $derived(waterLitersForDay($progress, totals.day));
-	const planWarnings = $derived($importWarnings.filter(Boolean));
+	const planWarnings = $derived.by(() => {
+		const imp = $importWarnings.filter(Boolean);
+		const live = $plan ? collectPlanWarnings($plan) : [];
+		return [...new Set([...imp, ...live])];
+	});
 
 	const calProg = $derived(
 		totals.targets.kcal > 0 ? Math.min(1, totals.kcal / totals.targets.kcal) : 0
@@ -221,6 +228,10 @@
 				progress={calProg}
 			/>
 		</div>
+
+		<QuickNavGrid />
+
+		<PrivacySafetyCard />
 
 		<SectionLabel text="TIMELINE" />
 		<TimelineCard items={timeline} />

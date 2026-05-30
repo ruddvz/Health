@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
@@ -185,7 +186,13 @@
 	<div class="modal" role="presentation">
 		<button type="button" class="backdrop" aria-label="Close" onclick={() => (checkOpen = false)}
 		></button>
-		<div class="sheet nothing-surface" role="dialog" aria-modal="true" aria-labelledby="chk-h">
+		<div
+			class="sheet nothing-surface"
+			use:focusTrap={{ onEscape: () => (checkOpen = false) }}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="chk-h"
+		>
 			<h2 id="chk-h" class="mono-caps h">Weekly check-in</h2>
 			<p class="sub">Stored locally. Weight also feeds the trend chart.</p>
 			<label class="field">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
@@ -224,7 +225,13 @@
 	<div class="modal" role="presentation">
 		<button type="button" class="backdrop" aria-label="Close" onclick={() => (addOpen = false)}
 		></button>
-		<div class="sheet nothing-surface" role="dialog" aria-modal="true" aria-labelledby="add-h">
+		<div
+			class="sheet nothing-surface"
+			use:focusTrap={{ onEscape: () => (addOpen = false) }}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="add-h"
+		>
 			<h2 id="add-h" class="mono-caps h">Add meal</h2>
 			<p class="sub">Logged for today only. Does not edit your imported plan JSON.</p>
 			<label class="field">

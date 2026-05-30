@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from '$lib/a11y/focusTrap';
 	import type { MealRowDetail } from '$lib/logic/planDerive';
 
 	interface Props {
@@ -68,7 +69,13 @@
 {#if open && meal}
 	<div class="modal" role="presentation">
 		<button type="button" class="backdrop" aria-label="Close cook mode" onclick={close}></button>
-		<div class="sheet nothing-surface" role="dialog" aria-modal="true" aria-labelledby="cook-h">
+		<div
+			class="sheet nothing-surface"
+			use:focusTrap={{ onEscape: onClose }}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="cook-h"
+		>
 			<div class="head">
 				<h2 id="cook-h" class="title">{meal.name}</h2>
 				<button type="button" class="x pressable" onclick={close} aria-label="Close">×</button>

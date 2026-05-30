@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { QUICK_FIX_PRESETS, type QuickFixPreset } from '$lib/logic/quickFixPresets';
 
 	interface Props {
@@ -12,7 +13,13 @@
 {#if open}
 	<div class="modal" role="presentation">
 		<button type="button" class="backdrop" aria-label="Close" onclick={onClose}></button>
-		<div class="sheet nothing-surface" role="dialog" aria-modal="true" aria-labelledby="qf-h">
+		<div
+			class="sheet nothing-surface"
+			use:focusTrap={{ onEscape: onClose }}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="qf-h"
+		>
 			<h2 id="qf-h" class="mono-caps h">Quick fix</h2>
 			<p class="sub">Adds a logged snack for today. Stored only on this device.</p>
 			<div class="grid">

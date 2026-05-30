@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { validatePinFormat } from '$lib/security/crypto';
@@ -51,7 +52,13 @@
 	}
 </script>
 
-<div class="sheet-wrap" role="dialog" aria-modal="true" aria-labelledby="offer-title">
+<div
+	class="sheet-wrap"
+	use:focusTrap={{ onEscape: ondecline }}
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="offer-title"
+>
 	<div class="sheet nothing-surface">
 		<h2 id="offer-title" class="title">Protect your health plan</h2>
 		<p class="body">

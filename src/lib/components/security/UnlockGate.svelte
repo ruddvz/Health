@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { resolve } from '$app/paths';
 	import PinPad from '$lib/components/security/PinPad.svelte';
 	import {
@@ -70,7 +71,7 @@
 	}
 </script>
 
-<div class="gate" role="dialog" aria-modal="true" aria-labelledby="lock-title">
+<div class="gate" use:focusTrap role="dialog" aria-modal="true" aria-labelledby="lock-title">
 	<div class="inner nothing-surface">
 		<p class="mono-caps kicker">Health Lock</p>
 		<h1 id="lock-title" class="title">Unlock Health</h1>

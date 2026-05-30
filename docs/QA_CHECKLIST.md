@@ -2,6 +2,18 @@
 
 Use after substantive UI or storage changes.
 
+## Automated smoke (CI)
+
+Playwright covers a subset of this list (`npm run test:e2e` after build):
+
+- Intake first step visible (`e2e/intake-smoke.spec.ts`)
+- Settings appearance + System Phases link (`e2e/system-followups.spec.ts`)
+- Today quick nav + privacy card; Phases drill-down (`e2e/plan-flow.spec.ts`)
+- Import paste invalid JSON error in modal (`e2e/import-paste.spec.ts`)
+- Passkey offer “Not now” → Today (`e2e/passkey-offer.spec.ts`)
+
+Manual checks below remain required for HTTPS passkeys, service worker updates, and cloud backup.
+
 ## Navigation
 
 - [ ] Bottom tabs: Today, Meals, Training, Progress, More all open the correct panel.

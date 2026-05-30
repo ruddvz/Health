@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
@@ -949,7 +950,13 @@
 {#if reviewOpen}
 	<div class="modal" role="presentation">
 		<button type="button" class="backdrop" aria-label="Close review" onclick={closeReview}></button>
-		<div class="sheet nothing-surface" role="dialog" aria-modal="true" aria-labelledby="rev-h">
+		<div
+			class="sheet nothing-surface"
+			use:focusTrap={{ onEscape: () => (reviewOpen = false) }}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="rev-h"
+		>
 			<h2 id="rev-h" class="mono-caps h">Review & import</h2>
 			<p class="rev-p">
 				Next, use <strong>Copy prompt</strong> on Import, then paste JSON when Claude finishes.

@@ -15,6 +15,10 @@ test.describe('Health PWA smoke', () => {
 		await page.getByRole('button', { name: 'Paste JSON' }).click();
 		await page.getByLabel('Plan JSON').fill(sample);
 		await page.getByRole('button', { name: 'Validate' }).click();
+		const passkey = page.getByRole('dialog', { name: /protect your health plan/i });
+		if (await passkey.isVisible().catch(() => false)) {
+			await page.getByRole('button', { name: /not now/i }).click();
+		}
 		await expect(page).toHaveURL(/\/today/, { timeout: 15000 });
 		await expect(page.getByText('TODAY').first()).toBeVisible();
 	});

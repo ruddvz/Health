@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -209,9 +210,18 @@
 	<div class="modal" role="presentation">
 		<button type="button" class="backdrop" aria-label="Close" onclick={() => (pasteOpen = false)}
 		></button>
-		<div class="sheet nothing-surface" role="dialog" aria-modal="true" aria-labelledby="paste-h">
+		<div
+			class="sheet nothing-surface"
+			use:focusTrap={{ onEscape: () => (pasteOpen = false) }}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="paste-h"
+		>
 			<h2 id="paste-h" class="mono-caps h">Paste JSON</h2>
 			<textarea class="ta" rows="10" bind:value={pasteText} aria-label="Plan JSON"></textarea>
+			{#if error}
+				<p class="paste-err" role="alert">{error}</p>
+			{/if}
 			{#if error}
 				<InlineErrorCard title="Import blocked" body={error} />
 			{/if}
@@ -354,6 +364,13 @@
 		margin: 0 0 var(--space-3);
 		font-size: 11px;
 		color: var(--text-2);
+	}
+
+	.paste-err {
+		margin: 0 0 var(--space-3);
+		font-size: 13px;
+		line-height: 1.45;
+		color: var(--red);
 	}
 
 	.ta {
