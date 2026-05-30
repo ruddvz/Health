@@ -71,7 +71,9 @@
 					<li>{c}</li>
 				{/each}
 			</ul>
-			<button type="button" class="primary pressable" onclick={continueToApp}>Continue to app</button>
+			<button type="button" class="primary pressable" onclick={continueToApp}
+				>Continue to app</button
+			>
 		{:else}
 			<label class="field">
 				<span class="mono-caps">Recovery PIN (required, 4–8 digits)</span>
@@ -85,13 +87,10 @@
 					disabled={busy}
 				/>
 			</label>
-			<p class="hint">Required for encrypted storage. Passkey unlocks the app; PIN loads encrypted data.</p>
-			<button
-				type="button"
-				class="primary pressable"
-				disabled={busy || !bioOk}
-				onclick={enable}
-			>
+			<p class="hint">
+				Required for encrypted storage. Passkey unlocks the app; PIN loads encrypted data.
+			</p>
+			<button type="button" class="primary pressable" disabled={busy || !bioOk} onclick={enable}>
 				{bioOk ? 'Protect with passkey' : 'Passkey not available on this device'}
 			</button>
 			<button type="button" class="secondary pressable" disabled={busy} onclick={ondecline}>

@@ -185,7 +185,9 @@
 		{/if}
 		{#if session}
 			<p class="p">Signed in · user {session.userId.slice(0, 8)}…</p>
-			<button type="button" class="btn secondary pressable" disabled={busy} onclick={signOut}>Sign out</button>
+			<button type="button" class="btn secondary pressable" disabled={busy} onclick={signOut}
+				>Sign out</button
+			>
 		{:else}
 			<label class="field">
 				<span class="mono-caps">Email (optional)</span>
@@ -195,7 +197,12 @@
 				<span class="mono-caps">Display name</span>
 				<input class="inp" bind:value={displayName} disabled={busy} />
 			</label>
-			<button type="button" class="btn pressable" disabled={busy || !isCloudPasskeyAvailable()} onclick={register}>
+			<button
+				type="button"
+				class="btn pressable"
+				disabled={busy || !isCloudPasskeyAvailable()}
+				onclick={register}
+			>
 				Create cloud passkey
 			</button>
 			<button type="button" class="btn secondary pressable" disabled={busy} onclick={signIn}>
@@ -209,14 +216,19 @@
 		<button type="button" class="btn pressable" disabled={busy || !session} onclick={uploadBackup}>
 			Upload encrypted backup
 		</button>
-		<button type="button" class="btn secondary pressable" disabled={busy || !session} onclick={downloadBackup}>
+		<button
+			type="button"
+			class="btn secondary pressable"
+			disabled={busy || !session}
+			onclick={downloadBackup}
+		>
 			Download encrypted backup
 		</button>
 	{:else}
 		<p class="p">{cap.reason}</p>
 		<p class="p muted">
-			Set <code>PUBLIC_HEALTH_API_URL</code> in Vercel, deploy this repo with <code>vercel.json</code>, and run the
-			Supabase migration.
+			Set <code>PUBLIC_HEALTH_API_URL</code> in Vercel, deploy this repo with
+			<code>vercel.json</code>, and run the Supabase migration.
 		</p>
 	{/if}
 	{#if status}<p class="status">{status}</p>{/if}

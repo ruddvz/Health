@@ -42,12 +42,6 @@
 		{ id: 6 as const, title: 'Life & place', sub: 'Country, rhythm, stress' }
 	];
 
-	function st(n: 1 | 2 | 3 | 4 | 5 | 6): 'complete' | 'current' | 'locked' {
-		const s = $onboarding.step;
-		if (n < s) return 'complete';
-		if (n === s) return 'current';
-		return 'locked';
-	}
 
 	function patch(p: Partial<OnboardingState>) {
 		persistOnboarding({ ...$onboarding, ...p });
@@ -90,6 +84,13 @@
 			return;
 		}
 		goto(resolve('/import'));
+	}
+
+	function goBack() {
+		const s = $onboarding.step;
+		if (s <= 1) return;
+		fieldErrors = {};
+		patch({ step: (s - 1) as 1 | 2 | 3 | 4 | 5 | 6 });
 	}
 
 	function continuePrimary() {
@@ -214,9 +215,12 @@
 		subtitle={stepMeta[$onboarding.step - 1].sub}
 	/>
 
-	{#each stepRail as r (r.id)}
-		<StepCard index={r.id} title={r.title} subtitle={r.sub} status={st(r.id)} />
-	{/each}
+	<StepCard
+		index={$onboarding.step}
+		title={stepRail[$onboarding.step - 1].title}
+		subtitle={stepRail[$onboarding.step - 1].sub}
+		status="current"
+	/>
 
 	{#if $onboarding.step === 1}
 		<div class="form nothing-surface">
@@ -931,11 +935,16 @@
 		</section>
 	{/if}
 
-	<RedActionButton
-		label={$onboarding.step < 6 ? 'Continue' : 'Review & import'}
-		onclick={continuePrimary}
-	/>
-	<TextLinkButton text="Skip for now" onclick={goImport} />
+	<div class="nav-actions">
+		{#if $onboarding.step > 1}
+			<TextLinkButton text="Back" onclick={goBack} />
+		{/if}
+		<RedActionButton
+			label={$onboarding.step < 6 ? 'Continue' : 'Review & import'}
+			onclick={continuePrimary}
+		/>
+		<TextLinkButton text="Skip for now" onclick={goImport} />
+	</div>
 </main>
 
 {#if reviewOpen}
@@ -967,6 +976,12 @@
 	.screen {
 		flex: 1;
 		padding-bottom: var(--space-8);
+	}
+
+	.nav-actions {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
 	}
 
 	.banner {

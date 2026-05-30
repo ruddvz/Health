@@ -65,13 +65,14 @@ async function deriveWrapKey(pin: string, saltB64: string): Promise<CryptoKey> {
 }
 
 async function generateDek(): Promise<CryptoKey> {
-	return crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, [
-		'encrypt',
-		'decrypt'
-	]);
+	return crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
 }
 
-export async function wrapDekForPin(dek: CryptoKey, pin: string, pinCred: PinCredential): Promise<WrappedDekPayload> {
+export async function wrapDekForPin(
+	dek: CryptoKey,
+	pin: string,
+	pinCred: PinCredential
+): Promise<WrappedDekPayload> {
 	const wrapKey = await deriveWrapKey(pin, pinCred.saltB64);
 	const ivBuf = crypto.getRandomValues(new Uint8Array(12));
 	const iv = new Uint8Array(ivBuf);
@@ -83,10 +84,7 @@ export async function wrapDekForPin(dek: CryptoKey, pin: string, pinCred: PinCre
 	};
 }
 
-export async function unwrapDekForPin(
-	pin: string,
-	wrapped: WrappedDekPayload
-): Promise<CryptoKey> {
+export async function unwrapDekForPin(pin: string, wrapped: WrappedDekPayload): Promise<CryptoKey> {
 	const wrapKey = await deriveWrapKey(pin, wrapped.saltB64);
 	const iv = new Uint8Array(fromB64(wrapped.ivB64));
 	const wrappedKey = new Uint8Array(fromB64(wrapped.wrappedB64));
@@ -113,11 +111,7 @@ export async function encryptJson(dek: CryptoKey, value: unknown): Promise<Vault
 export async function decryptJson<T>(dek: CryptoKey, payload: VaultPayload): Promise<T> {
 	const iv = new Uint8Array(fromB64(payload.ivB64));
 	const cipher = new Uint8Array(fromB64(payload.cipherB64));
-	const plain = await crypto.subtle.decrypt(
-		{ name: 'AES-GCM', iv },
-		dek,
-		cipher
-	);
+	const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, dek, cipher);
 	return JSON.parse(new TextDecoder().decode(plain)) as T;
 }
 

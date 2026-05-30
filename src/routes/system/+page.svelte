@@ -25,14 +25,14 @@
 		icon="OUT"
 		title="Export Plan"
 		subtitle="Save a backup of your plan."
-		href={ROUTES.systemSettings}
+		href={ROUTES.systemSettingsExport}
 	/>
 	<SettingsRowLink
 		icon="DEL"
 		title="Delete Local Data"
 		subtitle="Remove all app data permanently."
 		tone="danger"
-		href={ROUTES.systemSettings}
+		href={ROUTES.systemSettingsDanger}
 	/>
 
 	<SectionLabel text="APP" />
@@ -40,7 +40,7 @@
 		icon="OFF"
 		title="Offline Ready"
 		subtitle="Works fully without internet."
-		href={ROUTES.systemSettings}
+		href={ROUTES.systemAbout}
 	/>
 	<SettingsRowLink
 		icon="DX"
@@ -51,8 +51,8 @@
 	<SettingsRowLink
 		icon="i"
 		title="About"
-		subtitle="Version 1.0.0 • Up to date."
-		href={ROUTES.systemSettings}
+		subtitle="Version 0.0.1 · Local PWA"
+		href={ROUTES.systemAbout}
 	/>
 
 	<SectionLabel text="TOOLS" />

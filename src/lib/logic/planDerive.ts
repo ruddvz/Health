@@ -18,7 +18,7 @@ export function getPhaseLabel(plan: PlanV2 | null, index: number): string {
 	return `Phase ${index + 1}`;
 }
 
-export function getMealsForDay(plan: PlanV2 | null, day: DayType): MealRow[] {
+export function getMealsForDay(plan: PlanV2 | null, day: DayType): MealRowDetail[] {
 	const mp = plan?.meal_plan as Record<string, unknown> | undefined;
 	if (!mp) return [];
 	const key = day === 'workout' ? 'workout_day' : 'rest_day';
@@ -27,13 +27,20 @@ export function getMealsForDay(plan: PlanV2 | null, day: DayType): MealRow[] {
 	return arr.map((m, i) => {
 		const row = m as Record<string, unknown>;
 		return {
+			mealIndex: i,
+			dayKey: key,
 			slot: typeof row.slot === 'number' ? row.slot : i + 1,
 			time: typeof row.time === 'string' ? row.time : '—',
 			name: typeof row.name === 'string' ? row.name : 'Meal',
 			kcal: typeof row.kcal === 'number' ? row.kcal : 0,
 			protein: macroG(row, 'protein'),
 			carbs: macroG(row, 'carbs'),
-			fat: macroG(row, 'fat')
+			fat: macroG(row, 'fat'),
+			description: typeof row.description === 'string' ? row.description : undefined,
+			prep_method: typeof row.prep_method === 'string' ? row.prep_method : undefined,
+			prep_minutes: typeof row.prep_minutes === 'number' ? row.prep_minutes : undefined,
+			ingredients: parseIngredients(row.ingredients),
+			swaps: flattenMealSwaps(row)
 		};
 	});
 }
@@ -46,6 +53,126 @@ export interface MealRow {
 	protein: string;
 	carbs: string;
 	fat: string;
+}
+
+export interface MealSwapLine {
+	label: string;
+	text: string;
+}
+
+export interface MealRowDetail extends MealRow {
+	mealIndex: number;
+	dayKey: 'workout_day' | 'rest_day';
+	description?: string;
+	prep_method?: string;
+	prep_minutes?: number;
+	ingredients?: { name: string; grams?: number }[];
+	swaps: MealSwapLine[];
+}
+
+function parseIngredients(raw: unknown): { name: string; grams?: number }[] | undefined {
+	if (!Array.isArray(raw)) return undefined;
+	const out: { name: string; grams?: number }[] = [];
+	for (const ing of raw) {
+		const r = (ing || {}) as Record<string, unknown>;
+		const name = typeof r.name === 'string' ? r.name : '';
+		if (!name) continue;
+		const grams = typeof r.grams === 'number' ? r.grams : undefined;
+		out.push({ name, grams });
+	}
+	return out.length ? out : undefined;
+}
+
+export function flattenMealSwaps(meal: Record<string, unknown>): MealSwapLine[] {
+	const sw = meal.swaps;
+	if (!sw || typeof sw !== 'object') return [];
+	const out: MealSwapLine[] = [];
+	for (const [group, arr] of Object.entries(sw as Record<string, unknown>)) {
+		if (!Array.isArray(arr)) continue;
+		for (const item of arr) {
+			const r = (item || {}) as Record<string, unknown>;
+			const label = typeof r.label === 'string' ? r.label : group;
+			const replace = typeof r.replace === 'string' ? r.replace : '';
+			const withAlt = typeof r.with === 'string' ? r.with : '';
+			const note = typeof r.note === 'string' ? r.note : '';
+			const text = [replace && withAlt ? `${replace} → ${withAlt}` : replace || withAlt, note]
+				.filter(Boolean)
+				.join(' — ');
+			if (text) out.push({ label, text });
+		}
+	}
+	return out;
+}
+
+export function getEmergencyMeals(plan: PlanV2 | null, day: DayType): string[] {
+	const mp = plan?.meal_plan as Record<string, unknown> | undefined;
+	if (!mp) return [];
+	const key =
+		day === 'workout'
+			? (mp.emergency_workout_meals ?? mp.emergency_meals ?? mp.bad_day_meals)
+			: (mp.emergency_rest_meals ?? mp.emergency_meals ?? mp.bad_day_meals);
+	if (!Array.isArray(key)) return [];
+	return key
+		.map((em) => {
+			if (typeof em === 'string') return em;
+			if (em && typeof em === 'object') {
+				const r = em as Record<string, unknown>;
+				const name = typeof r.name === 'string' ? r.name : '';
+				const detail =
+					typeof r.description === 'string'
+						? r.description
+						: typeof r.detail === 'string'
+							? r.detail
+							: '';
+				return [name, detail].filter(Boolean).join(' — ');
+			}
+			return '';
+		})
+		.filter(Boolean);
+}
+
+export function getBudgetSwaps(
+	plan: PlanV2 | null
+): { premium: string; budget: string; note?: string }[] {
+	const g = plan?.grocery as Record<string, unknown> | undefined;
+	const swaps = g?.budget_swaps;
+	if (!Array.isArray(swaps)) return [];
+	const out: { premium: string; budget: string; note?: string }[] = [];
+	for (const row of swaps) {
+		const r = (row || {}) as Record<string, unknown>;
+		const premium =
+			typeof r.premium === 'string' ? r.premium : typeof r.item === 'string' ? r.item : '';
+		const budget =
+			typeof r.budget === 'string'
+				? r.budget
+				: typeof r.alternative === 'string'
+					? r.alternative
+					: '';
+		const note = typeof r.note === 'string' ? r.note : undefined;
+		if (!premium && !budget) continue;
+		out.push({ premium, budget, note });
+	}
+	return out;
+}
+
+/** Litres per day from plan root or first phase; default 3 L. */
+export function getWaterTargetLiters(plan: PlanV2 | null, phaseIndex = 0): number {
+	const root = plan as Record<string, unknown> | null;
+	const wl = root?.water_target_litres;
+	if (typeof wl === 'number' && wl > 0) return wl;
+	const phases = plan?.phases;
+	if (Array.isArray(phases) && phases[phaseIndex]) {
+		const p = phases[phaseIndex] as Record<string, unknown>;
+		const pw = p.water_litres ?? p.water_target_litres;
+		if (typeof pw === 'number' && pw > 0) return pw;
+	}
+	return 3;
+}
+
+export function getPhaseIndex(settings: Record<string, unknown>): number {
+	const i = settings.phaseIndex;
+	if (typeof i === 'number' && Number.isFinite(i) && i >= 0) return Math.floor(i);
+	return 0;
 }
 
 function macroG(row: Record<string, unknown>, key: string): string {

@@ -94,58 +94,90 @@
 			onSelect={(c) => (chip = c)}
 		/>
 
-		<ChartCard
-			title="WEIGHT TREND"
-			value={chart.valueLabel}
-			delta={chart.deltaLabel}
-			labels={chart.labels}
-			series={chart.series}
-		/>
+		{#if chip === 'Overview'}
+			<ChartCard
+				title="WEIGHT TREND"
+				value={chart.valueLabel}
+				delta={chart.deltaLabel}
+				labels={chart.labels}
+				series={chart.series}
+			/>
 
-		<AdherenceCard
-			title="ADHERENCE"
-			value={`${adherencePct}%`}
-			subtitle="7 day blend (water · training · check-ins)"
-			{bars}
-		/>
+			<AdherenceCard
+				title="ADHERENCE"
+				value={`${adherencePct}%`}
+				subtitle="7 day blend (water · training · check-ins)"
+				{bars}
+			/>
 
-		<SectionLabel text="RECENT WORKOUTS" />
-		{#if sessions.length === 0}
-			<p class="empty">Finish a session from Train to build history here.</p>
+			<SectionLabel text="RECENT WORKOUTS" />
+			{#if sessions.length === 0}
+				<p class="empty">Finish a session from Train to build history here.</p>
+			{:else}
+				<ul class="list nothing-surface">
+					{#each sessions as s (s.id)}
+						<li class="row">
+							<p class="mono-caps t">{fmtShort(s.finishedAt)}</p>
+							<p class="b">{s.exercises.length} exercises · logged sets</p>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+
+			<CheckinCard
+				title="WEEKLY CHECK-IN"
+				question="How was your week?"
+				subtitle="Log weight, waist, energy, sleep, and notes."
+				cta="Log Check-in"
+				onclick={() => (checkOpen = true)}
+			/>
+		{:else if chip === 'Trends'}
+			<ChartCard
+				title="WEIGHT TREND"
+				value={chart.valueLabel}
+				delta={chart.deltaLabel}
+				labels={chart.labels}
+				series={chart.series}
+			/>
+			<AdherenceCard title="ADHERENCE" value={`${adherencePct}%`} subtitle="7 day average" {bars} />
+			<SectionLabel text="WEIGHT LOG" />
+			{#if ($progress.weightEntries ?? []).length === 0}
+				<p class="empty">Log weight in a weekly check-in to build your trend.</p>
+			{:else}
+				<ul class="list nothing-surface">
+					{#each [...($progress.weightEntries ?? [])]
+						.reverse()
+						.slice(0, 14) as e, i (`${e.date}-${i}`)}
+						<li class="row">
+							<p class="mono-caps t">{e.date}</p>
+							<p class="b">{e.kg} kg</p>
+						</li>
+					{/each}
+				</ul>
+			{/if}
 		{:else}
-			<ul class="list nothing-surface">
-				{#each sessions as s (s.id)}
-					<li class="row">
-						<p class="mono-caps t">{fmtShort(s.finishedAt)}</p>
-						<p class="b">{s.exercises.length} exercises · logged sets</p>
-					</li>
-				{/each}
-			</ul>
+			<SectionLabel text="TRAINING VOLUME" />
+			<p class="stat mono-caps">{histSessions.length} sessions logged</p>
+			{#if liftStats.length}
+				<SectionLabel text="LAST LOGGED WEIGHTS" />
+				<div class="lift nothing-surface">
+					{#each liftStats as ls (ls.name)}
+						<div class="lr">
+							<p class="nm">{ls.name}</p>
+							<p class="vals mono-caps">
+								Last {ls.lastKg !== null ? `${ls.lastKg} kg` : '—'} · Best {ls.bestKg !== null
+									? `${ls.bestKg} kg`
+									: '—'}
+							</p>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<p class="empty">Complete a Train session with logged sets to see lift metrics.</p>
+			{/if}
+			<SectionLabel text="CHECK-INS" />
+			<p class="stat mono-caps">{($progress.weeklyCheckins ?? []).length} weekly entries</p>
 		{/if}
-
-		{#if liftStats.length}
-			<SectionLabel text="LAST LOGGED WEIGHTS" />
-			<div class="lift nothing-surface">
-				{#each liftStats as ls (ls.name)}
-					<div class="lr">
-						<p class="nm">{ls.name}</p>
-						<p class="vals mono-caps">
-							Last {ls.lastKg !== null ? `${ls.lastKg} kg` : '—'} · Best {ls.bestKg !== null
-								? `${ls.bestKg} kg`
-								: '—'}
-						</p>
-					</div>
-				{/each}
-			</div>
-		{/if}
-
-		<CheckinCard
-			title="WEEKLY CHECK-IN"
-			question="How was your week?"
-			subtitle="Log weight, waist, energy, sleep, and notes."
-			cta="Log Check-in"
-			onclick={() => (checkOpen = true)}
-		/>
 	</main>
 {/if}
 
@@ -194,10 +226,16 @@
 		padding-bottom: var(--space-6);
 	}
 
-	.empty {
+	.empty,
+	.stat {
 		margin: 0 0 var(--space-3);
 		font-size: 14px;
 		color: var(--text-2);
+	}
+
+	.stat {
+		font-size: 12px;
+		color: var(--text-3);
 	}
 
 	.list {

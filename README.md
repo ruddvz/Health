@@ -76,9 +76,11 @@ npm run build && npm run verify:sw
 
 The last line is optional locally; **GitHub Actions** runs `verify:sw` after every production build.
 
-## SvelteKit roadmap
+## SvelteKit app (current)
 
-Import/paste JSON, Zod validation, persistence, and full Today/Meals/Train/Progress behavior are tracked in **`docs/HEALTH_APP_REBUILD_PLAN.md`** (Phases 2–8). Until then, tab screens beyond basic layout are mostly placeholders.
+The SvelteKit build includes intake, JSON import with validation, Today (macros, water, timeline, plan warnings), Meals (tracking, quick fix, cook mode, swaps), Train (session logging, rest timer), Progress (tabbed views), System hub (export, security, diagnostics), and optional Health Lock / cloud passkey backup when configured.
+
+Further polish and legacy parity items are tracked in **`docs/HEALTH_APP_REBUILD_PLAN.md`** and **`HEALTH_APP_EXECUTION_PLAN.md`**.
 
 ## Reset data
 

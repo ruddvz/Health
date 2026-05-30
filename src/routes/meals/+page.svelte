@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
+	import CookModeSheet from '$lib/components/spec/CookModeSheet.svelte';
 	import ChipRow from '$lib/components/spec/ChipRow.svelte';
 	import MealCard from '$lib/components/spec/MealCard.svelte';
 	import QuickFixSheet from '$lib/components/spec/QuickFixSheet.svelte';
@@ -13,8 +14,14 @@
 	import { getMealSlotState, mealSlotKey } from '$lib/logic/mealSlots';
 	import { newId } from '$lib/logic/id';
 	import type { QuickFixPreset } from '$lib/logic/quickFixPresets';
-	import { getMealsForDay, getPhaseTargets } from '$lib/logic/planDerive';
 	import {
+		getEmergencyMeals,
+		getMealsForDay,
+		getPhaseTargets,
+		type MealRowDetail
+	} from '$lib/logic/planDerive';
+	import {
+		activeDayType,
 		persistActiveDayType,
 		persistProgress,
 		plan,
@@ -33,6 +40,7 @@
 	let emP = $state('');
 	let emC = $state('');
 	let emF = $state('');
+	let cookMeal = $state<MealRowDetail | null>(null);
 
 	const logDay = $derived(logicalDateKey(new Date(), $settings));
 	const dayTypeForTrack = $derived<DayType | null>(
@@ -47,6 +55,11 @@
 		}
 		return getMealsForDay($plan, chip === 'Rest Day' ? 'rest' : 'workout');
 	});
+
+	const dayForEmergency = $derived<DayType>(
+		chip === 'Rest Day' ? 'rest' : chip === 'Workout Day' ? 'workout' : ($activeDayType as DayType)
+	);
+	const emergency = $derived(getEmergencyMeals($plan, dayForEmergency));
 
 	const targets = $derived(getPhaseTargets($plan, 0));
 	const planned = $derived(plannedMacrosFromMeals(meals, targets));
@@ -176,12 +189,35 @@
 						}
 					: undefined}
 			/>
+			<div class="meal-extra nothing-surface">
+				{#if m.swaps.length}
+					<details class="swaps">
+						<summary class="mono-caps sum">Swaps and alternatives</summary>
+						{#each m.swaps as sw (sw.label + sw.text)}
+							<p class="swap-row"><span class="mono-caps tag">{sw.label}</span> {sw.text}</p>
+						{/each}
+					</details>
+				{/if}
+				<button type="button" class="cook pressable" onclick={() => (cookMeal = m)}
+					>Cook mode</button
+				>
+			</div>
 		{/each}
+
+		{#if emergency.length}
+			<section class="emerg nothing-surface">
+				<p class="mono-caps emerg-t">Backup / busy-day options</p>
+				{#each emergency as line, i (i)}
+					<p class="emerg-line">{line}</p>
+				{/each}
+			</section>
+		{/if}
 
 		<SecondaryButton label="+ Add Meal" onclick={() => (addOpen = true)} />
 	</main>
 {/if}
 
+<CookModeSheet open={cookMeal !== null} meal={cookMeal} onClose={() => (cookMeal = null)} />
 <QuickFixSheet open={quickFixOpen} onClose={() => (quickFixOpen = false)} onPick={onQuickPick} />
 
 {#if addOpen}
@@ -231,6 +267,46 @@
 	.screen {
 		flex: 1;
 		padding-bottom: var(--space-6);
+	}
+
+	.meal-extra {
+		margin: calc(-1 * var(--space-1)) 0 var(--space-3);
+		padding: var(--space-2) var(--space-4) var(--space-3);
+		border-radius: 0 0 var(--radius-widget) var(--radius-widget);
+	}
+	.cook {
+		width: 100%;
+		min-height: 44px;
+		margin-top: 8px;
+		border-radius: var(--radius-xs);
+		border: 1px solid var(--line-2);
+		background: rgba(255, 42, 42, 0.1);
+		color: var(--text-1);
+		font-weight: 650;
+		cursor: pointer;
+	}
+	.emerg {
+		padding: var(--space-4);
+		margin-bottom: var(--space-3);
+	}
+	.emerg-t {
+		margin: 0 0 8px;
+		font-size: 9px;
+		color: var(--warning);
+	}
+	.emerg-line {
+		margin: 0 0 8px;
+		font-size: 14px;
+		color: var(--text-2);
+	}
+	.swap-row {
+		margin: 8px 0 0;
+		font-size: 13px;
+		color: var(--text-2);
+	}
+	.sum {
+		font-size: 9px;
+		color: var(--text-3);
 	}
 
 	.modal {

@@ -1,4 +1,9 @@
-import { isCloudApiConfigured, cloudApiBaseUrl, configuredRpId, configuredOrigin } from '$lib/security/domainConfig';
+import {
+	isCloudApiConfigured,
+	cloudApiBaseUrl,
+	configuredRpId,
+	configuredOrigin
+} from '$lib/security/domainConfig';
 
 export interface PasskeyServerCapability {
 	available: boolean;

@@ -18,7 +18,9 @@ export interface RelyingPartyInfo {
 }
 
 /** Effective RP ID for WebAuthn (must be registrable domain suffix of origin). */
-export function getRpId(hostname: string = browser ? window.location.hostname : 'localhost'): string {
+export function getRpId(
+	hostname: string = browser ? window.location.hostname : 'localhost'
+): string {
 	const configured = configuredRpId();
 	if (configured) return configured;
 	if (hostname === 'localhost' || hostname === '127.0.0.1') return 'localhost';

@@ -31,8 +31,12 @@
 		{/each}
 		<span class="key spacer"></span>
 		<button type="button" class="key pressable" {disabled} onclick={() => press('0')}>0</button>
-		<button type="button" class="key pressable del" {disabled} onclick={backspace} aria-label="Delete"
-			>⌫</button
+		<button
+			type="button"
+			class="key pressable del"
+			{disabled}
+			onclick={backspace}
+			aria-label="Delete">⌫</button
 		>
 	</div>
 </div>

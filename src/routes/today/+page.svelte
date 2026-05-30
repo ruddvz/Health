@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
+	import PlanWarningsCard from '$lib/components/spec/PlanWarningsCard.svelte';
 	import MetricRing from '$lib/components/spec/MetricRing.svelte';
 	import MetricTile from '$lib/components/spec/MetricTile.svelte';
 	import NextActionCard from '$lib/components/spec/NextActionCard.svelte';
@@ -16,16 +17,20 @@
 	import {
 		formatTimeFromHHMM,
 		getMealsForDay,
+		getPhaseIndex,
 		getPhaseLabel,
 		getTrainingDay,
 		getUserName,
+		getWaterTargetLiters,
 		greeting
 	} from '$lib/logic/planDerive';
 	import {
 		activeDayType,
+		importWarnings,
 		onboarding,
 		persistActiveDayType,
 		persistProgress,
+		persistSettings,
 		plan,
 		progress,
 		settings
@@ -33,18 +38,18 @@
 	import type { DayType } from '$lib/types/planV2';
 	import { get } from 'svelte/store';
 
-	let phaseIndex = $state(0);
+	const phaseIndex = $derived(getPhaseIndex($settings));
+	const phaseCount = $derived($plan && Array.isArray($plan.phases) ? $plan.phases.length : 1);
 
 	const logDay = $derived(logicalDateKey(new Date(), $settings));
 	const dayT = $derived($activeDayType as DayType);
 
-	const phaseCount = $derived($plan && Array.isArray($plan.phases) ? $plan.phases.length : 1);
-
 	const totals = $derived(consumedTotalsForToday($plan, dayT, phaseIndex, $progress, $settings));
 	const meals = $derived(getMealsForDay($plan, dayT));
 
-	const waterTarget = 3;
+	const waterTarget = $derived(getWaterTargetLiters($plan, phaseIndex));
 	const waterL = $derived(waterLitersForDay($progress, totals.day));
+	const planWarnings = $derived($importWarnings.filter(Boolean));
 
 	const calProg = $derived(
 		totals.targets.kcal > 0 ? Math.min(1, totals.kcal / totals.targets.kcal) : 0
@@ -150,8 +155,10 @@
 			label={getPhaseLabel($plan, phaseIndex)}
 			{phaseCount}
 			{phaseIndex}
-			onPhaseChange={(i) => (phaseIndex = i)}
+			onPhaseChange={(i) => persistSettings({ ...$settings, phaseIndex: i })}
 		/>
+
+		<PlanWarningsCard warnings={planWarnings} />
 
 		<SegmentedControl
 			options={[

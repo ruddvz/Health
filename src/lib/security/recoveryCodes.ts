@@ -1,4 +1,8 @@
-import { generateRecoveryCodes, hashRecoveryCode, normalizeRecoveryCode } from '$lib/security/crypto';
+import {
+	generateRecoveryCodes,
+	hashRecoveryCode,
+	normalizeRecoveryCode
+} from '$lib/security/crypto';
 import type { HealthSecurityConfig } from '$lib/security/types';
 
 export async function createRecoveryCodeSet(): Promise<{
@@ -27,5 +31,7 @@ export async function consumeRecoveryCode(
 }
 
 export function formatRecoveryCodeForDisplay(code: string): string {
-	return normalizeRecoveryCode(code).replace(/(.{4})/g, '$1-').replace(/-$/, '');
+	return normalizeRecoveryCode(code)
+		.replace(/(.{4})/g, '$1-')
+		.replace(/-$/, '');
 }

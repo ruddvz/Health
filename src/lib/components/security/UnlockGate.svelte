@@ -24,7 +24,9 @@
 		});
 	});
 
-	const showPin = $derived($securityConfig.method === 'pin' || $securityConfig.method === 'pin+biometric');
+	const showPin = $derived(
+		$securityConfig.method === 'pin' || $securityConfig.method === 'pin+biometric'
+	);
 	const showBio = $derived(
 		bioAvailable &&
 			($securityConfig.method === 'biometric' || $securityConfig.method === 'pin+biometric')

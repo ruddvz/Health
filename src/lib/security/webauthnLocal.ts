@@ -32,7 +32,9 @@ export type WebAuthnAuthResult = { ok: true } | { ok: false; error: string };
  * Register a platform authenticator for local app lock.
  * This is NOT server-verified passkey sync — suitable for device privacy screen only.
  */
-export async function registerPlatformLock(tier: PasskeyTier = 'local'): Promise<WebAuthnRegisterResult> {
+export async function registerPlatformLock(
+	tier: PasskeyTier = 'local'
+): Promise<WebAuthnRegisterResult> {
 	if (!isWebAuthnAvailable()) {
 		return { ok: false, error: 'WebAuthn is not available in this browser.' };
 	}

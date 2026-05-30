@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 	import RedActionButton from '$lib/components/nothing/RedActionButton.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import { LS_PLAN } from '$lib/constants/storage';
@@ -127,6 +128,15 @@
 		clearAllLocalHealthData();
 		goto(resolve('/'));
 	}
+
+	onMount(() => {
+		if (!browser) return;
+		const hash = window.location.hash.replace('#', '');
+		if (!hash) return;
+		requestAnimationFrame(() => {
+			document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		});
+	});
 </script>
 
 <main class="screen px-screen pt-safe stack">
@@ -163,7 +173,7 @@
 	<button type="button" class="save pressable" onclick={saveCalendar}>Save calendar settings</button
 	>
 
-	<p class="mono-caps lab">Export</p>
+	<p id="export" class="mono-caps lab anchor">Export</p>
 	<p class="txt">
 		Full backup includes your plan, progress logs (meals, water, workouts, check-ins), settings,
 		onboarding answers, and active day type. You can also export or import just the intake JSON.
@@ -190,7 +200,7 @@
 		Download plan JSON only
 	</button>
 
-	<p class="mono-caps lab danger">Danger zone</p>
+	<p id="danger" class="mono-caps lab danger anchor">Danger zone</p>
 	<p class="txt">
 		Clears keys: health.v2.plan, progress, grocery, settings, activeDayType, onboarding.
 	</p>
@@ -211,6 +221,10 @@
 
 	.lab.danger {
 		color: var(--red);
+	}
+
+	.anchor {
+		scroll-margin-top: calc(var(--safe-top) + 48px);
 	}
 
 	.txt {

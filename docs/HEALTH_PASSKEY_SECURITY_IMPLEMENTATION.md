@@ -4,11 +4,11 @@
 
 ## Architecture overview
 
-| Phase | Goal | Status |
-|-------|------|--------|
-| **1** | Local passkey app lock + encrypted vault | ✅ Shipped |
-| **2** | Custom domain + env (`PUBLIC_HEALTH_RP_ID`) | ✅ Config + docs |
-| **3** | Server passkeys + encrypted cloud backup | ✅ API + UI (needs Vercel + Supabase deploy) |
+| Phase | Goal                                        | Status                                       |
+| ----- | ------------------------------------------- | -------------------------------------------- |
+| **1** | Local passkey app lock + encrypted vault    | ✅ Shipped                                   |
+| **2** | Custom domain + env (`PUBLIC_HEALTH_RP_ID`) | ✅ Config + docs                             |
+| **3** | Server passkeys + encrypted cloud backup    | ✅ API + UI (needs Vercel + Supabase deploy) |
 
 ## Phase 1 — What shipped
 
@@ -22,16 +22,16 @@
 
 ### Files
 
-| Area | Path |
-|------|------|
-| Lock store | `src/lib/stores/healthLock.ts` |
-| Vault bridge | `src/lib/stores/vaultBridge.ts` |
-| Crypto / vault | `src/lib/security/crypto.ts`, `vault.ts` |
-| WebAuthn (local) | `src/lib/security/webauthnLocal.ts` |
-| RP / domain | `src/lib/security/rpOrigin.ts` |
-| Route gate | `src/lib/security/routeLock.ts`, `src/routes/+layout.svelte` |
-| UI | `UnlockGate.svelte`, `PasskeyOfferSheet.svelte`, `routes/system/security/` |
-| Server stub | `src/lib/security/passkeyServer.stub.ts` |
+| Area             | Path                                                                       |
+| ---------------- | -------------------------------------------------------------------------- |
+| Lock store       | `src/lib/stores/healthLock.ts`                                             |
+| Vault bridge     | `src/lib/stores/vaultBridge.ts`                                            |
+| Crypto / vault   | `src/lib/security/crypto.ts`, `vault.ts`                                   |
+| WebAuthn (local) | `src/lib/security/webauthnLocal.ts`                                        |
+| RP / domain      | `src/lib/security/rpOrigin.ts`                                             |
+| Route gate       | `src/lib/security/routeLock.ts`, `src/routes/+layout.svelte`               |
+| UI               | `UnlockGate.svelte`, `PasskeyOfferSheet.svelte`, `routes/system/security/` |
+| Server stub      | `src/lib/security/passkeyServer.stub.ts`                                   |
 
 ### Security properties
 
@@ -101,7 +101,6 @@ When extending Health Lock:
 2. Never store passkey private keys; only public credential metadata.
 3. Test on **HTTPS** production origin before release.
 4. Update this doc + CHANGELOG + QA checklist for behavior changes.
-
 
 ## Phase 3 — Deploy checklist
 

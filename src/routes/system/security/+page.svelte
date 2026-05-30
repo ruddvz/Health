@@ -5,11 +5,7 @@
 	import { createRecoveryCodeSet } from '$lib/security/recoveryCodes';
 	import CloudAccountPanel from '$lib/components/security/CloudAccountPanel.svelte';
 	import { getPasskeyServerCapability } from '$lib/security/passkeyServer';
-	import {
-		configuredOrigin,
-		configuredRpId,
-		deploymentMode,
-	} from '$lib/security/domainConfig';
+	import { configuredOrigin, configuredRpId, deploymentMode } from '$lib/security/domainConfig';
 	import {
 		getRelyingPartyInfo,
 		isPlatformAuthenticatorAvailable,
@@ -65,7 +61,6 @@
 				return 'Off';
 		}
 	}
-
 
 	async function savePinSetup() {
 		errorMsg = null;
@@ -157,7 +152,6 @@
 		statusMsg = 'Auto-lock settings saved.';
 	}
 
-	
 	function removePasskey() {
 		const ok = window.confirm(
 			'Remove the passkey registered on this device? You can still use your recovery PIN if set.'
@@ -167,7 +161,7 @@
 		statusMsg = 'Passkey removed from this device.';
 	}
 
-function disableLock() {
+	function disableLock() {
 		const ok = window.confirm('Turn off Health Lock on this device?');
 		if (!ok) return;
 		persistSecurity({
@@ -200,9 +194,12 @@ function disableLock() {
 		<h2 class="title">Protect your health plan</h2>
 		<p class="p">
 			Use Face ID, Touch ID, Windows Hello, or your device passcode to unlock this app. Your plan
-			stays on this device. Health does not upload your meals, weight, supplements, or progress data.
+			stays on this device. Health does not upload your meals, weight, supplements, or progress
+			data.
 		</p>
-		<p class="p muted">Phase 1: local app lock only — no cloud accounts. Synced passkeys need a backend (Phase 3).</p>
+		<p class="p muted">
+			Phase 1: local app lock only — no cloud accounts. Synced passkeys need a backend (Phase 3).
+		</p>
 	</section>
 
 	<section class="block nothing-surface">
@@ -233,12 +230,7 @@ function disableLock() {
 			Uses your device’s platform authenticator. This is a privacy screen for your local PWA — not
 			the same as a server-synced passkey backed by a cloud account.
 		</p>
-		<button
-			type="button"
-			class="btn pressable"
-			disabled={!bioAvailable}
-			onclick={enableBiometric}
-		>
+		<button type="button" class="btn pressable" disabled={!bioAvailable} onclick={enableBiometric}>
 			{bioAvailable ? 'Enable passkey on this device' : 'Passkey not available in this browser'}
 		</button>
 	</section>
@@ -297,7 +289,9 @@ function disableLock() {
 			<input type="checkbox" bind:checked={lockOnColdStart} />
 			<span>Require unlock when reopening the app</span>
 		</label>
-		<button type="button" class="btn pressable" onclick={saveAutoLockSettings}>Save auto-lock</button>
+		<button type="button" class="btn pressable" onclick={saveAutoLockSettings}
+			>Save auto-lock</button
+		>
 	</section>
 
 	<CloudAccountPanel />
@@ -306,8 +300,10 @@ function disableLock() {
 		<h2 class="mono-caps h">Deployment notes</h2>
 		<p class="p">
 			Mode: <strong>{deploymentMode()}</strong>
-			{#if configuredRpId()} · Configured RP: <code>{configuredRpId()}</code>{/if}
-			{#if configuredOrigin()} · Origin: <code>{configuredOrigin()}</code>{/if}
+			{#if configuredRpId()}
+				· Configured RP: <code>{configuredRpId()}</code>{/if}
+			{#if configuredOrigin()}
+				· Origin: <code>{configuredOrigin()}</code>{/if}
 		</p>
 		<p class="p">{serverCap.available ? 'Cloud API ready.' : serverCap.reason}</p>
 	</section>
@@ -319,7 +315,6 @@ function disableLock() {
 		<p class="error" role="alert">{errorMsg}</p>
 	{/if}
 
-	
 	{#if $securityConfig.webauthn}
 		<button type="button" class="btn secondary pressable" onclick={removePasskey}>
 			Remove passkey from this device
@@ -329,7 +324,9 @@ function disableLock() {
 	<p class="mono-caps lab">Actions</p>
 	<button type="button" class="btn secondary pressable" onclick={lockScreenNow}>Lock now</button>
 	{#if $securityConfig.enabled}
-		<button type="button" class="btn danger pressable" onclick={disableLock}>Turn off Health Lock</button>
+		<button type="button" class="btn danger pressable" onclick={disableLock}
+			>Turn off Health Lock</button
+		>
 	{/if}
 </main>
 

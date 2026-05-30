@@ -21,6 +21,9 @@
 	});
 
 	let idx = $state(0);
+	let restLeft = $state(0);
+	let restLabel = $state('');
+	let restId: ReturnType<typeof setInterval> | null = null;
 
 	const aw = $derived($progress.activeWorkout);
 	const current = $derived(aw?.exercises[idx]);
@@ -115,9 +118,54 @@
 	}
 
 	function endWithoutSave() {
+		clearRest();
 		const cur = get(progress);
 		persistProgress({ ...cur, activeWorkout: undefined });
 		goto(resolve('/train'));
+	}
+
+	function clearRest() {
+		if (restId) {
+			clearInterval(restId);
+			restId = null;
+		}
+		restLeft = 0;
+		restLabel = '';
+	}
+
+	function restSecondsForExercise(ex: Record<string, unknown>): number {
+		const r = ex.rest_seconds;
+		if (typeof r === 'number' && r > 0) return Math.min(600, Math.floor(r));
+		if (typeof r === 'string') {
+			const n = parseInt(r, 10);
+			if (Number.isFinite(n) && n > 0) return Math.min(600, n);
+		}
+		return 90;
+	}
+
+	function startRest() {
+		clearRest();
+		const ex = exercises[idx] as Record<string, unknown>;
+		const total = restSecondsForExercise(ex);
+		restLeft = total;
+		restLabel = `${total}s`;
+		const tick = () => {
+			restLabel = restLeft > 0 ? `${restLeft}s` : 'Rest done';
+			if (restLeft <= 0) {
+				clearRest();
+				if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+					try {
+						navigator.vibrate(180);
+					} catch {
+						/* ignore */
+					}
+				}
+				return;
+			}
+			restLeft -= 1;
+		};
+		tick();
+		restId = setInterval(tick, 1000);
 	}
 
 	$effect(() => {
@@ -183,6 +231,13 @@
 						</div>
 					{/each}
 				</div>
+
+				{#if restLabel}
+					<p class="rest mono-caps" aria-live="polite">Rest · {restLabel}</p>
+				{/if}
+				<button type="button" class="rest-btn pressable" onclick={startRest}
+					>Start rest timer</button
+				>
 
 				<div class="row">
 					<button type="button" class="ghost pressable" onclick={endWithoutSave}>End</button>
@@ -297,5 +352,24 @@
 
 	.empty {
 		color: var(--text-2);
+	}
+
+	.rest {
+		margin: var(--space-3) 0 0;
+		font-size: 12px;
+		color: var(--red);
+		text-align: center;
+	}
+
+	.rest-btn {
+		width: 100%;
+		min-height: 44px;
+		margin-top: var(--space-2);
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--line-2);
+		background: var(--surface-2);
+		color: var(--text-1);
+		font-weight: 650;
+		cursor: pointer;
 	}
 </style>

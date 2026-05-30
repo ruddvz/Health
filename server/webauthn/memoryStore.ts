@@ -19,9 +19,15 @@ export interface MemoryCredential {
 const users = new Map<string, MemoryUser>();
 const usersByEmail = new Map<string, string>();
 const credentials = new Map<string, MemoryCredential>();
-const challenges = new Map<string, { challenge: string; userId: string | null; type: string; expires: number }>();
+const challenges = new Map<
+	string,
+	{ challenge: string; userId: string | null; type: string; expires: number }
+>();
 const sessions = new Map<string, { userId: string; expires: number }>();
-const backups = new Map<string, { ciphertext: string; iv: string; version: number; updatedAt: string }>();
+const backups = new Map<
+	string,
+	{ ciphertext: string; iv: string; version: number; updatedAt: string }
+>();
 
 export const memoryStore = {
 	createUser(email: string | null, displayName: string): MemoryUser {

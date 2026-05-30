@@ -212,6 +212,9 @@
 		<div class="sheet nothing-surface" role="dialog" aria-modal="true" aria-labelledby="paste-h">
 			<h2 id="paste-h" class="mono-caps h">Paste JSON</h2>
 			<textarea class="ta" rows="10" bind:value={pasteText} aria-label="Plan JSON"></textarea>
+			{#if error}
+				<InlineErrorCard title="Import blocked" body={error} />
+			{/if}
 			<div class="row">
 				<button type="button" class="ghost pressable" onclick={() => (pasteOpen = false)}
 					>Cancel</button

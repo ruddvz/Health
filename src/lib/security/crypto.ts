@@ -27,7 +27,10 @@ export async function hashRecoveryCode(code: string): Promise<string> {
 	return sha256Hex(normalizeRecoveryCode(code));
 }
 
-export async function hashPin(pin: string, saltB64?: string): Promise<{
+export async function hashPin(
+	pin: string,
+	saltB64?: string
+): Promise<{
 	hashB64: string;
 	saltB64: string;
 	iterations: number;
@@ -58,7 +61,10 @@ export async function hashPin(pin: string, saltB64?: string): Promise<{
 	};
 }
 
-export async function verifyPin(pin: string, cred: { hashB64: string; saltB64: string }): Promise<boolean> {
+export async function verifyPin(
+	pin: string,
+	cred: { hashB64: string; saltB64: string }
+): Promise<boolean> {
 	const next = await hashPin(pin, cred.saltB64);
 	return next.hashB64 === cred.hashB64;
 }

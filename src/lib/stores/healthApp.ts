@@ -121,7 +121,10 @@ export function savePlan(p: PlanV2, warnings: string[]) {
 	void persistSlice('plan', p);
 }
 
-async function persistSlice(key: 'plan' | 'progress' | 'onboarding' | 'settings' | 'activeDayType', value: unknown) {
+async function persistSlice(
+	key: 'plan' | 'progress' | 'onboarding' | 'settings' | 'activeDayType',
+	value: unknown
+) {
 	if (!browser) return;
 	const cfg = loadSecurityConfig();
 	const { hasVaultDek, getVaultDek } = await import('$lib/stores/healthLock');

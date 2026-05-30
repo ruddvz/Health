@@ -1,16 +1,8 @@
 import { browser } from '$app/environment';
 import { writable, get, derived } from 'svelte/store';
-import {
-	clearSecurityConfig,
-	loadSecurityConfig,
-	saveSecurityConfig
-} from '$lib/security/config';
+import { clearSecurityConfig, loadSecurityConfig, saveSecurityConfig } from '$lib/security/config';
 import { hashPin, validatePinFormat, verifyPin } from '$lib/security/crypto';
-import {
-	clearPinFailures,
-	pinLockoutMessage,
-	recordPinFailure
-} from '$lib/security/pinRateLimit';
+import { clearPinFailures, pinLockoutMessage, recordPinFailure } from '$lib/security/pinRateLimit';
 import { consumeRecoveryCode } from '$lib/security/recoveryCodes';
 import { isLockSetupComplete } from '$lib/security/setupValidation';
 import {
@@ -81,9 +73,7 @@ async function unlockVaultWithPin(pin: string): Promise<string | null> {
 	if (!wrapped) return null;
 	try {
 		vaultDek = await unwrapDekForPin(pin, wrapped);
-		const snap = await import('$lib/security/vault').then((m) =>
-			m.exportVaultSnapshot(vaultDek!)
-		);
+		const snap = await import('$lib/security/vault').then((m) => m.exportVaultSnapshot(vaultDek!));
 		hydrateFromVaultSnapshot(snap);
 		return null;
 	} catch {
@@ -106,10 +96,7 @@ export function hydrateSecurity() {
 	syncSessionStore();
 }
 
-export function persistSecurity(
-	cfg: HealthSecurityConfig,
-	opts?: { keepUnlocked?: boolean }
-) {
+export function persistSecurity(cfg: HealthSecurityConfig, opts?: { keepUnlocked?: boolean }) {
 	const next = saveSecurityConfig(cfg);
 	securityConfig.set(next);
 	if (!next.enabled) {

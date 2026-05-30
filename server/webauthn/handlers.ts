@@ -5,10 +5,7 @@ import {
 	verifyAuthenticationResponse,
 	verifyRegistrationResponse
 } from '@simplewebauthn/server';
-import type {
-	AuthenticationResponseJSON,
-	RegistrationResponseJSON
-} from '@simplewebauthn/server';
+import type { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
 import { getWebAuthnEnv } from './env.js';
 import { bearerToken, errorResponse, jsonResponse, readJson } from './http.js';
 import { memoryStore } from './memoryStore.js';
@@ -110,7 +107,10 @@ export async function handleAuthenticateOptions(request: Request): Promise<Respo
 		const user = await db.findUserByEmail(body.email.trim().toLowerCase());
 		if (!user) return errorResponse('No account found for that email.', 404);
 		const creds = await db.listCredentials(user.id);
-		allowCredentials = creds.map((c) => ({ id: c.credentialId, transports: c.transports as AuthenticatorTransport[] }));
+		allowCredentials = creds.map((c) => ({
+			id: c.credentialId,
+			transports: c.transports as AuthenticatorTransport[]
+		}));
 	}
 
 	const options = await generateAuthenticationOptions({

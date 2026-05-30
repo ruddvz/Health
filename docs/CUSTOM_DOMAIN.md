@@ -19,13 +19,13 @@ Point your domain to either:
 
 Set in Vercel (or `.env` for local API dev):
 
-| Variable | Example | Purpose |
-|----------|---------|---------|
-| `PUBLIC_HEALTH_RP_ID` | `health.bookphysio.in` | WebAuthn RP ID |
-| `PUBLIC_HEALTH_ORIGIN` | `https://health.bookphysio.in` | Expected origin |
+| Variable                | Example                        | Purpose                        |
+| ----------------------- | ------------------------------ | ------------------------------ |
+| `PUBLIC_HEALTH_RP_ID`   | `health.bookphysio.in`         | WebAuthn RP ID                 |
+| `PUBLIC_HEALTH_ORIGIN`  | `https://health.bookphysio.in` | Expected origin                |
 | `PUBLIC_HEALTH_API_URL` | `https://health.bookphysio.in` | Client calls `/api/webauthn/*` |
-| `HEALTH_RP_ID` | same as above | Server WebAuthn |
-| `HEALTH_ORIGIN` | same as above | Server verification |
+| `HEALTH_RP_ID`          | same as above                  | Server WebAuthn                |
+| `HEALTH_ORIGIN`         | same as above                  | Server verification            |
 
 Rebuild the static app after changing `PUBLIC_*` vars so Vite inlines them.
 

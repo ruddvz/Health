@@ -19,6 +19,7 @@ export interface PasskeyServerCapability {
 export function getPasskeyServerCapability(): PasskeyServerCapability {
 	return {
 		available: false,
-		reason: 'This build is a static PWA. Use local Face ID / Touch ID lock, or add a backend for synced passkeys.'
+		reason:
+			'This build is a static PWA. Use local Face ID / Touch ID lock, or add a backend for synced passkeys.'
 	};
 }

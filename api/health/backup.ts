@@ -6,7 +6,8 @@ export const config = { runtime: 'nodejs' };
 export default async function handler(request: Request): Promise<Response> {
 	if (request.method === 'OPTIONS') return corsPreflight();
 	try {
-		if (request.method === 'PUT' || request.method === 'POST') return await handleBackupPut(request);
+		if (request.method === 'PUT' || request.method === 'POST')
+			return await handleBackupPut(request);
 		if (request.method === 'GET') return await handleBackupGet(request);
 		return new Response('Method not allowed', { status: 405 });
 	} catch (e) {
