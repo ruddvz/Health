@@ -12,7 +12,6 @@ import {
 import { defaultOnboardingState, normalizeOnboarding } from '$lib/logic/onboardingState';
 import { loadSecurityConfig } from '$lib/security/config';
 import { isVaultEncrypted } from '$lib/security/vault';
-import { hydrateFromVaultSnapshot } from '$lib/stores/vaultBridge';
 import type { DayType, OnboardingState, PlanV2, ProgressV2 } from '$lib/types/planV2';
 import { parsePlanJsonText } from '$lib/validation/planV2';
 

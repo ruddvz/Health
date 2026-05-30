@@ -21,7 +21,7 @@
 
 <div class="pad" role="group" aria-label="PIN keypad">
 	<div class="dots" aria-live="polite">
-		{#each Array(maxLength) as _, i (i)}
+		{#each Array.from({ length: maxLength }, (_, i) => i) as i (i)}
 			<span class="dot" class:filled={i < value.length}></span>
 		{/each}
 	</div>

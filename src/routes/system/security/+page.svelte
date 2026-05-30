@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
-	import { hashPin, validatePinFormat } from '$lib/security/crypto';
+	import { validatePinFormat } from '$lib/security/crypto';
 	import { createRecoveryCodeSet } from '$lib/security/recoveryCodes';
 	import CloudAccountPanel from '$lib/components/security/CloudAccountPanel.svelte';
 	import { getPasskeyServerCapability } from '$lib/security/passkeyServer';

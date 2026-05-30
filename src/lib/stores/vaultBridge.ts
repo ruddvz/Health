@@ -1,17 +1,10 @@
 import { get } from 'svelte/store';
-import {
-	LS_ACTIVE_DAY_TYPE,
-	LS_GROCERY,
-	LS_ONBOARDING,
-	LS_PLAN,
-	LS_PROGRESS,
-	LS_SETTINGS
-} from '$lib/constants/storage';
+import { LS_GROCERY } from '$lib/constants/storage';
 import { defaultOnboardingState, normalizeOnboarding } from '$lib/logic/onboardingState';
 import type { VaultSnapshot } from '$lib/security/vault';
 import { persistVaultSlice } from '$lib/security/vault';
 import { parsePlanJsonText } from '$lib/validation/planV2';
-import type { DayType, ProgressV2 } from '$lib/types/planV2';
+import type { ProgressV2 } from '$lib/types/planV2';
 import {
 	activeDayType,
 	importWarnings,

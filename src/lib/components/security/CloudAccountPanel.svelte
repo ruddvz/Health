@@ -90,7 +90,7 @@
 				'decrypt'
 			]);
 			const wrapKey = await deriveKeyFromPassword(cloudPassword);
-			const exported = await crypto.subtle.exportKey('raw', dek);
+			await crypto.subtle.exportKey('raw', dek); // ensure extractable before wrap
 			const ivWrap = crypto.getRandomValues(new Uint8Array(12));
 			const wrappedDek = await crypto.subtle.wrapKey('raw', dek, wrapKey, {
 				name: 'AES-GCM',

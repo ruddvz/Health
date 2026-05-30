@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import '$lib/styles/global.css';
+	import '$lib/styles/theme-light.css';
 	import '$lib/styles/nothing.css';
 	import '$lib/styles/utilities.css';
 	import favicon from '$lib/assets/favicon.svg';
@@ -12,7 +13,8 @@
 	import UnlockGate from '$lib/components/security/UnlockGate.svelte';
 	import { normalizePathname } from '$lib/paths';
 	import { isLockProtectedPath } from '$lib/security/routeLock';
-	import { activeDayType, hydrateFromLocalStorage, plan } from '$lib/stores/healthApp';
+	import { syncThemeFromSettings } from '$lib/theme';
+	import { activeDayType, hydrateFromLocalStorage, plan, settings } from '$lib/stores/healthApp';
 	import {
 		hydrateSecurity,
 		lockOnHidden,
@@ -23,7 +25,7 @@
 	let { children } = $props();
 
 	onMount(() => {
-		void hydrateFromLocalStorage();
+		void hydrateFromLocalStorage().then(() => syncThemeFromSettings());
 		hydrateSecurity();
 
 		const onHide = () => lockOnHidden();
@@ -37,6 +39,10 @@
 			window.removeEventListener('pagehide', onHide);
 			document.removeEventListener('visibilitychange', onVis);
 		};
+	});
+
+	$effect(() => {
+		syncThemeFromSettings($settings);
 	});
 
 	const path = $derived(normalizePathname(page.url.pathname));

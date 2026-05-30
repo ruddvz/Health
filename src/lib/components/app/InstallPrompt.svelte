@@ -8,13 +8,18 @@
 	};
 
 	let closeInstallHint = $state(false);
+	let dismissUpdate = $state(false);
 
 	let deferred: InstallableEvent | null = null;
 	let canInstall = $state(false);
 	let userEngaged = $state(false);
 	let delayElapsed = $state(false);
 
+	let updateAvailable = $state(false);
+	let applyUpdate: ((reload?: boolean) => Promise<void>) | null = null;
+
 	const showInstallUi = $derived(canInstall && !closeInstallHint && (userEngaged || delayElapsed));
+	const showUpdateUi = $derived(updateAvailable && !dismissUpdate);
 
 	onMount(() => {
 		if (!browser) return;
@@ -40,13 +45,13 @@
 
 		import('virtual:pwa-register')
 			.then(({ registerSW }) => {
-				registerSW({
+				applyUpdate = registerSW({
 					immediate: true,
 					onNeedRefresh() {
-						// No in-app toast; reload the tab to pick up a new deploy.
+						updateAvailable = true;
 					},
 					onOfflineReady() {
-						// No hint toast.
+						/* optional hint omitted */
 					},
 					onRegisteredSW(_url, registration) {
 						if (!registration) return;
@@ -77,10 +82,29 @@
 		deferred = null;
 		canInstall = false;
 	}
+
+	async function refreshApp() {
+		if (applyUpdate) await applyUpdate(true);
+		updateAvailable = false;
+		dismissUpdate = false;
+	}
 </script>
 
+{#if showUpdateUi}
+	<div class="toast update nothing-surface-2" role="status" aria-live="polite">
+		<p class="mono-caps title">Update ready</p>
+		<p class="sub">A newer version of the app is available. Refresh to load it.</p>
+		<div class="row">
+			<button type="button" class="primary pressable" onclick={refreshApp}>Refresh</button>
+			<button type="button" class="ghost pressable" onclick={() => (dismissUpdate = true)}
+				>Later</button
+			>
+		</div>
+	</div>
+{/if}
+
 {#if showInstallUi}
-	<div class="toast install nothing-surface-2">
+	<div class="toast install nothing-surface-2" class:below-update={showUpdateUi}>
 		<p class="mono-caps title">Install</p>
 		<p class="sub">Add to home screen for full-screen use.</p>
 		<div class="row">
@@ -104,12 +128,20 @@
 		margin-inline: auto;
 	}
 
+	.update {
+		z-index: 51;
+	}
+
+	.install.below-update {
+		bottom: calc(var(--nav-h) + var(--safe-bottom) + 148px);
+	}
+
 	.title {
 		margin: 0 0 var(--space-2);
 		color: var(--red);
 	}
 
-	.install .sub {
+	.sub {
 		margin: 0 0 var(--space-3);
 		font-size: 13px;
 		color: var(--text-2);
@@ -127,7 +159,7 @@
 		border: 1px solid var(--red);
 		border-radius: var(--radius-xs);
 		background: var(--red);
-		color: #0b0b0b;
+		color: #fff;
 		font-family: var(--font-mono);
 		font-size: 10px;
 		font-weight: 700;

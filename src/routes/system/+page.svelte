@@ -57,6 +57,12 @@
 
 	<SectionLabel text="TOOLS" />
 	<SettingsRowLink
+		icon="PH"
+		title="Phases"
+		subtitle="Targets and focus by phase"
+		href={ROUTES.systemPhases}
+	/>
+	<SettingsRowLink
 		icon="CART"
 		title="Grocery"
 		subtitle="Store checklist"

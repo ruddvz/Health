@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { ROUTES } from '$lib/appRoutes';
-	import { resolve } from '$app/paths';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SettingsRowLink from '$lib/components/spec/SettingsRowLink.svelte';
 

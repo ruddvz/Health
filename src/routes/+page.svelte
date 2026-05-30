@@ -42,7 +42,6 @@
 		{ id: 6 as const, title: 'Life & place', sub: 'Country, rhythm, stress' }
 	];
 
-
 	function patch(p: Partial<OnboardingState>) {
 		persistOnboarding({ ...$onboarding, ...p });
 	}

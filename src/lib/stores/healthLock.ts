@@ -198,10 +198,8 @@ export async function enablePasskeyLock(opts: {
 	const pinCred = await hashPin(opts.recoveryPin);
 	const cur = get(securityConfig);
 
-	let encryptionEnabled = false;
 	try {
 		vaultDek = await migratePlaintextToVault(opts.recoveryPin, pinCred);
-		encryptionEnabled = true;
 	} catch (e) {
 		const msg = e instanceof Error ? e.message : 'Encryption setup failed.';
 		return { ok: false, error: msg };
@@ -214,7 +212,7 @@ export async function enablePasskeyLock(opts: {
 		webauthn: reg.meta,
 		method: 'pin+biometric',
 		recoveryCodeHashes: opts.recoveryCodeHashes,
-		encryptionEnabled
+		encryptionEnabled: true
 	};
 	persistSecurity(next, { keepUnlocked: opts.keepUnlocked ?? true });
 	return { ok: true };
@@ -240,10 +238,8 @@ export async function enablePinLock(opts: {
 		webauthn = reg.meta;
 	}
 
-	let encryptionEnabled = false;
 	try {
 		vaultDek = await migratePlaintextToVault(opts.recoveryPin, pinCred);
-		encryptionEnabled = true;
 	} catch (e) {
 		const msg = e instanceof Error ? e.message : 'Encryption setup failed.';
 		return { ok: false, error: msg };
@@ -257,7 +253,7 @@ export async function enablePinLock(opts: {
 		webauthn,
 		method: webauthn ? 'pin+biometric' : 'pin',
 		recoveryCodeHashes: opts.recoveryCodeHashes,
-		encryptionEnabled
+		encryptionEnabled: true
 	};
 	persistSecurity(next, { keepUnlocked: opts.keepUnlocked ?? true });
 	return { ok: true };

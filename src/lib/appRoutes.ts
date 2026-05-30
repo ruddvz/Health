@@ -6,6 +6,7 @@ export const ROUTES = {
 	systemSettingsExport: '/system/settings#export',
 	systemSettingsDanger: '/system/settings#danger',
 	systemAbout: '/system/about',
+	systemPhases: '/system/phases',
 	systemDiagnostics: '/system/diagnostics',
 	systemGrocery: '/system/grocery',
 	systemPrep: '/system/prep',
