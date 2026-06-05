@@ -151,6 +151,8 @@ export interface ProgressV2 {
 	activeWorkout?: ActiveWorkout;
 	workoutSessions?: WorkoutSessionLog[];
 	groceryChecked?: Record<string, boolean>;
+	/** User-added grocery rows (local only, not written to plan JSON). */
+	groceryExtras?: { key: string; name: string; qty: string; store: string }[];
 	prepChecked?: Record<string, boolean>;
 	suppChecked?: Record<string, boolean>;
 	extraMeals?: ExtraMeal[];

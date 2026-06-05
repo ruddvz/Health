@@ -10,6 +10,7 @@
 	import AppShell from '$lib/components/app/AppShell.svelte';
 	import TopStatusBar from '$lib/components/app/TopStatusBar.svelte';
 	import InstallPrompt from '$lib/components/app/InstallPrompt.svelte';
+	import ToastHost from '$lib/components/app/ToastHost.svelte';
 	import UnlockGate from '$lib/components/security/UnlockGate.svelte';
 	import { normalizePathname } from '$lib/paths';
 	import { isLockProtectedPath } from '$lib/security/routeLock';
@@ -95,3 +96,4 @@
 	{/if}
 </AppShell>
 <InstallPrompt />
+<ToastHost />
