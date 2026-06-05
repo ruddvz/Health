@@ -1,46 +1,39 @@
-/* Surfaces: spec gradient + Apple-style continuous corners (squircle) where supported */
+/* Legacy class names — mapped to wellness surfaces */
 
 .nothing-surface {
-	background: linear-gradient(180deg, #181818 0%, #111111 100%);
-	border: 1px solid rgba(255, 255, 255, 0.12);
-	border-radius: var(--radius-widget);
-	box-shadow: var(--shadow-card);
+	background: var(--health-surface);
+	border: 1px solid var(--health-line);
+	border-radius: var(--radius-xl);
+	box-shadow: var(--shadow-card-soft);
 	overflow: hidden;
 }
 
 .nothing-surface-2 {
-	background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-1) 100%);
-	border: 1px solid var(--line-1);
-	border-radius: var(--radius-widget);
-	box-shadow: var(--shadow-card);
+	background: var(--health-surface-soft);
+	border: 1px solid var(--health-line);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-card-soft);
 	overflow: hidden;
 }
 
-@supports (corner-shape: squircle) {
-	.nothing-surface,
-	.nothing-surface-2 {
-		corner-shape: squircle;
-	}
-}
-
 .mono-caps {
-	font-family: var(--font-mono);
-	font-size: 10px;
-	font-weight: 600;
-	letter-spacing: 0.22em;
+	font-size: var(--text-2xs);
+	font-weight: var(--weight-bold);
+	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: var(--text-3);
+	color: var(--health-muted-2);
 }
 
 .pressable {
 	transition:
-		transform var(--motion-fast) var(--motion-ease),
-		background var(--motion-base) var(--motion-ease),
-		border-color var(--motion-base) var(--motion-ease);
+		transform var(--motion-fast) ease,
+		opacity var(--motion-fast) ease,
+		box-shadow var(--motion-fast) ease;
 }
 
 .pressable:active {
-	transform: scale(0.985);
+	transform: scale(0.975);
+	opacity: 0.88;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -50,5 +43,6 @@
 
 	.pressable:active {
 		transform: none;
+		opacity: 1;
 	}
 }

@@ -10,7 +10,7 @@
 	import MetricTile from '$lib/components/spec/MetricTile.svelte';
 	import NextActionCard from '$lib/components/spec/NextActionCard.svelte';
 	import PhaseRow from '$lib/components/spec/PhaseRow.svelte';
-	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
+	import AppHeader from '$lib/components/app/AppHeader.svelte';
 	import SegmentedControl from '$lib/components/spec/SegmentedControl.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
 	import TimelineCard from '$lib/components/spec/TimelineCard.svelte';
@@ -150,13 +150,19 @@
 	}
 </script>
 
-<main class="screen px-screen pt-safe stack">
+<main class="screen stack">
 	{#if !$plan}
-		<ScreenHeaderBlock title="TODAY" subtitle="Daily command center" />
+		<AppHeader
+			title="Today"
+			subtitle="Your daily command center"
+			pageLabel="Today"
+			planState="none"
+		/>
 
 		<EmptyState
-			title="No plan loaded yet"
-			body="Import a Health JSON plan or create one from your intake answers. Once loaded, Today will show your next meal, workout, water, macros, reminders, and safety checks."
+			eyebrow="Get started"
+			title="Build your daily command center"
+			body="Import a plan and Today will show your next meal, workout, water, macros, reminders, and safety checks."
 		>
 			{#snippet preview()}
 				<div class="preview-card">
@@ -179,29 +185,13 @@
 			<NoPlanActions onStartIntake={startIntake} />
 		</EmptyState>
 	{:else}
-		<ScreenHeaderBlock title="TODAY" subtitle="{greeting()}, {getUserName($plan)}">
-			{#snippet right()}
-				<a
-					class="icon-header-btn"
-					href={resolve('/system/settings')}
-					aria-label="Day and app settings"
-				>
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-						<path
-							d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
-							stroke="currentColor"
-							stroke-width="1.6"
-						/>
-						<path
-							d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.54V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.54 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.54-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.54-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.54V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.54 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c0 .66.39 1.26 1 1.54H21a2 2 0 1 1 0 4h-.09c-.61.28-1 .88-1 1.54Z"
-							stroke="currentColor"
-							stroke-width="1.2"
-							stroke-linejoin="round"
-						/>
-					</svg>
-				</a>
-			{/snippet}
-		</ScreenHeaderBlock>
+		<AppHeader
+			title={greeting()}
+			subtitle="{getUserName($plan)} · {$activeDayType === 'workout' ? 'Workout day' : 'Rest day'}"
+			pageLabel="Today"
+			planState="loaded"
+			rightAction="settings"
+		/>
 
 		<PhaseRow
 			label={getPhaseLabel($plan, phaseIndex)}

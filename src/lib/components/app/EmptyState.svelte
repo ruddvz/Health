@@ -5,26 +5,28 @@
 		title: string;
 		body: string;
 		eyebrow?: string;
+		icon?: string;
 		children?: Snippet;
 		preview?: Snippet;
 	}
 
-	let { title, body, eyebrow, children, preview }: Props = $props();
+	let { title, body, eyebrow, icon = '✦', children, preview }: Props = $props();
 </script>
 
-<section class="empty nothing-surface" aria-labelledby="empty-title">
+<section class="empty health-card" aria-labelledby="empty-title">
+	<div class="empty__orb" aria-hidden="true">{icon}</div>
 	{#if eyebrow}
-		<p class="eyebrow mono-caps">{eyebrow}</p>
+		<p class="empty__eyebrow">{eyebrow}</p>
 	{/if}
-	<h2 id="empty-title" class="title">{title}</h2>
-	<p class="body">{body}</p>
+	<h2 id="empty-title" class="empty__title">{title}</h2>
+	<p class="empty__body">{body}</p>
 	{#if preview}
-		<div class="preview" aria-hidden="true">
+		<div class="empty__preview" aria-hidden="true">
 			{@render preview()}
 		</div>
 	{/if}
 	{#if children}
-		<div class="actions">
+		<div class="empty__actions">
 			{@render children()}
 		</div>
 	{/if}
@@ -32,112 +34,83 @@
 
 <style>
 	.empty {
-		padding: var(--space-5) var(--space-4);
-		margin-bottom: var(--space-4);
-		border-radius: var(--radius-card, var(--radius-lg));
+		padding: var(--space-6) var(--space-5);
+		text-align: center;
 	}
 
-	.eyebrow {
-		margin: 0 0 var(--space-2);
-		font-size: 10px;
-		color: var(--text-3);
-		letter-spacing: 0.08em;
-	}
-
-	.title {
-		margin: 0 0 var(--space-2);
+	.empty__orb {
+		width: 52px;
+		height: 52px;
+		margin: 0 auto var(--space-4);
+		display: grid;
+		place-items: center;
+		border-radius: 18px;
+		background: var(--health-green-soft);
+		color: var(--health-green);
 		font-size: 22px;
-		font-weight: 700;
-		line-height: 1.2;
-		color: var(--text-1);
+		font-weight: var(--weight-bold);
+	}
+
+	.empty__eyebrow {
+		margin: 0 0 var(--space-2);
+		font-size: var(--text-2xs);
+		font-weight: var(--weight-bold);
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--health-muted-2);
+	}
+
+	.empty__title {
+		margin: 0 0 var(--space-2);
+		font-size: var(--text-xl);
+		font-weight: var(--weight-bold);
+		line-height: var(--leading-title);
+		color: var(--health-ink);
 		letter-spacing: -0.02em;
 	}
 
-	.body {
+	.empty__body {
 		margin: 0;
-		font-size: 15px;
-		line-height: 1.5;
-		color: var(--text-2);
+		font-size: var(--text-base);
+		line-height: var(--leading-relaxed);
+		color: var(--health-muted);
 	}
 
-	.preview {
+	.empty__preview {
 		display: grid;
-		gap: 10px;
-		margin-top: var(--space-4);
-		opacity: 0.45;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--space-2);
+		margin-top: var(--space-5);
+		opacity: 0.55;
 		pointer-events: none;
 	}
 
-	.actions {
+	.empty__actions {
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: var(--space-2);
 		margin-top: var(--space-5);
 	}
 
-	:global(.empty .btn-primary) {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 48px;
-		padding: 12px 18px;
-		border-radius: var(--radius-control, var(--radius-sm));
-		border: none;
-		background: var(--accent, var(--ios-blue, var(--red)));
-		color: #fff;
-		font-size: 16px;
-		font-weight: 650;
-		text-decoration: none;
-		cursor: pointer;
-	}
-
-	:global(.empty .btn-secondary) {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 48px;
-		padding: 12px 18px;
-		border-radius: var(--radius-control, var(--radius-sm));
-		border: 1px solid var(--line-2);
-		background: transparent;
-		color: var(--text-1);
-		font-size: 16px;
-		font-weight: 600;
-		text-decoration: none;
-		cursor: pointer;
-	}
-
-	:global(.empty .btn-ghost) {
-		min-height: 44px;
-		padding: 10px 14px;
-		border: none;
-		background: transparent;
-		color: var(--text-2);
-		font-size: 14px;
-		font-weight: 500;
-		text-decoration: underline;
-		text-underline-offset: 3px;
-		cursor: pointer;
-	}
-
 	:global(.empty .preview-card) {
-		padding: var(--space-3) var(--space-4);
-		border-radius: var(--radius-sm);
-		border: 1px dashed var(--line-2);
-		background: rgba(0, 0, 0, 0.2);
+		padding: var(--space-3);
+		border-radius: var(--radius-md);
+		border: 1px dashed var(--health-line);
+		background: var(--health-surface-soft);
+		text-align: left;
 	}
 
 	:global(.empty .preview-card .pc-label) {
 		margin: 0;
-		font-size: 10px;
-		color: var(--text-3);
+		font-size: var(--text-2xs);
+		color: var(--health-muted-2);
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
 	}
 
 	:global(.empty .preview-card .pc-val) {
 		margin: 6px 0 0;
-		font-size: 14px;
-		color: var(--text-2);
+		font-size: var(--text-sm);
+		color: var(--health-muted);
 	}
 </style>

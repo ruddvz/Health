@@ -8,7 +8,7 @@ const minimalPlan = readFileSync(join(process.cwd(), 'samples/minimal-plan-v2.js
 test.describe('Plan loaded flow', () => {
 	test.beforeEach(async ({ page }) => {
 		await importPlanViaPaste(page, minimalPlan);
-		await expect(page.getByText('TODAY').first()).toBeVisible({ timeout: 15_000 });
+		await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible({ timeout: 15_000 });
 	});
 
 	test('Today shows quick navigation and privacy card', async ({ page }) => {

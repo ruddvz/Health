@@ -1,49 +1,5 @@
-/* Light appearance — same structure as dark tokens, tuned for WCAG on soft backgrounds */
-html[data-theme='light'] {
+/* Light is default in tokens.css; this file keeps import compatibility */
+html[data-theme='light'],
+:root:not([data-theme='dark']) {
 	color-scheme: light;
-
-	--bg: #f0f0ec;
-	--bg-elevated: #fafaf8;
-	--bg-grid: #e8e8e4;
-
-	--surface-1: #ffffff;
-	--surface-2: #f4f4f0;
-	--surface-3: #ebebe6;
-	--surface-hover: #e2e2dc;
-
-	--text-1: #121210;
-	--text-2: #4a4a44;
-	--text-3: #73736c;
-	--text-disabled: #9a9a92;
-
-	--line-1: rgba(0, 0, 0, 0.08);
-	--line-2: rgba(0, 0, 0, 0.14);
-	--line-3: rgba(0, 0, 0, 0.2);
-
-	--red: #e62222;
-	--red-hover: #ff2a2a;
-	--red-pressed: #c41a1a;
-	--red-soft: rgba(230, 34, 34, 0.12);
-	--red-line: rgba(230, 34, 34, 0.38);
-
-	--shadow-card: 0 14px 40px rgba(0, 0, 0, 0.1);
-	--shadow-phone: 0 30px 90px rgba(0, 0, 0, 0.18);
-	--shadow-red-glow: 0 0 22px rgba(230, 34, 34, 0.2);
-
-	--chart-grid: rgba(0, 0, 0, 0.06);
-	--dot-grid-dot: rgba(0, 0, 0, 0.055);
-
-	--input-bg: rgba(0, 0, 0, 0.04);
-	--modal-scrim: rgba(0, 0, 0, 0.45);
-	--warning-surface: rgba(255, 159, 10, 0.12);
-	--warning-border: rgba(255, 159, 10, 0.35);
-}
-
-html[data-theme='light'] .nothing-surface {
-	background: linear-gradient(180deg, #f4f4f0 0%, #ffffff 100%);
-	border-color: var(--line-1);
-}
-
-html[data-theme='light'] .nothing-surface-2 {
-	background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-1) 100%);
 }

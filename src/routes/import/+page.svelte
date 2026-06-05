@@ -11,8 +11,8 @@
 	import ListRowButton from '$lib/components/spec/ListRowButton.svelte';
 	import { loadSamplePlan } from '$lib/logic/loadSamplePlan';
 	import { buildImportPreview } from '$lib/logic/importPreview';
-	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
-	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
+	import AppHeader from '$lib/components/app/AppHeader.svelte';
+	import SafetyCard from '$lib/components/ui/SafetyCard.svelte';
 	import TextLinkButton from '$lib/components/spec/TextLinkButton.svelte';
 	import { MAX_PLAN_BYTES, SS_OFFER_PASSKEY } from '$lib/constants/storage';
 	import { buildClaudePrompt, copyTextToClipboard } from '$lib/logic/buildClaudePrompt';
@@ -37,7 +37,6 @@
 	let pendingIssues = $state<ValidationIssue[]>([]);
 	let pendingWarnings = $state<string[]>([]);
 
-	const importTitle = 'Bring in your\nhealth plan';
 	const OPEN_BRACE = '{';
 	const CLOSE_BRACE = '}';
 
@@ -183,15 +182,21 @@
 	onchange={onFile}
 />
 
-<main class="screen px-screen pt-safe stack">
-	<StatusStrip />
-	<ScreenHeaderBlock
-		eyebrow="IMPORT YOUR PLAN"
-		title={importTitle}
-		subtitle="Use your JSON plan to power your dashboard."
+<main class="screen stack">
+	<AppHeader
+		title="Import plan"
+		subtitle="Your data stays on this iPhone."
+		pageLabel="Import"
+		rightAction="none"
 	/>
 
-	<p class="safety" role="note">{HEALTH_DISCLAIMER}</p>
+	<section class="import-hero health-card">
+		<p class="import-hero__body">
+			Paste or upload your plan file. Validation happens on this device — nothing is uploaded.
+		</p>
+	</section>
+
+	<SafetyCard body={HEALTH_DISCLAIMER} />
 
 	{#if preview && pendingPlan}
 		<ImportPreviewCard
@@ -291,15 +296,11 @@
 		padding-bottom: var(--space-8);
 	}
 
-	.safety {
-		margin: 0 0 var(--space-4);
-		padding: var(--space-3) var(--space-4);
-		font-size: 13px;
-		line-height: 1.5;
-		color: var(--text-3);
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-1);
-		background: var(--surface-1);
+	.import-hero__body {
+		margin: 0;
+		font-size: var(--text-sm);
+		line-height: var(--leading-relaxed);
+		color: var(--health-muted);
 	}
 
 	.helper {

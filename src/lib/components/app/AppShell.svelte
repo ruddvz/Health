@@ -1,5 +1,5 @@
 <script lang="ts">
-	import BottomNav from './BottomNav.svelte';
+	import BottomTabBar from './BottomTabBar.svelte';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -9,51 +9,57 @@
 	let { children, showNav = true }: Props = $props();
 </script>
 
-<div class="shell">
-	<div class="dot-layer" aria-hidden="true"></div>
-	<div class="content" class:pb-nav={showNav} class:pb-min={!showNav}>
+<div class="shell" class:shell--nav={showNav}>
+	<div class="shell__main">
 		{@render children()}
 	</div>
 	{#if showNav}
-		<BottomNav />
+		<BottomTabBar />
 	{/if}
 </div>
 
 <style>
 	.shell {
 		position: relative;
-		isolation: isolate;
 		min-height: 100dvh;
 		display: flex;
 		flex-direction: column;
-		background: var(--bg);
-		overflow-x: hidden;
 	}
 
-	/* AppShell: dot grid at 15% opacity (component_specs.AppShell) */
-	.dot-layer {
-		position: absolute;
-		inset: 0;
-		z-index: 0;
-		opacity: 0.15;
-		pointer-events: none;
-		background-image: radial-gradient(circle at 1px 1px, var(--dot-grid-dot) 1px, transparent 0);
-		background-size: 18px 18px;
-	}
-
-	.content {
-		position: relative;
-		z-index: 1;
+	.shell__main {
 		flex: 1;
-		display: flex;
-		flex-direction: column;
+		width: 100%;
+		max-width: var(--page-max);
+		margin: 0 auto;
+		padding-left: max(var(--mobile-pad), env(safe-area-inset-left));
+		padding-right: max(var(--mobile-pad), env(safe-area-inset-right));
+		padding-top: max(12px, env(safe-area-inset-top));
 	}
 
-	.pb-nav {
-		padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + var(--space-6));
+	.shell--nav .shell__main {
+		padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 16px);
 	}
 
-	.pb-min {
-		padding-bottom: calc(var(--space-6) + var(--safe-bottom));
+	.shell:not(.shell--nav) .shell__main {
+		padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
+	}
+
+	@media (min-width: 900px) {
+		.shell--nav {
+			padding-left: 88px;
+		}
+
+		.shell--nav .shell__main {
+			padding-bottom: var(--space-8);
+			padding-left: var(--desktop-pad);
+			padding-right: var(--desktop-pad);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.shell__main {
+			padding-left: var(--desktop-pad);
+			padding-right: var(--desktop-pad);
+		}
 	}
 </style>

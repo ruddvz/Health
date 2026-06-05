@@ -72,13 +72,11 @@
 </script>
 
 <div class="gate" use:focusTrap role="dialog" aria-modal="true" aria-labelledby="lock-title">
-	<div class="inner nothing-surface">
-		<p class="mono-caps kicker">Health Lock</p>
+	<div class="inner health-card">
+		<div class="mark" aria-hidden="true">H</div>
+		<p class="kicker">Health Lock</p>
 		<h1 id="lock-title" class="title">Unlock Health</h1>
-		<p class="sub">
-			Use Face ID, Touch ID, Windows Hello, or your device passcode. Your plan stays on this device
-			— Health does not upload your meals, weight, supplements, or progress.
-		</p>
+		<p class="sub">Your plan is protected on this device.</p>
 
 		{#if error}
 			<p class="err" role="alert">{error}</p>
@@ -151,20 +149,36 @@
 		align-items: center;
 		justify-content: center;
 		padding: var(--space-4);
-		background: rgba(0, 0, 0, 0.88);
+		background: var(--modal-scrim);
 		backdrop-filter: blur(12px);
 	}
 
 	.inner {
 		width: min(400px, 100%);
-		padding: var(--space-5);
-		border: 1px solid var(--line-1);
+		padding: var(--space-6) var(--space-5);
+		text-align: center;
+	}
+
+	.mark {
+		width: 52px;
+		height: 52px;
+		margin: 0 auto var(--space-4);
+		display: grid;
+		place-items: center;
+		border-radius: 16px;
+		background: var(--health-primary);
+		color: var(--health-primary-text);
+		font-weight: var(--weight-bold);
+		font-size: var(--text-lg);
 	}
 
 	.kicker {
 		margin: 0;
-		font-size: 9px;
-		color: var(--text-3);
+		font-size: var(--text-2xs);
+		font-weight: var(--weight-bold);
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--health-muted-2);
 	}
 
 	.title {
@@ -197,11 +211,11 @@
 		width: 100%;
 		min-height: 52px;
 		margin-bottom: var(--space-4);
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--red-line);
-		background: rgba(255, 42, 42, 0.12);
-		color: var(--red);
-		font-weight: 650;
+		border-radius: var(--radius-pill);
+		border: 1px solid var(--health-line);
+		background: var(--health-purple-soft);
+		color: var(--health-purple);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
 	}
 
@@ -209,11 +223,11 @@
 		width: 100%;
 		min-height: 48px;
 		margin-top: var(--space-3);
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-2);
-		background: var(--surface-2);
-		color: var(--text-1);
-		font-weight: 650;
+		border-radius: var(--radius-pill);
+		border: none;
+		background: var(--health-primary);
+		color: var(--health-primary-text);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
 	}
 

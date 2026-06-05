@@ -8,7 +8,8 @@
 	import ChartCard from '$lib/components/spec/ChartCard.svelte';
 	import CheckinCard from '$lib/components/spec/CheckinCard.svelte';
 	import ChipRow from '$lib/components/spec/ChipRow.svelte';
-	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
+	import AppHeader from '$lib/components/app/AppHeader.svelte';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
 	import { adherenceBars7d } from '$lib/logic/adherenceDerive';
 	import { logicalDateKey } from '$lib/logic/dateKey';
@@ -40,6 +41,13 @@
 	const bars = $derived(adherenceBars7d($progress, new Date(), $settings));
 	const adherencePct = $derived(
 		bars.length ? Math.round((bars.reduce((a, b) => a + b, 0) / bars.length) * 100) : 0
+	);
+	const hasAdherenceData = $derived(bars.some((b) => b > 0));
+	const adherenceLabel = $derived(hasAdherenceData ? `${adherencePct}%` : 'Not enough data yet');
+	const adherenceSubtitle = $derived(
+		hasAdherenceData
+			? '7 day blend (water · training · check-ins)'
+			: 'Adherence appears after water, training, or check-ins are logged.'
 	);
 
 	const histSessions = $derived(recentSessions($progress, 12));
@@ -134,22 +142,28 @@
 	});
 </script>
 
-<main class="screen px-screen pt-safe stack">
-	<ScreenHeaderBlock title="PROGRESS" />
+<main class="screen stack">
+	<AppHeader
+		title="Progress"
+		subtitle={$plan ? 'Trends and check-ins' : 'Track privately'}
+		pageLabel="Progress"
+		planState={$plan ? 'loaded' : 'none'}
+	/>
 
 	{#if !$plan}
 		<EmptyState
-			title="No plan loaded yet"
-			body="You can still log weight, waist, and check-ins below. Import a plan for richer adherence insights and plan-aware context."
+			title="Track progress privately"
+			body="Log weight, waist, energy, sleep, and notes. Import a plan later for richer adherence insights."
 		>
+			<HealthButton variant="primary" block onclick={() => (checkOpen = true)}>
+				Log check-in
+			</HealthButton>
 			<NoPlanActions onStartIntake={startIntake} />
 		</EmptyState>
 	{/if}
 
 	<div class="actions">
-		<button type="button" class="export-btn pressable" onclick={exportProgress}
-			>Export progress JSON</button
-		>
+		<HealthButton variant="soft" block onclick={exportProgress}>Export backup</HealthButton>
 	</div>
 
 	<p class="insight nothing-surface" role="note">{insightLine}</p>
@@ -165,12 +179,7 @@
 			series={chart.series}
 		/>
 
-		<AdherenceCard
-			title="ADHERENCE"
-			value={`${adherencePct}%`}
-			subtitle="7 day blend (water · training · check-ins)"
-			{bars}
-		/>
+		<AdherenceCard title="ADHERENCE" value={adherenceLabel} subtitle={adherenceSubtitle} {bars} />
 
 		<SectionLabel text="RECENT WORKOUTS" />
 		{#if sessions.length === 0}
@@ -201,7 +210,7 @@
 			labels={chart.labels}
 			series={chart.series}
 		/>
-		<AdherenceCard title="ADHERENCE" value={`${adherencePct}%`} subtitle="7 day average" {bars} />
+		<AdherenceCard title="ADHERENCE" value={adherenceLabel} subtitle={adherenceSubtitle} {bars} />
 		<SectionLabel text="WEIGHT LOG" />
 		{#if ($progress.weightEntries ?? []).length === 0}
 			<p class="empty">Log weight in a weekly check-in to build your trend.</p>
@@ -316,18 +325,6 @@
 
 	.actions {
 		margin-bottom: var(--space-3);
-	}
-
-	.export-btn {
-		width: 100%;
-		min-height: 44px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-2);
-		background: var(--surface-2);
-		color: var(--text-1);
-		font-weight: 650;
-		font-size: 14px;
-		cursor: pointer;
 	}
 
 	.insight {
