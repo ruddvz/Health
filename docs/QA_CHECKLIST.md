@@ -13,7 +13,7 @@ Playwright covers a subset of this list (`npm run test:e2e` after build):
 - Passkey offer “Not now” → Today (`e2e/passkey-offer.spec.ts`)
 - Progress JSON export section in Settings (`e2e/progress-export.spec.ts`)
 
-- No-plan empty states (`e2e/no-plan-states.spec.ts`)
+- No-plan empty states (`e2e/no-plan-states.spec.ts`) — Today, Meals, Train, Progress, Diagnostics, Phases, Grocery, Prep, Supplements
 - Import: paste → **Review** → **Apply plan** (`e2e/helpers/importPlan.ts`)
 
 Visual regression (optional, updates baselines): `npm run test:e2e:screenshots`
@@ -37,7 +37,8 @@ Test on a real iPhone in **Safari** (install flow is not available in desktop Ch
 ## Navigation
 
 - [ ] Bottom tabs: Today, Meals, Training, Progress, More all open the correct panel.
-- [ ] From **More**, open Phases / Prep / Grocery / Supplements; **← More menu** returns to the hub.
+- [ ] From **More**, open Phases / Prep / Grocery / Supplements **with no plan** — each shows setup CTAs (not a blank page or silent redirect).
+- [ ] From **More**, open Phases / Prep / Grocery / Supplements **with a plan**; **← More menu** returns to the hub.
 - [ ] **Quick navigation** cards on Today still jump to the correct More sub-views.
 
 ## Intake & prompt

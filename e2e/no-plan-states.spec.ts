@@ -35,15 +35,30 @@ test.describe('No-plan empty states', () => {
 		await expect(page.getByText('Log Check-in')).toBeVisible();
 	});
 
-	test('System phases shows no-plan state instead of redirecting', async ({ page }) => {
-		await page.goto('./system/phases');
-		await expect(page.getByText('Phases need a plan')).toBeVisible();
-		await expect(page).toHaveURL(/\/system\/phases/);
-	});
-
 	test('Diagnostics does not claim schema parses without plan', async ({ page }) => {
 		await page.goto('./system/diagnostics');
 		await expect(page.getByText('No plan loaded')).toBeVisible();
 		await expect(page.getByText('Plan JSON parses')).not.toBeVisible();
+	});
+
+	test('System Phases shows no-plan state', async ({ page }) => {
+		await page.goto('./system/phases');
+		await expect(page.getByRole('heading', { name: /Phases need a plan/i })).toBeVisible();
+		await expect(page.getByRole('link', { name: 'Import JSON' })).toBeVisible();
+	});
+
+	test('System Grocery shows no-plan state', async ({ page }) => {
+		await page.goto('./system/grocery');
+		await expect(page.getByRole('heading', { name: /Grocery list needs a plan/i })).toBeVisible();
+	});
+
+	test('System Prep shows no-plan state', async ({ page }) => {
+		await page.goto('./system/prep');
+		await expect(page.getByRole('heading', { name: /Prep schedule needs a plan/i })).toBeVisible();
+	});
+
+	test('System Supplements shows no-plan state', async ({ page }) => {
+		await page.goto('./system/supplements');
+		await expect(page.getByRole('heading', { name: /Supplements need a plan/i })).toBeVisible();
 	});
 });

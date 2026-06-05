@@ -1,93 +1,88 @@
 # Health — Personal Plan
 
-Health is a **local-first PWA** that turns a structured JSON health plan into an interactive daily dashboard.
+Health is a **local-first PWA** that turns a structured JSON health plan into an interactive daily dashboard (Today, Meals, Train, Progress, System).
 
-This repo now ships a **SvelteKit + TypeScript** build to GitHub Pages (Nothing OS–inspired shell; see `docs/HEALTH_APP_REBUILD_PLAN.md`). The **full-featured single-file app** from earlier iterations is preserved under **`legacy/`** (`legacy/index.html`, etc.) for reference and porting work.
+The production app is a **SvelteKit + TypeScript** build deployed to GitHub Pages at [https://ruddvz.github.io/Health/](https://ruddvz.github.io/Health/). The earlier single-file app is preserved under **`legacy/`** for reference.
+
+## Implementation status
+
+| Area                                         | Status                                                               |
+| -------------------------------------------- | -------------------------------------------------------------------- |
+| Welcome + 6-step intake                      | **Complete** — autosave, validation, skip to import                  |
+| Import / paste JSON                          | **Complete** — preview, size limit, validation summary               |
+| No-plan empty states                         | **Complete** — Today, Meals, Train, Progress, System subroutes       |
+| Plan-driven Today / Meals / Train / Progress | **Complete** — macros, timeline, cook mode, training, logs           |
+| Health Lock (local passkey + vault)          | **Complete** — optional; recovery PIN required                       |
+| Cloud passkey / backup                       | **Partial** — UI gated; needs Vercel API + Supabase env              |
+| iOS PWA polish                               | **Partial** — manifest, safe-area, install prompt; device QA ongoing |
+| Onboarding component split                   | **Not yet** — root `+page.svelte` still large (refactor planned)     |
 
 ## What the legacy app included
 
-The snapshot in `legacy/` reflects the pre-SvelteKit feature set:
-
-1. Intake form (or **Skip to JSON**) with a Claude prompt that includes **schema v2** guidance.
-2. **Upload** or **paste** JSON and apply it.
-3. **Today** — schedule timeline, macro strip vs phase, reminders, plan warnings, water, safety card.
-4. **Meals** — phase selector, workout/rest toggle, **Cook mode**, **Swaps**, macro gap hints, optional backup meals.
-5. **Training** — `training.weekly_split` rendering, on-device **rest countdown** when present.
-6. **Progress** — weight and waist logs, check-ins, insights; export from **More → Data**.
-7. **More** hub — Phases, Prep, Grocery, Supplements; appearance (light mode); grocery price disclaimer; prep food-safety note.
+See `legacy/index.html` and `docs/LEGACY_PARITY.md` for the pre-SvelteKit feature matrix.
 
 ## Sample JSON
 
-- `samples/minimal-plan-v2.json` — small valid plan with `training.weekly_split` for smoke tests.
-- `samples/rudra-plan-v2-normalized.json` — richer schema v2 example (night-shift `schedule`, swaps, safety).
-- `static/samples/rudra-plan-v2.json` — optional static copy for offline demos (import via **Paste JSON** or file upload in the app).
+- `samples/minimal-plan-v2.json` — small valid plan for smoke tests
+- `samples/rudra-plan-v2-normalized.json` — richer schema v2 example
+- `static/samples/rudra-plan-v2.json` — bundled demo (Import or welcome **Load sample plan**)
 
 ## Tech & privacy
 
-- **Production site:** SvelteKit static PWA (`npm run build` → `build/`), base path **`/Health`** on GitHub Pages. First launch shows a **welcome screen**; major tabs have **no-plan empty states** with import / intake / demo sample paths.
-- **Legacy:** single `legacy/index.html`, system fonts, strict CSP meta, no analytics; data in **localStorage** / **sessionStorage**.
-- Roadmaps: `HEALTH_APP_EXECUTION_PLAN.md`, `docs/HEALTH_APP_REBUILD_PLAN.md`, `docs/QA_CHECKLIST.md`.
+- **Production:** static PWA, base path **`/Health`**, data in **localStorage** / **IndexedDB** (encrypted when Health Lock is on)
+- **No account required** by default; optional cloud backup only when backend is configured
+- Roadmaps: `docs/HEALTH_APP_REBUILD_PLAN.md`, `docs/QA_CHECKLIST.md`, `docs/PRIVACY_MODEL.md`
 
 ## Requirements
 
 - Node.js 22+ (matches GitHub Actions)
 
-## Run locally (SvelteKit)
+## Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the URL Vite prints (dev uses an empty base path: `/`, `/meals`, `/system`, …).
+Dev uses base path `/` (`/today`, `/import`, …). Production build uses `/Health`.
 
-## Build
+## Build & preview
 
 ```bash
 npm run build
-```
-
-Output is written to **`build/`** for GitHub Pages.
-
-## Preview the production build
-
-```bash
 npm run preview
 ```
 
-Asset URLs use the `/Health` base in production builds.
+Output: **`build/`** for GitHub Pages.
 
-## Deploy
-
-Pushes to `main` run `.github/workflows/pages.yml`: `npm ci`, `npm run build`, publish **`build/`**.
-
-### PWA / service worker
-
-After a deploy, the browser may keep an older service worker until it checks for updates. If something looks stale, reload once or wait a few minutes. The build runs `npm run verify:sw` to ensure `build/sw.js` precaches the app shell and key routes (see `scripts/verify-sw-precache.mjs`).
-
-## Tests and checks
+## Tests and quality gates
 
 ```bash
 npm run quality      # check + lint + test + build + verify:sw
 npm run quality:e2e  # quality + Playwright e2e
-npm test
-npm run check
-npm run lint
-npm run build && npm run verify:sw
-npm run test:e2e
 ```
 
-The `quality` script is the recommended pre-push gate. **GitHub Actions** runs `verify:sw` after every production build.
+GitHub Actions runs `npm run quality` on pull requests and before deploy.
 
-## SvelteKit app status
+## Deploy
 
-The SvelteKit build includes intake, import/paste, Today/Meals/Train/Progress with plan-driven UI, Health Lock, System hub, and iOS PWA polish. See **`CHANGELOG.md`** and **`docs/QA_CHECKLIST.md`** for regression checks.
+Pushes to `main` run `.github/workflows/pages.yml` (build + `verify:sw` + publish `build/`).
+
+After deploy, reload once if a stale service worker caches an old shell.
+
+## Health Lock vs cloud
+
+- **Health Lock (Phase 1):** protects this device with passkey / PIN + encrypted vault. Works offline on GitHub Pages.
+- **Cloud passkey / backup (Phase 3):** optional; requires `PUBLIC_HEALTH_API_URL` and Supabase. Hidden or disabled when not configured.
+
+See `docs/HEALTH_PASSKEY_SECURITY_IMPLEMENTATION.md`.
 
 ## Reset data
 
-Clear site data for this origin in the browser, or use **More → Data** flows described in the legacy app when running `legacy/index.html` locally.
+**System → Settings → Delete all local data**, or clear site data in the browser.
 
 ## Known limitations
 
-- The live **GitHub Pages** app follows the **SvelteKit** shell until feature parity is implemented.
-- **`legacy/`** is a static snapshot; opening `legacy/index.html` directly may break asset paths (`assets/` icons) unless served with correct base URL.
+- Cloud sync is **not** active on the public GitHub Pages deployment unless you configure the API.
+- Very large onboarding file (`src/routes/+page.svelte`) is scheduled for component extraction.
+- Screenshot visual regression may need `--update-snapshots` after intentional UI changes.

@@ -16,6 +16,8 @@ import type { DayType, OnboardingState, PlanV2, ProgressV2 } from '$lib/types/pl
 import { parsePlanJsonText } from '$lib/validation/planV2';
 
 export const plan = writable<PlanV2 | null>(null);
+/** Set when persisted plan JSON exists but fails validation/parse. */
+export const planParseError = writable<string | null>(null);
 export const importWarnings = writable<string[]>([]);
 export const activeDayType = writable<DayType>('workout');
 export const progress = writable<ProgressV2>({});
@@ -68,12 +70,15 @@ export async function hydrateFromLocalStorage() {
 		if (r.ok) {
 			plan.set(r.plan);
 			importWarnings.set(r.warnings);
+			planParseError.set(null);
 		} else {
 			plan.set(null);
+			planParseError.set(r.error);
 			importWarnings.set([r.error]);
 		}
 	} else {
 		plan.set(null);
+		planParseError.set(null);
 	}
 
 	const dt = localStorage.getItem(LS_ACTIVE_DAY_TYPE);
@@ -134,6 +139,7 @@ export function persistSettings(s: Record<string, unknown>) {
 
 export function savePlan(p: PlanV2, warnings: string[]) {
 	plan.set(p);
+	planParseError.set(null);
 	importWarnings.set(warnings);
 	void persistSlice('plan', p);
 }
@@ -167,6 +173,10 @@ async function persistSlice(
 	}
 }
 
+export function clearPlanParseError() {
+	planParseError.set(null);
+}
+
 export function clearAllLocalHealthData() {
 	if (!browser) return;
 	for (const k of [
@@ -181,6 +191,7 @@ export function clearAllLocalHealthData() {
 		localStorage.removeItem(k);
 	}
 	plan.set(null);
+	planParseError.set(null);
 	importWarnings.set([]);
 	activeDayType.set('workout');
 	progress.set({});

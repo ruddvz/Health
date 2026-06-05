@@ -14,7 +14,14 @@
 	import { normalizePathname } from '$lib/paths';
 	import { isLockProtectedPath } from '$lib/security/routeLock';
 	import { syncThemeFromSettings } from '$lib/theme';
-	import { activeDayType, hydrateFromLocalStorage, plan, settings } from '$lib/stores/healthApp';
+	import StorageRecoveryBanner from '$lib/components/app/StorageRecoveryBanner.svelte';
+	import {
+		activeDayType,
+		hydrateFromLocalStorage,
+		plan,
+		planParseError,
+		settings
+	} from '$lib/stores/healthApp';
 	import {
 		hydrateSecurity,
 		lockOnHidden,
@@ -76,6 +83,9 @@
 
 {#if showNav}
 	<TopStatusBar {weekLabel} dayMode={$activeDayType} />
+{/if}
+{#if $planParseError}
+	<StorageRecoveryBanner message={$planParseError} />
 {/if}
 <AppShell {showNav}>
 	{#if gated}

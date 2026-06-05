@@ -30,11 +30,8 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Build
-        run: npm run build
-
-      - name: Verify service worker precache
-        run: npm run verify:sw
+      - name: Quality gate (check, lint, test, build, verify:sw)
+        run: npm run quality
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

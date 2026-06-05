@@ -121,17 +121,25 @@ export async function isVaultEncrypted(): Promise<boolean> {
 	return meta?.v === 1;
 }
 
+const VAULT_MIGRATION_BACKUP = 'vault:migrationBackup';
+
+async function restoreMigrationBackup(snapshot: VaultSnapshot): Promise<void> {
+	if (snapshot.plan != null) localStorage.setItem(LS_PLAN, snapshot.plan);
+	if (snapshot.progress != null) localStorage.setItem(LS_PROGRESS, snapshot.progress);
+	if (snapshot.onboarding != null) localStorage.setItem(LS_ONBOARDING, snapshot.onboarding);
+	if (snapshot.settings != null) localStorage.setItem(LS_SETTINGS, snapshot.settings);
+	if (snapshot.grocery != null) localStorage.setItem(LS_GROCERY, snapshot.grocery);
+	if (snapshot.activeDayType != null)
+		localStorage.setItem(LS_ACTIVE_DAY_TYPE, snapshot.activeDayType);
+}
+
 export async function migratePlaintextToVault(
 	pin: string,
 	pinCred: PinCredential
 ): Promise<CryptoKey> {
 	if (!browser) throw new Error('Vault requires a browser');
-	const dek = await generateDek();
-	const wrapped = await wrapDekForPin(dek, pin, pinCred);
-	await idbSet(VAULT_WRAPPED_DEK, wrapped);
-	await idbSet(VAULT_META, { v: 1 });
 
-	const snapshot = {
+	const snapshot: VaultSnapshot = {
 		plan: localStorage.getItem(LS_PLAN),
 		progress: localStorage.getItem(LS_PROGRESS),
 		onboarding: localStorage.getItem(LS_ONBOARDING),
@@ -140,32 +148,49 @@ export async function migratePlaintextToVault(
 		activeDayType: localStorage.getItem(LS_ACTIVE_DAY_TYPE)
 	};
 
-	if (snapshot.plan) {
-		await idbSet(VAULT_PLAN, await encryptJson(dek, JSON.parse(snapshot.plan)));
-		localStorage.removeItem(LS_PLAN);
-	}
-	if (snapshot.progress) {
-		await idbSet(VAULT_PROGRESS, await encryptJson(dek, JSON.parse(snapshot.progress)));
-		localStorage.removeItem(LS_PROGRESS);
-	}
-	if (snapshot.onboarding) {
-		await idbSet(VAULT_ONBOARDING, await encryptJson(dek, JSON.parse(snapshot.onboarding)));
-		localStorage.removeItem(LS_ONBOARDING);
-	}
-	if (snapshot.settings) {
-		await idbSet(VAULT_SETTINGS, await encryptJson(dek, JSON.parse(snapshot.settings)));
-		localStorage.removeItem(LS_SETTINGS);
-	}
-	if (snapshot.grocery) {
-		await idbSet(VAULT_GROCERY, await encryptJson(dek, JSON.parse(snapshot.grocery)));
-		localStorage.removeItem(LS_GROCERY);
-	}
-	if (snapshot.activeDayType) {
-		await idbSet(VAULT_ACTIVE_DAY, await encryptJson(dek, snapshot.activeDayType));
-		localStorage.removeItem(LS_ACTIVE_DAY_TYPE);
-	}
+	await idbSet(VAULT_MIGRATION_BACKUP, snapshot);
 
-	return dek;
+	const dek = await generateDek();
+	const wrapped = await wrapDekForPin(dek, pin, pinCred);
+
+	try {
+		await idbSet(VAULT_WRAPPED_DEK, wrapped);
+		await idbSet(VAULT_META, { v: 1 });
+
+		if (snapshot.plan) {
+			await idbSet(VAULT_PLAN, await encryptJson(dek, JSON.parse(snapshot.plan)));
+		}
+		if (snapshot.progress) {
+			await idbSet(VAULT_PROGRESS, await encryptJson(dek, JSON.parse(snapshot.progress)));
+		}
+		if (snapshot.onboarding) {
+			await idbSet(VAULT_ONBOARDING, await encryptJson(dek, JSON.parse(snapshot.onboarding)));
+		}
+		if (snapshot.settings) {
+			await idbSet(VAULT_SETTINGS, await encryptJson(dek, JSON.parse(snapshot.settings)));
+		}
+		if (snapshot.grocery) {
+			await idbSet(VAULT_GROCERY, await encryptJson(dek, JSON.parse(snapshot.grocery)));
+		}
+		if (snapshot.activeDayType) {
+			await idbSet(VAULT_ACTIVE_DAY, await encryptJson(dek, snapshot.activeDayType));
+		}
+
+		if (snapshot.plan) localStorage.removeItem(LS_PLAN);
+		if (snapshot.progress) localStorage.removeItem(LS_PROGRESS);
+		if (snapshot.onboarding) localStorage.removeItem(LS_ONBOARDING);
+		if (snapshot.settings) localStorage.removeItem(LS_SETTINGS);
+		if (snapshot.grocery) localStorage.removeItem(LS_GROCERY);
+		if (snapshot.activeDayType) localStorage.removeItem(LS_ACTIVE_DAY_TYPE);
+
+		await idbDelete(VAULT_MIGRATION_BACKUP);
+		return dek;
+	} catch (e) {
+		await clearVaultRecords();
+		await restoreMigrationBackup(snapshot);
+		await idbDelete(VAULT_MIGRATION_BACKUP);
+		throw e;
+	}
 }
 
 export async function loadWrappedDek(): Promise<WrappedDekPayload | undefined> {
@@ -181,7 +206,8 @@ export async function clearVaultRecords(): Promise<void> {
 		VAULT_SETTINGS,
 		VAULT_GROCERY,
 		VAULT_ACTIVE_DAY,
-		VAULT_META
+		VAULT_META,
+		VAULT_MIGRATION_BACKUP
 	]) {
 		await idbDelete(k);
 	}
