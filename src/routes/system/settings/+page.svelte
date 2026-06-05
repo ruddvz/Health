@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
-	import RedActionButton from '$lib/components/nothing/RedActionButton.svelte';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import { LS_PLAN } from '$lib/constants/storage';
 	import { normalizeOnboarding } from '$lib/logic/onboardingState';
@@ -153,7 +153,7 @@
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<ScreenHeaderBlock title="SETTINGS" subtitle="Data, calendar & backups" />
+	<ScreenHeaderBlock title="Settings" subtitle="Data, calendar & backups" />
 
 	<p class="mono-caps lab">Appearance</p>
 	<p class="txt">Choose light or dark surfaces across the app.</p>
@@ -223,7 +223,9 @@
 	<p class="mono-caps sub">
 		Plan in browser: {browser ? (localStorage.getItem(LS_PLAN) ? 'present' : 'empty') : '—'}
 	</p>
-	<RedActionButton label="Download full backup" disabled={!$plan} onclick={exportFullBackup} />
+	<HealthButton variant="primary" block disabled={!$plan} onclick={exportFullBackup}>
+		Download full backup
+	</HealthButton>
 	<button type="button" class="secondary pressable" onclick={exportIntakeOnly}>
 		Download intake JSON only
 	</button>
@@ -307,9 +309,9 @@
 	}
 
 	.theme-opt.active {
-		border-color: var(--red-line);
-		background: var(--red-soft);
-		color: var(--text-1);
+		border-color: var(--h-accent-line);
+		background: var(--h-accent-soft);
+		color: var(--h-text);
 	}
 
 	.inp {

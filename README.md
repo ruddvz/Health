@@ -14,7 +14,8 @@ The production app is a **SvelteKit + TypeScript** build deployed to GitHub Page
 | Plan-driven Today / Meals / Train / Progress | **Complete** — macros, timeline, cook mode, training, logs           |
 | Health Lock (local passkey + vault)          | **Complete** — optional; recovery PIN required                       |
 | Cloud passkey / backup                       | **Partial** — UI gated; needs Vercel API + Supabase env              |
-| iOS PWA polish                               | **Partial** — manifest, safe-area, install prompt; device QA ongoing |
+| iOS 26 UI/UX redesign                        | **Complete** — design tokens, shell, routes, sheets, desktop grid    |
+| iOS PWA polish                               | **Complete** — manifest, safe-area, install prompt, per-route titles |
 | Onboarding component split                   | **Complete** — `OnboardingFlow` + per-step components                |
 
 ## What the legacy app included

@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
-	import RedActionButton from '$lib/components/nothing/RedActionButton.svelte';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
 	import ProgressHeader from '$lib/components/spec/ProgressHeader.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
@@ -29,17 +29,17 @@
 	import '$lib/styles/onboarding-form.css';
 
 	const stepMeta = [
-		{ label: 'STEP 1 OF 6', progress: 1 / 6, title: 'About you', sub: 'Basics & measurements' },
-		{ label: 'STEP 2 OF 6', progress: 2 / 6, title: 'Your goal', sub: 'Timeline & pace' },
-		{ label: 'STEP 3 OF 6', progress: 3 / 6, title: 'Training', sub: 'Gym context & limits' },
+		{ label: 'Step 1 of 6', progress: 1 / 6, title: 'About you', sub: 'Basics & measurements' },
+		{ label: 'Step 2 of 6', progress: 2 / 6, title: 'Your goal', sub: 'Timeline & pace' },
+		{ label: 'Step 3 of 6', progress: 3 / 6, title: 'Training', sub: 'Gym context & limits' },
 		{
-			label: 'STEP 4 OF 6',
+			label: 'Step 4 of 6',
 			progress: 4 / 6,
 			title: 'Food & kitchen',
 			sub: 'Diet, allergies, cooking'
 		},
-		{ label: 'STEP 5 OF 6', progress: 5 / 6, title: 'Supplements', sub: 'What you have & budget' },
-		{ label: 'STEP 6 OF 6', progress: 1, title: 'Life & place', sub: 'Country, rhythm, stress' }
+		{ label: 'Step 5 of 6', progress: 5 / 6, title: 'Supplements', sub: 'What you have & budget' },
+		{ label: 'Step 6 of 6', progress: 1, title: 'Life & place', sub: 'Country, rhythm, stress' }
 	] as const;
 
 	const stepRail = [
@@ -170,14 +170,13 @@
 		<StepLifestyle {fieldErrors} onUseDefaults={useExampleValuesForThisStep} />
 	{/if}
 
-	<div class="nav-actions">
+	<div class="nav-actions health-glass">
 		{#if $onboarding.step > 1}
 			<TextLinkButton text="Back" onclick={goBack} />
 		{/if}
-		<RedActionButton
-			label={$onboarding.step < 6 ? 'Continue' : 'Review & import'}
-			onclick={continuePrimary}
-		/>
+		<HealthButton variant="primary" block onclick={continuePrimary}>
+			{$onboarding.step < 6 ? 'Continue' : 'Review & import'}
+		</HealthButton>
 		<TextLinkButton text="Skip for now" onclick={goImport} />
 	</div>
 </main>

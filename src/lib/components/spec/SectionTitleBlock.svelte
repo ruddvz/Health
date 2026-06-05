@@ -31,7 +31,7 @@
 	}
 
 	.sub.red {
-		color: var(--red);
+		color: var(--h-accent);
 		font-family: var(--font-mono);
 		font-size: 12px;
 		letter-spacing: 0.06em;

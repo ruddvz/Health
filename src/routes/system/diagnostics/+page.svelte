@@ -57,7 +57,7 @@
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<ScreenHeaderBlock title="DIAGNOSTICS" subtitle="Plan health" />
+	<ScreenHeaderBlock title="Diagnostics" subtitle="Plan health" />
 
 	{#if !hasPlan || diag.noPlan}
 		<EmptyState

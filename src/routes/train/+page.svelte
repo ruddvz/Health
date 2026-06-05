@@ -68,98 +68,104 @@
 	<main class="screen page-stack">
 		<ScreenHeaderBlock title="Training" subtitle="Today's session" />
 
-		{#if day}
-			<WorkoutHeroCard
-				title={String(day.name ?? 'Workout')}
-				tag={$activeDayType === 'workout' ? 'Workout day' : 'Rest day'}
-				duration={`${typeof day.duration_minutes === 'number' ? day.duration_minutes : 45}–${typeof day.duration_minutes === 'number' ? day.duration_minutes + 15 : 60} min`}
-				description={`${exercises.length} exercises · from your plan`}
-			/>
+		<div class="page-grid train-grid">
+			<div class="train-main page-stack">
+				{#if day}
+					<WorkoutHeroCard
+						title={String(day.name ?? 'Workout')}
+						tag={$activeDayType === 'workout' ? 'Workout day' : 'Rest day'}
+						duration={`${typeof day.duration_minutes === 'number' ? day.duration_minutes : 45}–${typeof day.duration_minutes === 'number' ? day.duration_minutes + 15 : 60} min`}
+						description={`${exercises.length} exercises · from your plan`}
+					/>
 
-			<HealthButton
-				variant="primary"
-				size="lg"
-				block
-				onclick={() => goto(resolve('/train/session'))}
-			>
-				Start workout
-			</HealthButton>
+					<HealthButton
+						variant="primary"
+						size="lg"
+						block
+						onclick={() => goto(resolve('/train/session'))}
+					>
+						Start workout
+					</HealthButton>
 
-			<SectionLabel text="Exercises" rightText={`${exercises.length} total`} />
+					<SectionLabel text="Exercises" rightText={`${exercises.length} total`} />
 
-			{#each exercises as ex, i (i)}
-				{@const e = ex as Record<string, unknown>}
-				<ExerciseRow
-					index={i + 1}
-					name={String(e.name ?? 'Exercise')}
-					setsReps={`${e.sets ?? '?'} sets × ${e.reps ?? '?'} reps`}
-					rest={`${e.rest_seconds ?? '—'}s rest`}
-				/>
-			{/each}
+					{#each exercises as ex, i (i)}
+						{@const e = ex as Record<string, unknown>}
+						<ExerciseRow
+							index={i + 1}
+							name={String(e.name ?? 'Exercise')}
+							setsReps={`${e.sets ?? '?'} sets × ${e.reps ?? '?'} reps`}
+							rest={`${e.rest_seconds ?? '—'}s rest`}
+						/>
+					{/each}
 
-			{#if weeklySplit.length}
-				<SectionLabel text="Weekly split" />
-				<div class="split-strip">
-					{#each weeklySplit as d (d.index)}
-						<div class="split-day" class:split-day--today={d.isToday}>
-							<span class="split-day__name">{d.name}</span>
+					{#if weeklySplit.length}
+						<SectionLabel text="Weekly split" />
+						<div class="split-strip">
+							{#each weeklySplit as d (d.index)}
+								<div class="split-day" class:split-day--today={d.isToday}>
+									<span class="split-day__name">{d.name}</span>
+								</div>
+							{/each}
 						</div>
-					{/each}
-				</div>
-			{/if}
+					{/if}
+				{:else}
+					<section class="card rest-card">
+						<h2>Recovery day</h2>
+						<p>
+							No workout scheduled today. Focus on mobility, walking, and sleep. Your plan may
+							schedule training on other days.
+						</p>
+						{#if weeklySplit.length}
+							<div class="split-strip">
+								{#each weeklySplit as d (d.index)}
+									<div class="split-day" class:split-day--today={d.isToday}>
+										<span class="split-day__name">{d.name}</span>
+									</div>
+								{/each}
+							</div>
+						{/if}
+					</section>
+				{/if}
+			</div>
 
-			<section class="card safety-note">
-				<p>
-					Review training changes with a qualified professional if you have injuries, pain, or
-					medical conditions.
-				</p>
-			</section>
+			<aside class="train-rail page-stack">
+				<section class="card safety-note">
+					<p>
+						Review training changes with a qualified professional if you have injuries, pain, or
+						medical conditions.
+					</p>
+				</section>
 
-			{#if sessions.length}
-				<SectionLabel text="Recent sessions" />
-				<ul class="list card">
-					{#each sessions as s (s.id)}
-						<li class="row">
-							<p class="row__time">{fmtShort(s.finishedAt)}</p>
-							<p class="row__body">{s.exercises.length} exercises logged</p>
-						</li>
-					{/each}
-				</ul>
-			{/if}
+				{#if sessions.length}
+					<SectionLabel text="Recent sessions" />
+					<ul class="list card">
+						{#each sessions as s (s.id)}
+							<li class="row">
+								<p class="row__time">{fmtShort(s.finishedAt)}</p>
+								<p class="row__body">{s.exercises.length} exercises logged</p>
+							</li>
+						{/each}
+					</ul>
+				{/if}
 
-			{#if liftStats.length}
-				<SectionLabel text="Last logged weights" />
-				<div class="lift card">
-					{#each liftStats as ls (ls.name)}
-						<div class="lr">
-							<p class="nm">{ls.name}</p>
-							<p class="vals">
-								Last {ls.lastKg !== null ? `${ls.lastKg} kg` : '—'} · Best {ls.bestKg !== null
-									? `${ls.bestKg} kg`
-									: '—'}
-							</p>
-						</div>
-					{/each}
-				</div>
-			{/if}
-		{:else}
-			<section class="card rest-card">
-				<h2>Recovery day</h2>
-				<p>
-					No workout scheduled today. Focus on mobility, walking, and sleep. Your plan may schedule
-					training on other days.
-				</p>
-				{#if weeklySplit.length}
-					<div class="split-strip">
-						{#each weeklySplit as d (d.index)}
-							<div class="split-day" class:split-day--today={d.isToday}>
-								<span class="split-day__name">{d.name}</span>
+				{#if liftStats.length}
+					<SectionLabel text="Last logged weights" />
+					<div class="lift card">
+						{#each liftStats as ls (ls.name)}
+							<div class="lr">
+								<p class="nm">{ls.name}</p>
+								<p class="vals">
+									Last {ls.lastKg !== null ? `${ls.lastKg} kg` : '—'} · Best {ls.bestKg !== null
+										? `${ls.bestKg} kg`
+										: '—'}
+								</p>
 							</div>
 						{/each}
 					</div>
 				{/if}
-			</section>
-		{/if}
+			</aside>
+		</div>
 	</main>
 {/if}
 

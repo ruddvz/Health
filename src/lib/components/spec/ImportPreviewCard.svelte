@@ -12,6 +12,7 @@
 
 	let { preview, issues, onApply, onCancel, busy = false }: Props = $props();
 
+	const errors = $derived(issues.filter((i) => i.level === 'error'));
 	const warnings = $derived(issues.filter((i) => i.level === 'warning'));
 	const infos = $derived(issues.filter((i) => i.level === 'info'));
 </script>
@@ -39,6 +40,17 @@
 		</div>
 	</div>
 
+	{#if errors.length}
+		<div class="err-block" role="alert">
+			<p class="err-t">Errors ({errors.length})</p>
+			<ul>
+				{#each errors as e (e.code + e.path)}
+					<li>{e.message}</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
+
 	{#if warnings.length}
 		<div class="warn-block" role="status">
 			<p class="warn-t">Warnings ({warnings.length})</p>
@@ -51,11 +63,14 @@
 	{/if}
 
 	{#if infos.length}
-		<ul class="info">
-			{#each infos as w (w.code + w.path)}
-				<li>{w.message}</li>
-			{/each}
-		</ul>
+		<div class="info-block" role="status">
+			<p class="info-t">Notes ({infos.length})</p>
+			<ul>
+				{#each infos as w (w.code + w.path)}
+					<li>{w.message}</li>
+				{/each}
+			</ul>
+		</div>
 	{/if}
 
 	<p class="note">
@@ -120,12 +135,34 @@
 		line-height: var(--lh-body);
 	}
 
-	.warn-block {
+	.err-block,
+	.warn-block,
+	.info-block {
 		margin-bottom: var(--s-3);
 		padding: var(--s-3);
 		border-radius: var(--r-card-inner);
+	}
+
+	.err-block {
+		border: 1px solid var(--h-red-line);
+		background: var(--h-red-soft);
+	}
+
+	.warn-block {
 		border: 1px solid var(--h-orange-line);
 		background: var(--h-orange-soft);
+	}
+
+	.info-block {
+		border: 1px solid var(--h-line);
+		background: var(--h-surface-2);
+	}
+
+	.err-t {
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-red);
 	}
 
 	.warn-t {
@@ -135,19 +172,19 @@
 		color: var(--h-orange);
 	}
 
+	.info-t {
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-muted);
+	}
+
 	ul {
 		margin: 0;
 		padding-left: 1.1rem;
 		font-size: var(--t-footnote);
 		line-height: var(--lh-body);
 		color: var(--h-text-soft);
-	}
-
-	.info {
-		margin: 0 0 var(--s-3);
-		padding-left: 1.1rem;
-		font-size: var(--t-footnote);
-		color: var(--h-text-muted);
 	}
 
 	.note {

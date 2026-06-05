@@ -177,13 +177,13 @@
 </script>
 
 <RequiresPlan
-	title="SESSION"
+	title="Workout"
 	subtitle="Log sets and finish your workout"
 	emptyTitle="Workout session needs a plan"
 	emptyBody="Training sessions are built from your plan's weekly split. Import a plan or load the demo sample, then start a session from the Train tab."
 >
 	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="SESSION" subtitle={String(day?.name ?? 'Workout')} />
+		<ScreenHeaderBlock title="Workout" subtitle={String(day?.name ?? 'Session')} />
 
 		{#if current}
 			<section class="panel nothing-surface">

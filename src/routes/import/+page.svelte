@@ -11,7 +11,9 @@
 	import ListRowButton from '$lib/components/spec/ListRowButton.svelte';
 	import { loadSamplePlan } from '$lib/logic/loadSamplePlan';
 	import { buildImportPreview } from '$lib/logic/importPreview';
-	import AppHeader from '$lib/components/app/AppHeader.svelte';
+	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
+	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
 	import SafetyCard from '$lib/components/ui/SafetyCard.svelte';
 	import TextLinkButton from '$lib/components/spec/TextLinkButton.svelte';
 	import { MAX_PLAN_BYTES, SS_OFFER_PASSKEY } from '$lib/constants/storage';
@@ -42,6 +44,7 @@
 
 	const promptBody = $derived(buildClaudePrompt($onboarding));
 	const preview = $derived(pendingPlan ? buildImportPreview(pendingPlan, pendingIssues) : null);
+	const pasteCharCount = $derived(pasteText.length);
 
 	const HEALTH_DISCLAIMER =
 		'Health is a planning and tracking companion. It does not provide medical diagnosis or emergency advice. Review major diet, supplement, medication, injury, pregnancy, diabetes, eating-disorder, or medical-condition decisions with a qualified professional.';
@@ -183,12 +186,8 @@
 />
 
 <main class="screen page-stack">
-	<AppHeader
-		title="Import plan"
-		subtitle="Your data stays on this iPhone."
-		pageLabel="Import"
-		rightAction="none"
-	/>
+	<StatusStrip />
+	<ScreenHeaderBlock title="Import plan" subtitle="Your data stays on this iPhone." />
 
 	<section class="import-hero health-card">
 		<p class="import-hero__body">
@@ -278,15 +277,15 @@
 	<PasskeyOfferSheet ondecline={declinePasskeyOffer} />
 {/if}
 
-<BottomSheet open={pasteOpen} title="Paste JSON" onClose={() => (pasteOpen = false)}>
-	<textarea class="ta" rows="10" bind:value={pasteText} aria-label="Plan JSON"></textarea>
+<BottomSheet open={pasteOpen} title="Paste plan JSON" onClose={() => (pasteOpen = false)}>
+	<textarea class="ta" rows="12" bind:value={pasteText} aria-label="Plan JSON"></textarea>
+	<p class="paste-meta" aria-live="polite">{pasteCharCount.toLocaleString()} characters</p>
 	{#if error}
 		<p class="paste-err" role="alert">{error}</p>
 	{/if}
 	{#snippet footer()}
-		<button type="button" class="ghost pressable" onclick={() => (pasteOpen = false)}>Cancel</button
-		>
-		<button type="button" class="red pressable" onclick={reviewPaste}>Review</button>
+		<HealthButton variant="ghost" block onclick={() => (pasteOpen = false)}>Cancel</HealthButton>
+		<HealthButton variant="primary" block onclick={reviewPaste}>Review plan</HealthButton>
 	{/snippet}
 </BottomSheet>
 
@@ -402,27 +401,15 @@
 		resize: vertical;
 	}
 
+	.paste-meta {
+		margin: var(--s-2) 0 0;
+		font-size: var(--t-caption);
+		color: var(--h-text-muted);
+	}
+
 	.paste-err {
-		margin: var(--space-2) 0;
-		font-size: 13px;
-		color: var(--danger, var(--red));
-	}
-
-	.ghost,
-	.red {
-		flex: 1;
-		min-height: 48px;
-		border-radius: var(--radius-sm);
-		font-weight: 650;
-		cursor: pointer;
-		border: 1px solid var(--line-2);
-		background: transparent;
-		color: var(--text-1);
-	}
-
-	.red {
-		background: linear-gradient(180deg, rgba(167, 255, 106, 0.95), rgba(112, 242, 166, 0.86));
-		border-color: rgba(167, 255, 106, 0.28);
-		color: #081008;
+		margin: var(--s-2) 0;
+		font-size: var(--t-footnote);
+		color: var(--h-red);
 	}
 </style>

@@ -162,40 +162,48 @@
 		</HealthButton>
 	{/if}
 
-	<ChartCard
-		title="Weight trend"
-		value={chart.valueLabel}
-		delta={chart.deltaLabel}
-		labels={chart.labels}
-		series={chart.series}
-	/>
+	<div class="page-grid progress-grid">
+		<div class="progress-main page-stack">
+			<ChartCard
+				title="Weight trend"
+				value={chart.valueLabel}
+				delta={chart.deltaLabel}
+				labels={chart.labels}
+				series={chart.series}
+			/>
 
-	<CheckinCard
-		title="Weekly check-in"
-		question="How was your week?"
-		subtitle="Log weight, waist, energy, sleep, and notes."
-		cta="Log check-in"
-		onclick={() => (checkOpen = true)}
-	/>
+			<CheckinCard
+				title="Weekly check-in"
+				question="How was your week?"
+				subtitle="Log weight, waist, energy, sleep, and notes."
+				cta="Log check-in"
+				onclick={() => (checkOpen = true)}
+			/>
 
-	<AdherenceCard title="Adherence" value={adherenceLabel} subtitle={adherenceSubtitle} {bars} />
+			<AdherenceCard title="Adherence" value={adherenceLabel} subtitle={adherenceSubtitle} {bars} />
+		</div>
 
-	<p class="insight card" role="note">{insightLine}</p>
+		<aside class="progress-rail page-stack">
+			<p class="insight card" role="note">{insightLine}</p>
 
-	{#if sessions.length}
-		<SectionLabel text="Recent workouts" />
-		<ul class="list card">
-			{#each sessions as s (s.id)}
-				<li class="row">
-					<p class="t">{fmtShort(s.finishedAt)}</p>
-					<p class="b">{s.exercises.length} exercises logged</p>
-				</li>
-			{/each}
-		</ul>
-	{/if}
+			{#if sessions.length}
+				<SectionLabel text="Recent workouts" />
+				<ul class="list card">
+					{#each sessions as s (s.id)}
+						<li class="row">
+							<p class="t">{fmtShort(s.finishedAt)}</p>
+							<p class="b">{s.exercises.length} exercises logged</p>
+						</li>
+					{/each}
+				</ul>
+			{/if}
 
-	<div class="actions">
-		<HealthButton variant="soft" block onclick={exportProgress}>Export progress JSON</HealthButton>
+			<div class="actions">
+				<HealthButton variant="soft" block onclick={exportProgress}
+					>Export progress JSON</HealthButton
+				>
+			</div>
+		</aside>
 	</div>
 </main>
 
