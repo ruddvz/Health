@@ -7,6 +7,8 @@
 	import { goto } from '$app/navigation';
 	import { LS_PLAN } from '$lib/constants/storage';
 	import { onboarding, persistOnboarding, importWarnings, plan } from '$lib/stores/healthApp';
+	import { downloadDiagnosticsReport } from '$lib/logic/exportDiagnostics';
+	import { showToast } from '$lib/stores/toast';
 	import { parsePlanJsonText } from '$lib/validation/planV2';
 	import type { ValidationIssue } from '$lib/validation/issues';
 	import { get } from 'svelte/store';
@@ -46,6 +48,11 @@
 	function startIntake() {
 		persistOnboarding({ ...get(onboarding), intakeLaunched: true });
 		goto(resolve('/'));
+	}
+
+	function exportReport() {
+		downloadDiagnosticsReport(displayIssues, diag.parseWarnings);
+		showToast('Diagnostics report downloaded', 'success');
 	}
 </script>
 
@@ -90,7 +97,12 @@
 				</ul>
 			</section>
 		{/if}
-		<a class="import-link" href={resolve('/import')}>Re-import or replace plan</a>
+		<div class="actions">
+			<button type="button" class="export pressable" onclick={exportReport}
+				>Export diagnostics JSON</button
+			>
+			<a class="import-link" href={resolve('/import')}>Re-import or replace plan</a>
+		</div>
 	{/if}
 </main>
 
@@ -150,6 +162,25 @@
 		color: var(--text-3);
 		letter-spacing: 0.06em;
 		margin-bottom: 2px;
+	}
+
+	.actions {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+		margin-top: var(--space-2);
+	}
+
+	.export {
+		width: 100%;
+		min-height: 44px;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--line-2);
+		background: var(--surface-2);
+		color: var(--text-1);
+		font-weight: 650;
+		font-size: 14px;
+		cursor: pointer;
 	}
 
 	.import-link {

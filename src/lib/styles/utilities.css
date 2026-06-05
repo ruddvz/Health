@@ -69,3 +69,50 @@
 		corner-shape: squircle;
 	}
 }
+
+/* Shared form controls — theme-aware (dark + light) */
+.field-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-bottom: var(--space-3);
+}
+
+.inp-shell,
+.ta-shell {
+	padding: 10px 12px;
+	border-radius: var(--radius-xs);
+	border: 1px solid var(--line-1);
+	background: var(--input-bg, rgba(0, 0, 0, 0.35));
+	color: var(--text-1);
+	font-size: 16px;
+	font-family: var(--font-ui);
+}
+
+.ta-shell {
+	resize: vertical;
+	min-height: 72px;
+}
+
+.sheet-actions {
+	display: flex;
+	gap: var(--space-2);
+	margin-top: var(--space-2);
+}
+
+.sheet-btn {
+	flex: 1;
+	min-height: 48px;
+	border-radius: var(--radius-sm);
+	font-weight: 650;
+	cursor: pointer;
+	border: 1px solid var(--line-2);
+	background: transparent;
+	color: var(--text-1);
+}
+
+.sheet-btn.primary {
+	background: var(--red);
+	border-color: var(--red);
+	color: #fff;
+}

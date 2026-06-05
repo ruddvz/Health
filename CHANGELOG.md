@@ -11,6 +11,14 @@
 - **E2E:** delete-all-local-data flow; expanded no-plan/screenshot routes; SW verify includes train/progress/system.
 - **Release QA note:** `docs/RELEASE_QA.md` (automated gate + manual iPhone checklist).
 
+### Master plan final polish
+
+- **Toast** host for lightweight in-app feedback; **ScreenHeader** and **MetricCard** shell primitives.
+- **BottomSheet** for Progress check-in, Meals add-meal, and Grocery add-item (theme-aware `inp-shell` inputs).
+- **Grocery:** local custom items via `groceryExtras` in progress store.
+- **Diagnostics:** export validation report JSON.
+- E2E: corrupted plan storage recovery banner.
+
 ### Master plan completion pass
 
 - **RequiresPlan** empty states on System → Phases, Grocery, Prep, Supplements, and Train session (no more silent redirect to Import).

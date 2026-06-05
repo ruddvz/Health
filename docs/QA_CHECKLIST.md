@@ -14,6 +14,7 @@ Playwright covers a subset of this list (`npm run test:e2e` after build):
 - Progress JSON export section in Settings (`e2e/progress-export.spec.ts`)
 
 - No-plan empty states (`e2e/no-plan-states.spec.ts`) — Today, Meals, Train, Progress, Diagnostics, Phases, Grocery, Prep, Supplements
+- Corrupted plan storage recovery banner (`e2e/storage-recovery.spec.ts`)
 - Import: paste → **Review** → **Apply plan** (`e2e/helpers/importPlan.ts`)
 
 Visual regression (optional, updates baselines): `npm run test:e2e:screenshots`
