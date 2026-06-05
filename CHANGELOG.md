@@ -11,6 +11,14 @@
 - **Responsive shell:** centered phone column with tablet/desktop borders; docs copy of `HEALTH_REPO_MASTER_FIX_PLAN.md`.
 - Tests: meal-schedule validation, quick-fix presets, system phases no-plan e2e.
 
+### Product completion (audit pass)
+
+- **Storage recovery banner** when saved plan JSON cannot parse (`planParseError` store).
+- **Vault migration** backup + rollback if encryption fails mid-migration.
+- **README** honest status matrix; removed contradictory “shell only” limitation.
+- **CI** workflow: `npm run quality` on PRs; Playwright e2e with browser install.
+- Docs: `SCHEMA_V2.md`, `PRIVACY_MODEL.md`, `IOS_PWA_QA.md`, `LEGACY_PARITY.md`.
+
 ### iOS PWA polish and no-plan UX (continued)
 
 - **Structured validation** (`ValidationIssue` with codes, paths, fix hints) and expanded safety checks (allergies, meds+supplements, unsafe calories, schedule/meal times, duplicate phase ids).
