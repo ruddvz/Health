@@ -4,18 +4,19 @@
 		max: number;
 		unit: string;
 		label: string;
+		tone?: 'default' | 'warning' | 'danger';
 	}
-	let { value, max, unit, label }: Props = $props();
+	let { value, max, unit, label, tone = 'default' }: Props = $props();
 	const pct = $derived(max <= 0 ? 0 : Math.min(1, value / max));
 	const size = 78;
-	const stroke = 6;
+	const stroke = 8;
 	const r = (size - stroke) / 2;
 	const c = size / 2;
 	const circ = 2 * Math.PI * r;
 	const dash = $derived(circ * (1 - pct));
 </script>
 
-<div class="wrap" role="img" aria-label={`${label}: ${value} ${unit} of ${max}`}>
+<div class="wrap" data-tone={tone} role="img" aria-label={`${label}: ${value} ${unit} of ${max}`}>
 	<svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
 		<circle class="track" cx={c} cy={c} {r} fill="none" stroke-width={stroke} />
 		<circle
@@ -32,7 +33,7 @@
 	</svg>
 	<div class="center">
 		<span class="val">{value}{unit}</span>
-		<span class="mono-caps sub">{label}</span>
+		<span class="sub">{label}</span>
 	</div>
 </div>
 
@@ -45,13 +46,21 @@
 	}
 
 	.track {
-		stroke: rgba(255, 255, 255, 0.08);
+		stroke: var(--h-line-soft);
 	}
 
 	.prog {
-		stroke: var(--red);
+		stroke: var(--h-accent);
 		stroke-linecap: round;
-		transition: stroke-dashoffset var(--motion-slow) var(--motion-ease);
+		transition: stroke-dashoffset var(--dur-slow) var(--ease-standard);
+	}
+
+	.wrap[data-tone='warning'] .prog {
+		stroke: var(--h-orange);
+	}
+
+	.wrap[data-tone='danger'] .prog {
+		stroke: var(--h-red);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -72,22 +81,20 @@
 	}
 
 	.val {
-		font-size: 22px;
-		font-weight: 650;
-		color: var(--text-1);
-		font-family: var(--font-ui);
-		letter-spacing: -0.015em;
+		font-size: 20px;
+		font-weight: 760;
+		color: var(--h-text);
+		letter-spacing: -0.02em;
 		line-height: 1.1;
 	}
 
 	.sub {
 		margin-top: 2px;
-		font-size: 10px;
-		font-weight: 600;
-		letter-spacing: 0.09em;
+		font-size: var(--t-caption-2);
+		font-weight: 650;
+		letter-spacing: 0.04em;
 		text-transform: uppercase;
-		font-family: var(--font-mono);
-		color: var(--text-3);
+		color: var(--h-text-muted);
 		max-width: 72px;
 		line-height: 1.2;
 	}

@@ -50,22 +50,15 @@
 					onNeedRefresh() {
 						updateAvailable = true;
 					},
-					onOfflineReady() {
-						/* optional hint omitted */
-					},
+					onOfflineReady() {},
 					onRegisteredSW(_url, registration) {
 						if (!registration) return;
 						if (swUpdateInterval) clearInterval(swUpdateInterval);
-						const fourHours = 4 * 60 * 60 * 1000;
-						swUpdateInterval = setInterval(() => {
-							void registration.update();
-						}, fourHours);
+						swUpdateInterval = setInterval(() => void registration.update(), 4 * 60 * 60 * 1000);
 					}
 				});
 			})
-			.catch(() => {
-				/* virtual module only under Vite */
-			});
+			.catch(() => {});
 
 		return () => {
 			if (swUpdateInterval) clearInterval(swUpdateInterval);
@@ -91,9 +84,9 @@
 </script>
 
 {#if showUpdateUi}
-	<div class="toast update nothing-surface-2" role="status" aria-live="polite">
-		<p class="mono-caps title">Update ready</p>
-		<p class="sub">A newer version of the app is available. Refresh to load it.</p>
+	<div class="toast update card" role="status" aria-live="polite">
+		<p class="title">Update ready</p>
+		<p class="sub">A newer version is available. Refresh to load it.</p>
 		<div class="row">
 			<button type="button" class="primary pressable" onclick={refreshApp}>Refresh</button>
 			<button type="button" class="ghost pressable" onclick={() => (dismissUpdate = true)}
@@ -104,9 +97,9 @@
 {/if}
 
 {#if showInstallUi}
-	<div class="toast install nothing-surface-2" class:below-update={showUpdateUi}>
-		<p class="mono-caps title">Install</p>
-		<p class="sub">Add to home screen for full-screen use.</p>
+	<div class="toast install card" class:below-update={showUpdateUi}>
+		<p class="title">Add to Home Screen</p>
+		<p class="sub">On iPhone: tap Share, then “Add to Home Screen” for full-screen use.</p>
 		<div class="row">
 			<button type="button" class="primary pressable" onclick={installClick}>Install</button>
 			<button type="button" class="ghost pressable" onclick={() => (closeInstallHint = true)}
@@ -119,11 +112,11 @@
 <style>
 	.toast {
 		position: fixed;
-		left: var(--space-4);
-		right: var(--space-4);
-		bottom: calc(var(--nav-h) + var(--safe-bottom) + var(--space-5));
+		left: 16px;
+		right: 16px;
+		bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 16px);
 		z-index: 50;
-		padding: var(--space-4);
+		padding: var(--s-4);
 		max-width: 400px;
 		margin-inline: auto;
 	}
@@ -133,52 +126,48 @@
 	}
 
 	.install.below-update {
-		bottom: calc(var(--nav-h) + var(--safe-bottom) + 148px);
+		bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 148px);
 	}
 
 	.title {
-		margin: 0 0 var(--space-2);
-		color: var(--red);
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-body-lg);
+		font-weight: var(--weight-bold);
+		color: var(--h-text);
 	}
 
 	.sub {
-		margin: 0 0 var(--space-3);
-		font-size: 13px;
-		color: var(--text-2);
-		line-height: 1.4;
+		margin: 0 0 var(--s-3);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+		line-height: var(--lh-body);
 	}
 
 	.row {
 		display: flex;
-		gap: var(--space-3);
+		gap: var(--s-2);
 	}
 
 	.primary {
 		flex: 1;
-		padding: var(--space-3) var(--space-4);
-		border: 1px solid var(--red);
-		border-radius: var(--radius-xs);
-		background: var(--red);
-		color: #fff;
-		font-family: var(--font-mono);
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
+		min-height: 48px;
+		padding: 0 var(--s-4);
+		border: 1px solid rgba(167, 255, 106, 0.28);
+		border-radius: var(--r-pill);
+		background: linear-gradient(180deg, rgba(167, 255, 106, 0.95), rgba(112, 242, 166, 0.86));
+		color: #081008;
+		font-weight: 760;
 		cursor: pointer;
 	}
 
 	.ghost {
-		padding: var(--space-3) var(--space-4);
-		border: 1px solid var(--line-2);
-		border-radius: var(--radius-xs);
+		min-height: 48px;
+		padding: 0 var(--s-4);
+		border: 1px solid var(--h-line-strong);
+		border-radius: var(--r-pill);
 		background: transparent;
-		color: var(--text-2);
-		font-family: var(--font-mono);
-		font-size: 10px;
-		font-weight: 600;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
+		color: var(--h-text-muted);
+		font-weight: 650;
 		cursor: pointer;
 	}
 </style>

@@ -183,7 +183,7 @@
 	.budget-toggle input {
 		width: 20px;
 		height: 20px;
-		accent-color: var(--red);
+		accent-color: var(--h-accent);
 	}
 
 	.hint {

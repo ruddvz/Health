@@ -84,7 +84,9 @@
 		min-height: 48px;
 		padding: 12px 18px;
 		border-radius: var(--radius-control, var(--radius-sm));
-		background: var(--accent, var(--ios-blue, var(--red)));
+		background: linear-gradient(180deg, rgba(167, 255, 106, 0.95), rgba(112, 242, 166, 0.86));
+		color: #081008;
+		border-color: rgba(167, 255, 106, 0.28);
 		color: #fff;
 		font-size: 16px;
 		font-weight: 650;

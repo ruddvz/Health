@@ -7,8 +7,7 @@
 	import AdherenceCard from '$lib/components/spec/AdherenceCard.svelte';
 	import ChartCard from '$lib/components/spec/ChartCard.svelte';
 	import CheckinCard from '$lib/components/spec/CheckinCard.svelte';
-	import ChipRow from '$lib/components/spec/ChipRow.svelte';
-	import AppHeader from '$lib/components/app/AppHeader.svelte';
+	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import HealthButton from '$lib/components/ui/HealthButton.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
 	import { adherenceBars7d } from '$lib/logic/adherenceDerive';
@@ -16,7 +15,7 @@
 	import { newId } from '$lib/logic/id';
 	import { downloadProgressJson } from '$lib/logic/exportProgress';
 	import { buildWeightChartModel } from '$lib/logic/weightSeries';
-	import { liftStatsFromSessions, recentSessions } from '$lib/logic/workoutHistory';
+	import { recentSessions } from '$lib/logic/workoutHistory';
 	import {
 		onboarding,
 		persistOnboarding,
@@ -29,7 +28,6 @@
 	import { showToast } from '$lib/stores/toast';
 	import { get } from 'svelte/store';
 
-	let chip = $state('Overview');
 	let checkOpen = $state(false);
 	let weightKg = $state('');
 	let waistCm = $state('');
@@ -50,9 +48,7 @@
 			: 'Adherence appears after water, training, or check-ins are logged.'
 	);
 
-	const histSessions = $derived(recentSessions($progress, 12));
 	const sessions = $derived(recentSessions($progress, 5));
-	const liftStats = $derived(liftStatsFromSessions(histSessions));
 
 	function parseKg(s: string): number | null {
 		const v = Number(String(s).replace(',', '.').trim());
@@ -103,26 +99,20 @@
 		goto(resolve('/'));
 	}
 
-	function deleteWeightAt(index: number) {
-		const cur = get(progress);
-		const entries = [...(cur.weightEntries ?? [])];
-		const revIndex = entries.length - 1 - index;
-		if (revIndex < 0 || revIndex >= entries.length) return;
-		entries.splice(revIndex, 1);
-		persistProgress({ ...cur, weightEntries: entries });
-	}
-
-	function deleteCheckin(id: string) {
-		const cur = get(progress);
-		persistProgress({
-			...cur,
-			weeklyCheckins: (cur.weeklyCheckins ?? []).filter((c) => c.id !== id)
-		});
-	}
-
 	function exportProgress() {
 		downloadProgressJson(get(progress));
 	}
+
+	const weightEntries = $derived($progress.weightEntries ?? []);
+	const latestWeight = $derived(
+		weightEntries.length ? weightEntries[weightEntries.length - 1]?.kg : null
+	);
+	const checkinCount = $derived(($progress.weeklyCheckins ?? []).length);
+	const progressSummary = $derived(
+		checkinCount > 0
+			? `${checkinCount} log${checkinCount === 1 ? '' : 's'} recorded`
+			: 'Start logging to see trends'
+	);
 
 	const insightLine = $derived.by(() => {
 		const entries = $progress.weightEntries ?? [];
@@ -143,11 +133,9 @@
 </script>
 
 <main class="screen page-stack">
-	<AppHeader
+	<ScreenHeaderBlock
 		title="Progress"
 		subtitle={$plan ? 'Trends and check-ins' : 'Track privately'}
-		pageLabel="Progress"
-		planState={$plan ? 'loaded' : 'none'}
 	/>
 
 	{#if !$plan}
@@ -160,126 +148,55 @@
 			</HealthButton>
 			<NoPlanActions onStartIntake={startIntake} />
 		</EmptyState>
+	{:else}
+		<section class="hero-card progress-hero">
+			<p class="hero-eyebrow">{progressSummary}</p>
+			<h2 class="hero-value">
+				{latestWeight !== null ? `${latestWeight} kg` : 'No weight logged yet'}
+			</h2>
+			<p class="hero-sub">Keep logging consistently before judging the trend.</p>
+		</section>
+
+		<HealthButton variant="primary" size="lg" block onclick={() => (checkOpen = true)}>
+			Log check-in
+		</HealthButton>
+	{/if}
+
+	<ChartCard
+		title="Weight trend"
+		value={chart.valueLabel}
+		delta={chart.deltaLabel}
+		labels={chart.labels}
+		series={chart.series}
+	/>
+
+	<CheckinCard
+		title="Weekly check-in"
+		question="How was your week?"
+		subtitle="Log weight, waist, energy, sleep, and notes."
+		cta="Log check-in"
+		onclick={() => (checkOpen = true)}
+	/>
+
+	<AdherenceCard title="Adherence" value={adherenceLabel} subtitle={adherenceSubtitle} {bars} />
+
+	<p class="insight card" role="note">{insightLine}</p>
+
+	{#if sessions.length}
+		<SectionLabel text="Recent workouts" />
+		<ul class="list card">
+			{#each sessions as s (s.id)}
+				<li class="row">
+					<p class="t">{fmtShort(s.finishedAt)}</p>
+					<p class="b">{s.exercises.length} exercises logged</p>
+				</li>
+			{/each}
+		</ul>
 	{/if}
 
 	<div class="actions">
-		<HealthButton variant="soft" block onclick={exportProgress}>Export backup</HealthButton>
+		<HealthButton variant="soft" block onclick={exportProgress}>Export progress JSON</HealthButton>
 	</div>
-
-	<p class="insight nothing-surface" role="note">{insightLine}</p>
-
-	<ChipRow chips={['Overview', 'Trends', 'Metrics']} selected={chip} onSelect={(c) => (chip = c)} />
-
-	{#if chip === 'Overview'}
-		<ChartCard
-			title="WEIGHT TREND"
-			value={chart.valueLabel}
-			delta={chart.deltaLabel}
-			labels={chart.labels}
-			series={chart.series}
-		/>
-
-		<AdherenceCard title="ADHERENCE" value={adherenceLabel} subtitle={adherenceSubtitle} {bars} />
-
-		<SectionLabel text="RECENT WORKOUTS" />
-		{#if sessions.length === 0}
-			<p class="empty">Finish a session from Train to build history here.</p>
-		{:else}
-			<ul class="list nothing-surface">
-				{#each sessions as s (s.id)}
-					<li class="row">
-						<p class="mono-caps t">{fmtShort(s.finishedAt)}</p>
-						<p class="b">{s.exercises.length} exercises · logged sets</p>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-
-		<CheckinCard
-			title="WEEKLY CHECK-IN"
-			question="How was your week?"
-			subtitle="Log weight, waist, energy, sleep, and notes."
-			cta="Log Check-in"
-			onclick={() => (checkOpen = true)}
-		/>
-	{:else if chip === 'Trends'}
-		<ChartCard
-			title="WEIGHT TREND"
-			value={chart.valueLabel}
-			delta={chart.deltaLabel}
-			labels={chart.labels}
-			series={chart.series}
-		/>
-		<AdherenceCard title="ADHERENCE" value={adherenceLabel} subtitle={adherenceSubtitle} {bars} />
-		<SectionLabel text="WEIGHT LOG" />
-		{#if ($progress.weightEntries ?? []).length === 0}
-			<p class="empty">Log weight in a weekly check-in to build your trend.</p>
-		{:else}
-			<ul class="list nothing-surface">
-				{#each [...($progress.weightEntries ?? [])]
-					.reverse()
-					.slice(0, 14) as e, i (`${e.date}-${i}`)}
-					<li class="row row-actions">
-						<div>
-							<p class="mono-caps t">{e.date}</p>
-							<p class="b">{e.kg} kg</p>
-						</div>
-						<button
-							type="button"
-							class="del pressable"
-							aria-label="Delete weight entry for {e.date}"
-							onclick={() => deleteWeightAt(i)}>Delete</button
-						>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-		<SectionLabel text="CHECK-INS" />
-		{#if ($progress.weeklyCheckins ?? []).length === 0}
-			<p class="empty">No check-ins yet.</p>
-		{:else}
-			<ul class="list nothing-surface">
-				{#each [...($progress.weeklyCheckins ?? [])].reverse().slice(0, 10) as c (c.id)}
-					<li class="row row-actions">
-						<div>
-							<p class="mono-caps t">{fmtShort(c.date)}</p>
-							<p class="b">
-								{c.weight_kg ? `${c.weight_kg} kg` : '—'}
-								{#if c.waist_cm}· waist {c.waist_cm} cm{/if}
-							</p>
-						</div>
-						<button
-							type="button"
-							class="del pressable"
-							aria-label="Delete check-in"
-							onclick={() => deleteCheckin(c.id)}>Delete</button
-						>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-	{:else}
-		<SectionLabel text="TRAINING VOLUME" />
-		<p class="stat mono-caps">{histSessions.length} sessions logged</p>
-		{#if liftStats.length}
-			<SectionLabel text="LAST LOGGED WEIGHTS" />
-			<div class="lift nothing-surface">
-				{#each liftStats as ls (ls.name)}
-					<div class="lr">
-						<p class="nm">{ls.name}</p>
-						<p class="vals mono-caps">
-							Last {ls.lastKg !== null ? `${ls.lastKg} kg` : '—'} · Best {ls.bestKg !== null
-								? `${ls.bestKg} kg`
-								: '—'}
-						</p>
-					</div>
-				{/each}
-			</div>
-		{:else}
-			<p class="empty">Complete a Train session with logged sets to see lift metrics.</p>
-		{/if}
-		<p class="stat mono-caps">{($progress.weeklyCheckins ?? []).length} weekly entries</p>
-	{/if}
 </main>
 
 <BottomSheet open={checkOpen} title="Weekly check-in" onClose={() => (checkOpen = false)}>
@@ -327,13 +244,39 @@
 		margin-bottom: var(--space-3);
 	}
 
+	.progress-hero {
+		padding: var(--s-5);
+	}
+
+	.hero-eyebrow {
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-accent);
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+	}
+
+	.hero-value {
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-large);
+		font-weight: 760;
+		color: var(--h-text);
+		line-height: var(--lh-tight);
+	}
+
+	.hero-sub {
+		margin: 0 0 var(--s-4);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+	}
+
 	.insight {
-		margin: 0 0 var(--space-4);
-		padding: var(--space-3) var(--space-4);
-		font-size: 13px;
-		line-height: 1.5;
-		color: var(--text-2);
-		border-radius: var(--radius-md);
+		margin: 0 0 var(--phone-card-gap);
+		padding: var(--s-4);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text-soft);
 	}
 
 	.empty,
@@ -361,66 +304,22 @@
 		border-bottom: 1px solid var(--line-1);
 	}
 
-	.row-actions {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-3);
-	}
-
-	.del {
-		flex-shrink: 0;
-		padding: 8px 12px;
-		border-radius: var(--radius-xs);
-		border: 1px solid var(--line-2);
-		background: transparent;
-		color: var(--text-3);
-		font-size: 12px;
-		font-weight: 650;
-		cursor: pointer;
-	}
-
 	.row:last-child {
 		border-bottom: none;
 	}
 
 	.t {
 		margin: 0;
-		font-size: 9px;
-		color: var(--text-3);
+		font-size: var(--t-caption);
+		color: var(--h-text-faint);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
 	}
 
 	.b {
-		margin: 6px 0 0;
-		font-size: 14px;
-		color: var(--text-1);
-	}
-
-	.lift {
-		padding: var(--space-3);
-		margin-bottom: var(--space-4);
-	}
-
-	.lr {
-		padding: var(--space-2) 0;
-		border-bottom: 1px solid var(--line-1);
-	}
-
-	.lr:last-child {
-		border-bottom: none;
-	}
-
-	.nm {
-		margin: 0;
-		font-size: 14px;
-		font-weight: 650;
-		color: var(--text-1);
-	}
-
-	.vals {
-		margin: 6px 0 0;
-		font-size: 9px;
-		color: var(--text-3);
+		margin: 4px 0 0;
+		font-size: var(--t-callout);
+		color: var(--h-text);
 	}
 
 	.sub {

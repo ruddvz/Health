@@ -179,9 +179,10 @@
 	}
 
 	.primary {
-		border: 1px solid var(--red-line);
-		background: rgba(255, 42, 42, 0.12);
-		color: var(--red);
+		border: 1px solid rgba(167, 255, 106, 0.28);
+		background: linear-gradient(180deg, rgba(167, 255, 106, 0.95), rgba(112, 242, 166, 0.86));
+		color: #081008;
+		box-shadow: 0 12px 28px rgba(112, 242, 166, 0.18);
 	}
 
 	.secondary {

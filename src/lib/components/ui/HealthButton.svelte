@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import type { AppRoute } from '$lib/appRoutes';
 	import type { Snippet } from 'svelte';
 
 	type Variant = 'primary' | 'secondary' | 'soft' | 'ghost' | 'danger' | 'success';
@@ -11,7 +12,7 @@
 		block?: boolean;
 		disabled?: boolean;
 		type?: 'button' | 'submit';
-		href?: '/' | '/import';
+		href?: AppRoute | '/';
 		ariaLabel?: string;
 		onclick?: (e: MouseEvent) => void;
 		children: Snippet;

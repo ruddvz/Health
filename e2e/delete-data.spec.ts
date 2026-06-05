@@ -22,6 +22,6 @@ test.describe('Delete local data', () => {
 		});
 
 		await page.goto('./today');
-		await expect(page.getByText('Build your daily command center')).toBeVisible();
+		await expect(page.getByText('Import a plan to unlock Today')).toBeVisible();
 	});
 });

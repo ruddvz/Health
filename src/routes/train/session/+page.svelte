@@ -347,9 +347,9 @@
 	}
 
 	.red {
-		background: var(--red);
-		border-color: var(--red);
-		color: #fff;
+		background: linear-gradient(180deg, rgba(167, 255, 106, 0.95), rgba(112, 242, 166, 0.86));
+		border-color: rgba(167, 255, 106, 0.28);
+		color: #081008;
 	}
 
 	.empty {
@@ -359,7 +359,7 @@
 	.rest {
 		margin: var(--space-3) 0 0;
 		font-size: 12px;
-		color: var(--red);
+		color: var(--h-accent);
 		text-align: center;
 	}
 

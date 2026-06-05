@@ -1,17 +1,27 @@
+<script lang="ts">
+	interface Props {
+		items?: string[];
+	}
+	let { items = ['Local only', 'Offline ready'] }: Props = $props();
+</script>
+
 <div class="strip" role="status" aria-live="off">
-	<span class="pill">
-		<span class="dot" aria-hidden="true"></span>
-		<span class="label">Health</span>
-	</span>
+	{#each items as item (item)}
+		<span class="pill">
+			<span class="dot" aria-hidden="true"></span>
+			<span class="label">{item}</span>
+		</span>
+	{/each}
 </div>
 
 <style>
 	.strip {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		gap: var(--s-2);
 		min-height: 32px;
-		padding: var(--s-2) 0 var(--s-1);
+		padding: 0 0 var(--s-3);
 	}
 
 	.pill {
@@ -35,9 +45,10 @@
 	}
 
 	.label {
-		font-size: var(--t-caption);
+		font-size: var(--t-caption-2);
 		font-weight: var(--weight-semibold);
-		color: var(--h-text-soft);
-		letter-spacing: -0.01em;
+		color: var(--h-text-muted);
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
 	}
 </style>

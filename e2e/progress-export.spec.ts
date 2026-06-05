@@ -14,6 +14,6 @@ test.describe('Progress export', () => {
 
 	test('progress tab exports JSON', async ({ page }) => {
 		await page.goto('./progress');
-		await expect(page.getByRole('button', { name: 'Export backup' })).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Export progress JSON' })).toBeVisible();
 	});
 });

@@ -9,11 +9,12 @@
 	import MetricRing from '$lib/components/spec/MetricRing.svelte';
 	import MetricTile from '$lib/components/spec/MetricTile.svelte';
 	import NextActionCard from '$lib/components/spec/NextActionCard.svelte';
-	import PhaseRow from '$lib/components/spec/PhaseRow.svelte';
-	import AppHeader from '$lib/components/app/AppHeader.svelte';
+	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SegmentedControl from '$lib/components/spec/SegmentedControl.svelte';
-	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
+	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import TimelineCard from '$lib/components/spec/TimelineCard.svelte';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
+	import { ROUTES } from '$lib/appRoutes';
 	import { consumedTotalsForToday, waterLitersForDay } from '$lib/logic/dayTotals';
 	import { logicalDateKey } from '$lib/logic/dateKey';
 	import { getMealSlotState } from '$lib/logic/mealSlots';
@@ -23,10 +24,9 @@
 		getMealsForDay,
 		getPhaseIndex,
 		getPhaseLabel,
+		getSupplementSchedule,
 		getTrainingDay,
-		getUserName,
-		getWaterTargetLiters,
-		greeting
+		getWaterTargetLiters
 	} from '$lib/logic/planDerive';
 	import {
 		activeDayType,
@@ -35,25 +35,24 @@
 		persistActiveDayType,
 		persistOnboarding,
 		persistProgress,
-		persistSettings,
 		plan,
 		progress,
 		settings
 	} from '$lib/stores/healthApp';
+	import { securityConfig } from '$lib/stores/healthLock';
 	import type { DayType } from '$lib/types/planV2';
 	import { get } from 'svelte/store';
 
 	const phaseIndex = $derived(getPhaseIndex($settings));
-	const phaseCount = $derived($plan && Array.isArray($plan.phases) ? $plan.phases.length : 1);
-
 	const logDay = $derived(logicalDateKey(new Date(), $settings));
 	const dayT = $derived($activeDayType as DayType);
 
 	const totals = $derived(consumedTotalsForToday($plan, dayT, phaseIndex, $progress, $settings));
 	const meals = $derived(getMealsForDay($plan, dayT));
-
 	const waterTarget = $derived(getWaterTargetLiters($plan, phaseIndex));
 	const waterL = $derived(waterLitersForDay($progress, totals.day));
+	const supplements = $derived(getSupplementSchedule($plan));
+
 	const planWarnings = $derived.by(() => {
 		const imp = $importWarnings.filter(Boolean);
 		const live = $plan ? collectPlanWarnings($plan) : [];
@@ -62,6 +61,25 @@
 
 	const calProg = $derived(
 		totals.targets.kcal > 0 ? Math.min(1, totals.kcal / totals.targets.kcal) : 0
+	);
+	const proteinLeft = $derived(Math.max(0, totals.targets.protein - totals.protein));
+	const calLeft = $derived(Math.max(0, totals.targets.kcal - totals.kcal));
+	const mealsLogged = $derived(
+		meals.filter((m) => getMealSlotState($progress, logDay, dayT, m.slot) === 'logged').length
+	);
+	const adherence = $derived(meals.length ? mealsLogged / meals.length : 0);
+
+	const statusItems = $derived([
+		'Local only',
+		'Offline ready',
+		logDay,
+		$securityConfig.enabled ? 'Locked' : 'Open'
+	]);
+
+	const subtitle = $derived(
+		$plan
+			? `${$activeDayType === 'workout' ? 'Workout day' : 'Rest day'} · ${getPhaseLabel($plan, phaseIndex)}`
+			: 'Your daily command center'
 	);
 
 	const timeline = $derived.by(() => {
@@ -82,12 +100,7 @@
 			let state: 'done' | 'next' | 'upcoming' = 'upcoming';
 			if (st === 'logged') state = 'done';
 			else if (i === pendingIdx) state = 'next';
-			items.push({
-				time: m.time,
-				title: `Meal ${m.slot}`,
-				subtitle: m.name,
-				state
-			});
+			items.push({ time: m.time, title: `Meal ${m.slot}`, subtitle: m.name, state });
 		}
 		const td = getTrainingDay($plan, 0);
 		const trainTime = formatTimeFromHHMM($onboarding.lifestyle.training_time) ?? '10:00 PM';
@@ -114,33 +127,48 @@
 	const nextAction = $derived.by(() => {
 		for (let i = 0; i < meals.length; i++) {
 			const m = meals[i];
-			const st = getMealSlotState($progress, logDay, dayT, m.slot);
-			if (st === 'pending') {
+			if (getMealSlotState($progress, logDay, dayT, m.slot) === 'pending') {
 				return {
 					title: m.name,
 					subtitle: m.time ? `Meal ${m.slot} · ${m.time}` : `Meal ${m.slot}`,
+					detail: m.kcal ? `${m.kcal} kcal · ${m.protein}g protein` : undefined,
+					micro: 'Based on your schedule',
+					cta: 'Cook next meal',
 					href: '/meals' as const
 				};
 			}
 		}
 		const td = getTrainingDay($plan, 0);
 		if (dayT === 'workout' && td && typeof td.name === 'string') {
-			return { title: String(td.name), subtitle: 'Start your workout', href: '/train' as const };
+			return {
+				title: String(td.name),
+				subtitle: 'Start your workout',
+				detail: undefined,
+				micro: 'Based on your schedule',
+				cta: 'Start workout',
+				href: '/train' as const
+			};
 		}
-		if (meals[0]) {
-			return { title: meals[0].name, subtitle: 'Next meal on your plan', href: '/meals' as const };
-		}
-		return { title: 'Recovery day', subtitle: 'Focus on recovery', href: '/train' as const };
+		return {
+			title: "You're clear for now",
+			subtitle: 'Recovery day — focus on rest and hydration',
+			detail: undefined,
+			micro: undefined,
+			cta: 'Open training',
+			href: '/train' as const
+		};
 	});
 
 	function bumpWater(delta: number) {
 		const cur = get(progress);
 		const key = logicalDateKey(new Date(), get(settings));
 		const prev = waterLitersForDay(cur, key);
-		const next = Math.max(0, Math.round((prev + delta) * 100) / 100);
 		persistProgress({
 			...cur,
-			waterLitersByDay: { ...(cur.waterLitersByDay ?? {}), [key]: next }
+			waterLitersByDay: {
+				...(cur.waterLitersByDay ?? {}),
+				[key]: Math.max(0, Math.round((prev + delta) * 100) / 100)
+			}
 		});
 	}
 
@@ -152,60 +180,22 @@
 
 <main class="screen page-stack">
 	{#if !$plan}
-		<AppHeader
-			title="Today"
-			subtitle="Your daily command center"
-			pageLabel="Today"
-			planState="none"
-		/>
-
+		<ScreenHeaderBlock title="Today" subtitle="Your daily command center" />
 		<EmptyState
 			eyebrow="Get started"
-			title="Build your daily command center"
-			body="Import a plan and Today will show your next meal, workout, water, macros, reminders, and safety checks."
+			title="Import a plan to unlock Today"
+			body="Today shows your next meal, workout, water, macros, reminders, and safety checks."
 		>
-			{#snippet preview()}
-				<div class="preview-card">
-					<p class="pc-label">Next meal</p>
-					<p class="pc-val">—</p>
-				</div>
-				<div class="preview-card">
-					<p class="pc-label">Macros</p>
-					<p class="pc-val">—</p>
-				</div>
-				<div class="preview-card">
-					<p class="pc-label">Workout</p>
-					<p class="pc-val">—</p>
-				</div>
-				<div class="preview-card">
-					<p class="pc-label">Plan checks</p>
-					<p class="pc-val">—</p>
-				</div>
-			{/snippet}
 			<NoPlanActions onStartIntake={startIntake} />
 		</EmptyState>
 	{:else}
-		<AppHeader
-			title={greeting()}
-			subtitle="{getUserName($plan)} · {$activeDayType === 'workout' ? 'Workout day' : 'Rest day'}"
-			pageLabel="Today"
-			planState="loaded"
-			rightAction="settings"
-		/>
-
-		<PhaseRow
-			label={getPhaseLabel($plan, phaseIndex)}
-			{phaseCount}
-			{phaseIndex}
-			onPhaseChange={(i) => persistSettings({ ...$settings, phaseIndex: i })}
-		/>
-
-		<PlanWarningsCard warnings={planWarnings} />
+		<ScreenHeaderBlock title="Today" {subtitle} />
+		<StatusStrip items={statusItems} />
 
 		<SegmentedControl
 			options={[
-				{ label: 'Workout Day', value: 'workout' },
-				{ label: 'Rest Day', value: 'rest' }
+				{ label: 'Workout day', value: 'workout' },
+				{ label: 'Rest day', value: 'rest' }
 			]}
 			selected={$activeDayType}
 			onSelect={(v) => persistActiveDayType(v as DayType)}
@@ -215,93 +205,132 @@
 			eyebrow="Up next"
 			title={nextAction.title}
 			subtitle={nextAction.subtitle}
-			ctaLabel="Open"
+			detail={nextAction.detail}
+			micro={nextAction.micro}
+			ctaLabel={nextAction.cta}
 			onclick={() => goto(resolve(nextAction.href))}
 		/>
 
-		<SectionLabel text="MACROS" />
-
-		<div class="rings">
-			<MetricRing
-				value={Math.min(totals.protein, totals.targets.protein)}
-				max={Math.max(1, totals.targets.protein)}
-				unit="g"
-				label="Protein"
+		<div class="metric-grid macro-strip">
+			<MetricTile
+				label="Protein left"
+				value={proteinLeft > 0 ? `${Math.round(proteinLeft)}g` : 'On target'}
+				subvalue={`Target ${Math.round(totals.targets.protein)}g`}
+				progress={totals.targets.protein > 0 ? totals.protein / totals.targets.protein : 0}
 			/>
-			<MetricRing
-				value={Math.min(totals.carbs, totals.targets.carbs)}
-				max={Math.max(1, totals.targets.carbs)}
-				unit="g"
-				label="Carbs"
+			<MetricTile
+				label="Calories left"
+				value={calLeft > 0 ? `${Math.round(calLeft)}` : 'On target'}
+				subvalue={totals.targets.kcal > 0 ? `Target ${Math.round(totals.targets.kcal)} kcal` : ''}
+				progress={calProg}
 			/>
-			<MetricRing
-				value={Math.min(totals.fat, totals.targets.fat)}
-				max={Math.max(1, totals.targets.fat)}
-				unit="g"
-				label="Fat"
+			<MetricTile
+				label="Meals done"
+				value={`${mealsLogged}/${meals.length}`}
+				subvalue="Today's adherence"
+				progress={adherence}
 			/>
-		</div>
-
-		<div class="tiles">
-			<div class="tile-wrap">
+			<div class="tile-wrap card water-card">
 				<MetricTile
-					label="WATER"
-					value={`${waterL.toFixed(2)} / ${waterTarget.toFixed(1)} L`}
-					subvalue={`${Math.round((waterL / waterTarget) * 100)}%`}
+					label="Water"
+					value={`${waterL.toFixed(1)} L`}
+					subvalue={`/ ${waterTarget.toFixed(1)} L`}
 					progress={waterL / waterTarget}
 				/>
 				<div class="water-actions">
-					<button type="button" class="mini pressable" onclick={() => bumpWater(-0.25)}>−</button>
-					<button type="button" class="mini pressable" onclick={() => bumpWater(0.25)}>+</button>
+					<button type="button" class="mini pressable touch-target" onclick={() => bumpWater(-0.25)}
+						>−</button
+					>
+					<button type="button" class="mini pressable touch-target" onclick={() => bumpWater(0.25)}
+						>+</button
+					>
 				</div>
 			</div>
-			<MetricTile
-				label="CALORIES"
-				value={totals.kcal > 0 ? `${Math.round(totals.kcal).toLocaleString()}` : '—'}
-				subvalue={totals.targets.kcal > 0
-					? `/ ${Math.round(totals.targets.kcal).toLocaleString()} kcal`
-					: ''}
-				progress={calProg}
-			/>
 		</div>
 
-		<QuickNavGrid />
+		<div class="page-grid today-grid">
+			<div class="today-left page-stack">
+				<TimelineCard items={timeline} />
+				{#if planWarnings.length}
+					<PlanWarningsCard warnings={planWarnings} />
+				{/if}
+			</div>
 
-		<PrivacySafetyCard />
+			<aside class="today-right page-stack">
+				<div class="rings card">
+					<MetricRing
+						value={Math.min(totals.protein, totals.targets.protein)}
+						max={Math.max(1, totals.targets.protein)}
+						unit="g"
+						label="Protein"
+					/>
+					<MetricRing
+						value={Math.min(totals.carbs, totals.targets.carbs)}
+						max={Math.max(1, totals.targets.carbs)}
+						unit="g"
+						label="Carbs"
+					/>
+					<MetricRing
+						value={Math.min(totals.fat, totals.targets.fat)}
+						max={Math.max(1, totals.targets.fat)}
+						unit="g"
+						label="Fat"
+					/>
+				</div>
 
-		<SectionLabel text="TIMELINE" />
-		<TimelineCard items={timeline} />
+				{#if supplements.length}
+					<section class="card compact">
+						<h2 class="compact__title">Supplements</h2>
+						<p class="compact__sub">{supplements.length} scheduled today</p>
+						<HealthButton variant="soft" block href={ROUTES.systemSupplements}
+							>View schedule</HealthButton
+						>
+					</section>
+				{/if}
+
+				<QuickNavGrid />
+				<PrivacySafetyCard />
+			</aside>
+		</div>
 	{/if}
 </main>
 
 <style>
 	.screen {
 		flex: 1;
-		padding-bottom: var(--space-6);
+	}
+
+	.macro-strip {
+		margin-bottom: var(--phone-card-gap);
+	}
+
+	.today-grid {
+		align-items: start;
 	}
 
 	.rings {
 		display: flex;
-		justify-content: space-between;
-		gap: var(--space-2);
-		margin-bottom: var(--space-3);
+		justify-content: space-around;
+		gap: var(--s-2);
+		padding: var(--s-4);
 	}
 
-	.tiles {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 10px;
-		margin-bottom: var(--space-4);
-	}
-
-	.tile-wrap {
+	.water-card {
 		position: relative;
+		padding: 0;
+		overflow: visible;
+	}
+
+	.water-card :global(.tile) {
+		box-shadow: none;
+		border: none;
+		background: transparent;
 	}
 
 	.water-actions {
 		position: absolute;
-		right: 8px;
-		bottom: 10px;
+		right: 10px;
+		bottom: 12px;
 		display: flex;
 		gap: 6px;
 	}
@@ -315,7 +344,26 @@
 		color: var(--h-text);
 		font-weight: 760;
 		font-size: 18px;
-		line-height: 1;
 		cursor: pointer;
+	}
+
+	.compact__title {
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-body-lg);
+		font-weight: var(--weight-bold);
+		color: var(--h-text);
+	}
+
+	.compact__sub {
+		margin: 0 0 var(--s-3);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+	}
+
+	@media (max-width: 767px) {
+		.today-grid {
+			display: flex;
+			flex-direction: column;
+		}
 	}
 </style>

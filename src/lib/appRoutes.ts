@@ -1,5 +1,6 @@
 /** Known in-app paths used by `SettingsRowLink` and similar (keeps `resolve()` type-safe). */
 export const ROUTES = {
+	import: '/import',
 	meals: '/meals',
 	systemSecurity: '/system/security',
 	systemPrivacy: '/system/privacy',
