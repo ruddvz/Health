@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { focusTrap } from '$lib/a11y/focusTrap';
+	import BottomSheet from '$lib/components/app/BottomSheet.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import CookModeSheet from '$lib/components/spec/CookModeSheet.svelte';
@@ -33,6 +33,7 @@
 		settings
 	} from '$lib/stores/healthApp';
 	import type { DayType, ExtraMeal, MealSlotStatus } from '$lib/types/planV2';
+	import { showToast } from '$lib/stores/toast';
 	import { get } from 'svelte/store';
 
 	let chip = $state<'Workout Day' | 'Rest Day' | 'All'>('Workout Day');
@@ -138,6 +139,7 @@
 			fat_g: emF.trim() ? Number(emF) : undefined
 		};
 		persistProgress({ ...cur, extraMeals: [...(cur.extraMeals ?? []), row] });
+		showToast('Meal logged for today', 'success');
 		addOpen = false;
 		emName = '';
 		emKcal = '';
@@ -234,54 +236,44 @@
 <CookModeSheet open={cookMeal !== null} meal={cookMeal} onClose={() => (cookMeal = null)} />
 <QuickFixSheet open={quickFixOpen} onClose={() => (quickFixOpen = false)} onPick={onQuickPick} />
 
-{#if addOpen}
-	<div class="modal" role="presentation">
-		<button type="button" class="backdrop" aria-label="Close" onclick={() => (addOpen = false)}
-		></button>
-		<div
-			class="sheet nothing-surface"
-			use:focusTrap={{ onEscape: () => (addOpen = false) }}
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="add-h"
-		>
-			<h2 id="add-h" class="mono-caps h">Add meal</h2>
-			<p class="sub">Logged for today only. Does not edit your imported plan JSON.</p>
-			<label class="field">
-				<span class="mono-caps">Name</span>
-				<input class="inp" type="text" bind:value={emName} placeholder="Post-workout shake" />
-			</label>
-			<label class="field">
-				<span class="mono-caps">Time</span>
-				<input class="inp" type="text" bind:value={emTime} placeholder="12:00" />
-			</label>
-			<label class="field">
-				<span class="mono-caps">Calories (required)</span>
-				<input class="inp" type="number" min="1" bind:value={emKcal} placeholder="320" />
-			</label>
-			<div class="row2">
-				<label class="field">
-					<span class="mono-caps">P (g)</span>
-					<input class="inp" type="number" min="0" bind:value={emP} />
-				</label>
-				<label class="field">
-					<span class="mono-caps">C (g)</span>
-					<input class="inp" type="number" min="0" bind:value={emC} />
-				</label>
-				<label class="field">
-					<span class="mono-caps">F (g)</span>
-					<input class="inp" type="number" min="0" bind:value={emF} />
-				</label>
-			</div>
-			<div class="row">
-				<button type="button" class="ghost pressable" onclick={() => (addOpen = false)}
-					>Cancel</button
-				>
-				<button type="button" class="red pressable" onclick={saveExtraMeal}>Save</button>
-			</div>
-		</div>
+<BottomSheet open={addOpen} title="Add meal" onClose={() => (addOpen = false)}>
+	<p class="sub">Logged for today only. Does not edit your imported plan JSON.</p>
+	<label class="field-stack">
+		<span class="mono-caps">Name</span>
+		<input class="inp-shell" type="text" bind:value={emName} placeholder="Post-workout shake" />
+	</label>
+	<label class="field-stack">
+		<span class="mono-caps">Time</span>
+		<input class="inp-shell" type="text" bind:value={emTime} placeholder="12:00" />
+	</label>
+	<label class="field-stack">
+		<span class="mono-caps">Calories (required)</span>
+		<input class="inp-shell" type="number" min="1" bind:value={emKcal} placeholder="320" />
+	</label>
+	<div class="row2">
+		<label class="field-stack">
+			<span class="mono-caps">P (g)</span>
+			<input class="inp-shell" type="number" min="0" bind:value={emP} />
+		</label>
+		<label class="field-stack">
+			<span class="mono-caps">C (g)</span>
+			<input class="inp-shell" type="number" min="0" bind:value={emC} />
+		</label>
+		<label class="field-stack">
+			<span class="mono-caps">F (g)</span>
+			<input class="inp-shell" type="number" min="0" bind:value={emF} />
+		</label>
 	</div>
-{/if}
+	{#snippet footer()}
+		<div class="sheet-actions">
+			<button type="button" class="sheet-btn pressable" onclick={() => (addOpen = false)}
+				>Cancel</button
+			>
+			<button type="button" class="sheet-btn primary pressable" onclick={saveExtraMeal}>Save</button
+			>
+		</div>
+	{/snippet}
+</BottomSheet>
 
 <style>
 	.screen {
@@ -329,39 +321,6 @@
 		color: var(--text-3);
 	}
 
-	.modal {
-		position: fixed;
-		inset: 0;
-		z-index: 200;
-		display: flex;
-		align-items: flex-end;
-		justify-content: center;
-	}
-
-	.backdrop {
-		position: absolute;
-		inset: 0;
-		border: none;
-		background: rgba(0, 0, 0, 0.55);
-		cursor: pointer;
-	}
-
-	.sheet {
-		position: relative;
-		width: min(100vw, 430px);
-		padding: var(--space-4);
-		border-radius: 18px 18px 0 0;
-		border: 1px solid var(--line-1);
-		max-height: 90dvh;
-		overflow: auto;
-	}
-
-	.h {
-		margin: 0 0 var(--space-2);
-		font-size: 11px;
-		color: var(--text-2);
-	}
-
 	.sub {
 		margin: 0 0 var(--space-3);
 		font-size: 13px;
@@ -369,49 +328,9 @@
 		line-height: 1.45;
 	}
 
-	.field {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-		margin-bottom: var(--space-3);
-	}
-
-	.inp {
-		padding: 10px 12px;
-		border-radius: var(--radius-xs);
-		border: 1px solid var(--line-1);
-		background: rgba(0, 0, 0, 0.35);
-		color: var(--text-1);
-		font-size: 16px;
-	}
-
 	.row2 {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
 		gap: 10px;
-	}
-
-	.row {
-		display: flex;
-		gap: var(--space-2);
-		margin-top: var(--space-2);
-	}
-
-	.ghost,
-	.red {
-		flex: 1;
-		min-height: 48px;
-		border-radius: var(--radius-sm);
-		font-weight: 650;
-		cursor: pointer;
-		border: 1px solid var(--line-2);
-		background: transparent;
-		color: var(--text-1);
-	}
-
-	.red {
-		background: var(--red);
-		border-color: var(--red);
-		color: #fff;
 	}
 </style>

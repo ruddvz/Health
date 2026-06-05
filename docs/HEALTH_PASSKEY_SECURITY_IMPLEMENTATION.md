@@ -110,7 +110,7 @@ When extending Health Lock:
 4. Rebuild static PWA with matching `PUBLIC_HEALTH_RP_ID` / `PUBLIC_HEALTH_ORIGIN`
 5. Security → **Cloud passkey account** → register / sign in / encrypted backup
 
-API routes: `/api/webauthn/register/options`, `verify`, `authenticate/options`, `verify`, `/api/health/backup`, `/api/health/status`
+API routes: `/api/webauthn/register/options`, `verify`, `authenticate/options`, `verify`, `/api/health/backup`, `/api/health/logout`, `/api/health/status`
 
 ## API security (production)
 
@@ -120,5 +120,7 @@ API routes: `/api/webauthn/register/options`, `verify`, `authenticate/options`, 
   - **Production:** missing Supabase **without** that flag returns HTTP 500 from `/api/health/status` and throws on passkey routes — fail closed.
 - **Request bodies:** JSON bodies are capped at 256 KB (`readJson` in `server/webauthn/http.ts`).
 - **Rate limiting:** In-memory per-IP limits on register/auth/backup handlers (suitable for demo; use edge rate limiting for high traffic).
+- **Sessions:** `POST /api/health/logout` revokes the bearer session. Session tokens are stored as SHA-256 hashes server-side; the plain token is only returned once at registration/sign-in.
+- **Backup delete:** `DELETE /api/health/backup` removes the encrypted cloud backup for the authenticated user.
 
 Without Supabase and without `HEALTH_ALLOW_MEMORY_STORE=true` in production, cloud passkey features are intentionally unavailable.
