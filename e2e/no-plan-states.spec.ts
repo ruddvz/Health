@@ -9,10 +9,10 @@ test.describe('No-plan empty states', () => {
 
 	test('welcome screen explains the app', async ({ page }) => {
 		await expect(
-			page.getByRole('heading', { name: /daily health plan, without the noise/i })
+			page.getByRole('heading', { name: /Your private daily health plan/i })
 		).toBeVisible();
 		await expect(page.getByRole('button', { name: /Create plan prompt/i }).first()).toBeVisible();
-		await expect(page.getByRole('link', { name: /Import my plan/i }).first()).toBeVisible();
+		await expect(page.getByRole('link', { name: /Import plan/i }).first()).toBeVisible();
 	});
 
 	test('Today shows no-plan state', async ({ page }) => {

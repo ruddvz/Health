@@ -32,7 +32,7 @@
 </script>
 
 <section class="card nothing-surface" aria-label={title}>
-	<p class="mono-caps t">{title}</p>
+	<p class="t">{title}</p>
 	<p class="val">{value}</p>
 	<p class="d">{delta}</p>
 	<div class="chart" role="img" aria-label="Trend sparkline">
@@ -43,15 +43,15 @@
 					y1="8"
 					x2={(i / Math.max(1, labels.length - 1)) * 300 + 10}
 					y2="64"
-					stroke="rgba(255,255,255,0.06)"
+					stroke="var(--h-line-soft)"
 					stroke-width="1"
 				/>
 			{/each}
-			<polyline fill="none" stroke="var(--red)" stroke-width="2" points={polyPoints} />
+			<polyline fill="none" stroke="var(--h-accent)" stroke-width="2.5" points={polyPoints} />
 		</svg>
 		<div class="labs">
 			{#each labels as lb, li (`${lb}-${li}`)}
-				<span class="mono-caps">{lb}</span>
+				<span>{lb}</span>
 			{/each}
 		</div>
 	</div>
@@ -59,46 +59,50 @@
 
 <style>
 	.card {
-		padding: var(--space-4);
-		margin-bottom: var(--space-3);
+		padding: var(--s-4);
+		margin-bottom: var(--s-3);
 	}
 
 	.t {
 		margin: 0;
-		color: var(--text-3);
-		font-size: 10px;
+		color: var(--h-text-faint);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
 	}
 
 	.val {
-		margin: var(--space-2) 0 0;
-		font-size: 22px;
-		font-weight: 650;
-		color: var(--text-1);
+		margin: var(--s-2) 0 0;
+		font-size: var(--t-title-2);
+		font-weight: var(--weight-bold);
+		letter-spacing: -0.02em;
+		color: var(--h-text);
 	}
 
 	.d {
-		margin: var(--space-1) 0 var(--space-3);
-		font-size: 13px;
-		color: var(--text-2);
+		margin: var(--s-1) 0 var(--s-3);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 	}
 
 	.chart {
-		border-radius: var(--radius-xs);
-		background: rgba(0, 0, 0, 0.25);
+		border-radius: var(--r-card-inner);
+		background: var(--h-surface-3);
+		border: 1px solid var(--h-line-soft);
 		overflow: hidden;
 	}
 
 	.labs {
 		display: flex;
 		justify-content: space-between;
-		padding: 0 8px 8px;
-		gap: 4px;
+		padding: 0 var(--s-2) var(--s-2);
+		gap: var(--s-1);
 	}
 
 	.labs span {
 		flex: 1;
 		text-align: center;
-		font-size: 8px;
-		color: var(--text-3);
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 	}
 </style>

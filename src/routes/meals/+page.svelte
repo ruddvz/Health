@@ -160,7 +160,7 @@
 </script>
 
 {#if !$plan}
-	<main class="screen stack">
+	<main class="screen page-stack">
 		<AppHeader
 			title="Meals"
 			subtitle="Nutrition from your plan"
@@ -175,7 +175,7 @@
 		</EmptyState>
 	</main>
 {:else}
-	<main class="screen stack">
+	<main class="screen page-stack">
 		<AppHeader title="Meals" subtitle="Today's nutrition" pageLabel="Meals" planState="loaded" />
 
 		<ChipRow

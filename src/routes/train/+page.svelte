@@ -40,7 +40,7 @@
 </script>
 
 {#if !$plan}
-	<main class="screen stack">
+	<main class="screen page-stack">
 		<AppHeader
 			title="Train"
 			subtitle="Workouts from your plan"
@@ -58,7 +58,7 @@
 		</EmptyState>
 	</main>
 {:else}
-	<main class="screen stack">
+	<main class="screen page-stack">
 		<AppHeader title="Train" subtitle="Today's session" pageLabel="Train" planState="loaded" />
 
 		{#if day}

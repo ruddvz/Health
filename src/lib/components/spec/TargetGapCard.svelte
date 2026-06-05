@@ -15,12 +15,12 @@
 </script>
 
 <section class="card nothing-surface" aria-label={title}>
-	<p class="mono-caps t">{title}</p>
+	<p class="t">{title}</p>
 	<p class="msg">{message}</p>
 	<div class="grid">
 		{#each metrics as m (m.label)}
 			<div class="cell">
-				<p class="mono-caps lab">{m.label}</p>
+				<p class="lab">{m.label}</p>
 				<p class="val" class:red={m.color === 'red'} class:warn={m.color === 'warning'}>
 					{m.value}
 				</p>
@@ -32,67 +32,72 @@
 
 <style>
 	.card {
-		padding: var(--space-4);
-		margin-bottom: var(--space-3);
+		padding: var(--s-4);
+		margin-bottom: var(--s-3);
+		border: 1px solid var(--h-orange-line);
+		background: linear-gradient(180deg, var(--h-orange-soft), var(--h-surface));
 	}
 
 	.t {
 		margin: 0;
-		color: var(--red);
-		font-size: 10px;
+		color: var(--h-orange);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
 	}
 
 	.msg {
-		margin: var(--space-2) 0 var(--space-3);
-		font-size: 15px;
-		color: var(--text-1);
-		line-height: 1.45;
+		margin: var(--s-2) 0 var(--s-3);
+		font-size: var(--t-callout);
+		color: var(--h-text);
+		line-height: var(--lh-body);
 	}
 
 	.grid {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		gap: var(--space-2);
-		margin-bottom: var(--space-3);
+		gap: var(--s-2);
+		margin-bottom: var(--s-3);
 	}
 
 	.cell {
-		padding: var(--space-2);
-		border-radius: var(--radius-xs);
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid var(--line-1);
+		padding: var(--s-2);
+		border-radius: var(--r-card-inner);
+		background: var(--h-surface-2);
+		border: 1px solid var(--h-line-soft);
 	}
 
 	.lab {
-		margin: 0 0 4px;
-		font-size: 8px;
-		color: var(--text-3);
+		margin: 0 0 var(--s-1);
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 	}
 
 	.val {
 		margin: 0;
-		font-size: 14px;
-		font-weight: 700;
-		color: var(--text-1);
+		font-size: var(--t-footnote);
+		font-weight: var(--weight-bold);
+		color: var(--h-text);
 	}
 
 	.val.red {
-		color: var(--red);
+		color: var(--h-red);
 	}
 
 	.val.warn {
-		color: var(--warning);
+		color: var(--h-orange);
 	}
 
 	.cta {
 		width: 100%;
 		min-height: 44px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-2);
-		background: transparent;
-		color: var(--text-1);
-		font-weight: 650;
-		font-size: 14px;
+		border-radius: var(--r-pill);
+		border: none;
+		background: var(--h-accent);
+		color: var(--health-primary-text);
+		font-weight: var(--weight-semibold);
+		font-size: var(--t-footnote);
 		cursor: pointer;
+		box-shadow: var(--shadow-glow);
 	}
 </style>

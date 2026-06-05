@@ -8,8 +8,8 @@
 </script>
 
 {#if warnings.length}
-	<section class="card nothing-surface" role="status" aria-live="polite">
-		<p class="mono-caps t">Plan checks</p>
+	<section class="card" role="status" aria-live="polite">
+		<p class="t">Plan checks</p>
 		<ul>
 			{#each warnings as w, i (i)}
 				<li>{w}</li>
@@ -21,30 +21,32 @@
 
 <style>
 	.card {
-		padding: var(--space-4);
-		margin-bottom: var(--space-3);
-		border-color: var(--warning-border);
-		background: var(--warning-surface);
+		padding: var(--s-4);
+		margin-bottom: var(--s-3);
+		border-radius: var(--r-card);
+		border: 1px solid var(--h-orange-line);
+		background: var(--h-orange-soft);
 	}
 
 	.t {
-		margin: 0 0 var(--space-2);
-		font-size: 10px;
-		color: var(--warning);
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-orange);
 	}
 
 	ul {
-		margin: 0 0 var(--space-3);
+		margin: 0 0 var(--s-3);
 		padding-left: 1.1rem;
-		font-size: 14px;
-		line-height: 1.45;
-		color: var(--text-2);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text-soft);
 	}
 
 	.link {
-		font-size: 13px;
-		font-weight: 650;
-		color: var(--warning);
+		font-size: var(--t-footnote);
+		font-weight: var(--weight-semibold);
+		color: var(--h-orange);
 		text-decoration: underline;
 		text-underline-offset: 3px;
 	}

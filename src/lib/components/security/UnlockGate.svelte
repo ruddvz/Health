@@ -87,7 +87,7 @@
 
 		{#if mode === 'recovery'}
 			<label class="field">
-				<span class="mono-caps">Recovery code</span>
+				<span class="field-label">Recovery code</span>
 				<input
 					class="inp"
 					type="text"
@@ -144,75 +144,80 @@
 	.gate {
 		position: fixed;
 		inset: 0;
-		z-index: 100;
+		z-index: var(--z-modal);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: var(--space-4);
+		padding: var(--s-4);
 		background: var(--modal-scrim);
-		backdrop-filter: blur(12px);
+		backdrop-filter: blur(var(--blur-sheet));
+		-webkit-backdrop-filter: blur(var(--blur-sheet));
 	}
 
 	.inner {
 		width: min(400px, 100%);
-		padding: var(--space-6) var(--space-5);
+		padding: var(--s-6) var(--s-5);
 		text-align: center;
 	}
 
 	.mark {
 		width: 52px;
 		height: 52px;
-		margin: 0 auto var(--space-4);
+		margin: 0 auto var(--s-4);
 		display: grid;
 		place-items: center;
-		border-radius: 16px;
-		background: var(--health-primary);
+		border-radius: var(--r-control);
+		background: var(--h-accent);
 		color: var(--health-primary-text);
 		font-weight: var(--weight-bold);
-		font-size: var(--text-lg);
+		font-size: var(--t-title-3);
+		box-shadow: var(--shadow-glow);
 	}
 
 	.kicker {
 		margin: 0;
-		font-size: var(--text-2xs);
-		font-weight: var(--weight-bold);
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--health-muted-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 	}
 
 	.title {
-		margin: var(--space-2) 0;
-		font-size: 28px;
-		font-weight: 700;
+		margin: var(--s-2) 0;
+		font-size: var(--t-title-1);
+		font-weight: var(--weight-bold);
 		letter-spacing: -0.02em;
+		color: var(--h-text);
 	}
 
 	.sub {
-		margin: 0 0 var(--space-4);
-		font-size: 14px;
-		line-height: 1.5;
-		color: var(--text-2);
+		margin: 0 0 var(--s-4);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text-muted);
 	}
 
 	.hint {
-		margin: 0 0 var(--space-3);
-		font-size: 13px;
-		color: var(--text-2);
+		margin: 0 0 var(--s-3);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 	}
 
 	.err {
-		margin: 0 0 var(--space-3);
-		font-size: 13px;
-		color: var(--red);
+		margin: 0 0 var(--s-3);
+		padding: var(--s-3);
+		border-radius: var(--r-card-inner);
+		background: var(--h-red-soft);
+		border: 1px solid var(--h-red-line);
+		font-size: var(--t-footnote);
+		color: var(--h-red);
 	}
 
 	.bio {
 		width: 100%;
 		min-height: 52px;
-		margin-bottom: var(--space-4);
-		border-radius: var(--radius-pill);
-		border: 1px solid var(--health-line);
+		margin-bottom: var(--s-4);
+		border-radius: var(--r-pill);
+		border: 1px solid var(--health-purple);
 		background: var(--health-purple-soft);
 		color: var(--health-purple);
 		font-weight: var(--weight-semibold);
@@ -222,49 +227,58 @@
 	.primary {
 		width: 100%;
 		min-height: 48px;
-		margin-top: var(--space-3);
-		border-radius: var(--radius-pill);
+		margin-top: var(--s-3);
+		border-radius: var(--r-pill);
 		border: none;
-		background: var(--health-primary);
+		background: var(--h-accent);
 		color: var(--health-primary-text);
 		font-weight: var(--weight-semibold);
 		cursor: pointer;
+		box-shadow: var(--shadow-glow);
 	}
 
 	.link {
 		display: block;
 		width: 100%;
-		margin-top: var(--space-3);
-		padding: 8px;
+		min-height: 44px;
+		margin-top: var(--s-3);
+		padding: var(--s-2);
 		border: none;
 		background: transparent;
-		color: var(--text-2);
-		font-size: 14px;
+		color: var(--h-text-muted);
+		font-size: var(--t-footnote);
 		cursor: pointer;
 	}
 
 	.field {
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
-		margin-bottom: var(--space-3);
+		gap: var(--s-2);
+		margin-bottom: var(--s-3);
+		text-align: left;
+	}
+
+	.field-label {
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 	}
 
 	.inp {
-		padding: 10px 12px;
-		border-radius: var(--radius-xs);
-		border: 1px solid var(--line-1);
-		background: rgba(0, 0, 0, 0.35);
-		color: var(--text-1);
-		font-size: 16px;
+		padding: var(--s-3);
+		border-radius: var(--r-card-inner);
+		border: 1px solid var(--h-line);
+		background: var(--input-bg);
+		color: var(--h-text);
+		font-size: var(--t-body);
 		letter-spacing: 0.08em;
 	}
 
 	.setup-link {
 		display: block;
-		margin-top: var(--space-5);
-		font-size: 13px;
-		color: var(--text-3);
+		margin-top: var(--s-5);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 		text-align: center;
 	}
 </style>

@@ -21,10 +21,11 @@
 
 <style>
 	.privacy__title {
-		margin: 0 0 var(--space-3);
-		font-size: var(--text-md);
+		margin: 0 0 var(--s-3);
+		font-size: var(--t-body-lg);
 		font-weight: var(--weight-bold);
-		color: var(--health-ink);
+		letter-spacing: -0.01em;
+		color: var(--h-text);
 	}
 
 	.privacy__list {
@@ -33,15 +34,15 @@
 		list-style: none;
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-2);
+		gap: var(--s-2);
 	}
 
 	.privacy__list li {
 		position: relative;
 		padding-left: 22px;
-		font-size: var(--text-sm);
-		color: var(--health-muted);
-		line-height: var(--leading-body);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+		line-height: var(--lh-body);
 	}
 
 	.privacy__list li::before {
@@ -52,6 +53,6 @@
 		width: 8px;
 		height: 8px;
 		border-radius: 50%;
-		background: var(--health-green);
+		background: var(--h-accent);
 	}
 </style>

@@ -49,8 +49,8 @@
 	ondrop={onDrop}
 >
 	<div class="inner">
-		<span class="mono-caps brace" aria-hidden="true">{'{ }'}</span>
-		<p class="mono-caps lab">.JSON</p>
+		<span class="brace" aria-hidden="true">{'{ }'}</span>
+		<p class="lab">.JSON</p>
 		<p class="hint">Drop a file, browse, or use upload below</p>
 		{#if onBrowse}
 			<button type="button" class="browse pressable" onclick={() => onBrowse()}>Browse files</button
@@ -62,12 +62,19 @@
 <style>
 	.zone {
 		position: relative;
-		min-height: 210px;
+		min-height: 180px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin-bottom: var(--space-3);
+		margin-bottom: var(--s-3);
 		overflow: hidden;
+		border-radius: var(--r-card);
+	}
+
+	@media (min-width: 768px) {
+		.zone {
+			min-height: 210px;
+		}
 	}
 
 	.zone:focus-visible {
@@ -78,53 +85,51 @@
 		content: '';
 		position: absolute;
 		inset: 0;
-		background-image: radial-gradient(
-			circle at 1px 1px,
-			rgba(255, 255, 255, 0.065) 1px,
-			transparent 0
-		);
+		background-image: radial-gradient(circle at 1px 1px, var(--h-line-soft) 1px, transparent 0);
 		background-size: 18px 18px;
-		opacity: 0.35;
+		opacity: 0.5;
 		pointer-events: none;
 	}
 
 	.inner {
 		position: relative;
 		text-align: center;
-		padding: var(--space-6);
+		padding: var(--s-6);
 	}
 
 	.brace {
 		display: block;
+		font-family: var(--font-mono);
 		font-size: 42px;
-		color: var(--text-3);
+		color: var(--h-text-faint);
 		letter-spacing: 0.08em;
-		margin-bottom: var(--space-2);
+		margin-bottom: var(--s-2);
 	}
 
 	.lab {
 		margin: 0;
-		font-size: 14px;
-		color: var(--red);
-		letter-spacing: 0.35em;
+		font-size: var(--t-footnote);
+		font-weight: var(--weight-semibold);
+		color: var(--h-accent);
+		letter-spacing: 0.12em;
 	}
 
 	.hint {
-		margin: var(--space-3) 0 0;
-		font-size: 13px;
-		color: var(--text-3);
+		margin: var(--s-3) 0 0;
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 	}
 
 	.browse {
-		margin-top: var(--space-4);
+		margin-top: var(--s-4);
 		min-height: 44px;
-		padding: 0 var(--space-5);
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-2);
-		background: rgba(0, 0, 0, 0.4);
-		color: var(--text-1);
-		font-weight: 650;
-		font-size: 13px;
+		padding: 0 var(--s-5);
+		border-radius: var(--r-pill);
+		border: 1px solid var(--h-line-strong);
+		background: var(--h-surface-3);
+		color: var(--h-text);
+		font-weight: var(--weight-semibold);
+		font-size: var(--t-footnote);
 		cursor: pointer;
 	}
 
@@ -133,7 +138,8 @@
 	}
 
 	.zone.drag {
-		outline: 2px solid var(--red-line);
+		outline: 2px solid var(--h-accent-line);
 		outline-offset: -2px;
+		background: var(--h-accent-soft);
 	}
 </style>

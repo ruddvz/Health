@@ -2,6 +2,8 @@
 
 Use after substantive UI or storage changes.
 
+**UI baseline:** iOS 26 squircle design system (graphite + lime + blue). See `docs/UI_AUDIT_BASELINE.md`.
+
 ## Automated smoke (CI)
 
 Playwright covers a subset of this list (`npm run test:e2e` after build):

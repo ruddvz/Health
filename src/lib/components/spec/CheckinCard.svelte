@@ -10,7 +10,7 @@
 </script>
 
 <section class="card nothing-surface">
-	<p class="mono-caps t">{title}</p>
+	<p class="t">{title}</p>
 	<p class="q">{question}</p>
 	<p class="s">{subtitle}</p>
 	<button type="button" class="btn pressable" {onclick}>{cta}</button>
@@ -18,39 +18,42 @@
 
 <style>
 	.card {
-		padding: var(--space-4);
-		margin-bottom: var(--space-3);
+		padding: var(--s-4);
+		margin-bottom: var(--s-3);
 	}
 
 	.t {
 		margin: 0;
-		color: var(--text-3);
-		font-size: 10px;
+		color: var(--h-text-faint);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
 	}
 
 	.q {
-		margin: var(--space-2) 0 0;
-		font-size: 17px;
-		font-weight: 650;
-		color: var(--text-1);
+		margin: var(--s-2) 0 0;
+		font-size: var(--t-body-lg);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text);
+		line-height: var(--lh-title);
 	}
 
 	.s {
-		margin: var(--space-2) 0 var(--space-3);
-		font-size: 13px;
-		color: var(--text-2);
-		line-height: 1.45;
+		margin: var(--s-2) 0 var(--s-4);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+		line-height: var(--lh-body);
 	}
 
 	.btn {
 		width: 100%;
 		min-height: 48px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-2);
-		background: var(--surface-2);
-		color: var(--text-1);
-		font-weight: 650;
-		font-size: 14px;
+		border-radius: var(--r-pill);
+		border: none;
+		background: var(--h-accent);
+		color: var(--health-primary-text);
+		font-weight: var(--weight-semibold);
+		font-size: var(--t-footnote);
 		cursor: pointer;
+		box-shadow: var(--shadow-glow);
 	}
 </style>

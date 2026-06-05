@@ -16,7 +16,7 @@ test.describe('Delete local data', () => {
 
 		await expect(page).toHaveURL(/\/Health\/?$/);
 		await expect(
-			page.getByRole('heading', { name: /daily health plan, without the noise/i })
+			page.getByRole('heading', { name: /Your private daily health plan/i })
 		).toBeVisible({
 			timeout: 15_000
 		});

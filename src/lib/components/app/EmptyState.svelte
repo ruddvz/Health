@@ -34,53 +34,51 @@
 
 <style>
 	.empty {
-		padding: var(--space-6) var(--space-5);
-		text-align: center;
+		padding: var(--s-6) var(--s-5);
+		text-align: left;
 	}
 
 	.empty__orb {
 		width: 52px;
 		height: 52px;
-		margin: 0 auto var(--space-4);
+		margin: 0 0 var(--s-4);
 		display: grid;
 		place-items: center;
-		border-radius: 18px;
-		background: var(--health-green-soft);
-		color: var(--health-green);
+		border-radius: var(--r-control);
+		background: var(--h-accent-soft);
+		color: var(--h-accent);
 		font-size: 22px;
 		font-weight: var(--weight-bold);
 	}
 
 	.empty__eyebrow {
-		margin: 0 0 var(--space-2);
-		font-size: var(--text-2xs);
-		font-weight: var(--weight-bold);
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--health-muted-2);
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 	}
 
 	.empty__title {
-		margin: 0 0 var(--space-2);
-		font-size: var(--text-xl);
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-title-2);
 		font-weight: var(--weight-bold);
-		line-height: var(--leading-title);
-		color: var(--health-ink);
+		line-height: var(--lh-title);
+		color: var(--h-text);
 		letter-spacing: -0.02em;
 	}
 
 	.empty__body {
 		margin: 0;
-		font-size: var(--text-base);
-		line-height: var(--leading-relaxed);
-		color: var(--health-muted);
+		font-size: var(--t-body);
+		line-height: var(--lh-body);
+		color: var(--h-text-muted);
 	}
 
 	.empty__preview {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: var(--space-2);
-		margin-top: var(--space-5);
+		gap: var(--s-2);
+		margin-top: var(--s-5);
 		opacity: 0.55;
 		pointer-events: none;
 	}
@@ -88,29 +86,27 @@
 	.empty__actions {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-2);
-		margin-top: var(--space-5);
+		gap: var(--s-2);
+		margin-top: var(--s-5);
 	}
 
 	:global(.empty .preview-card) {
-		padding: var(--space-3);
-		border-radius: var(--radius-md);
-		border: 1px dashed var(--health-line);
-		background: var(--health-surface-soft);
+		padding: var(--s-3);
+		border-radius: var(--r-card-inner);
+		border: 1px dashed var(--h-line);
+		background: var(--h-surface-2);
 		text-align: left;
 	}
 
 	:global(.empty .preview-card .pc-label) {
 		margin: 0;
-		font-size: var(--text-2xs);
-		color: var(--health-muted-2);
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
+		font-size: var(--t-caption-2);
+		color: var(--h-text-faint);
 	}
 
 	:global(.empty .preview-card .pc-val) {
-		margin: 6px 0 0;
-		font-size: var(--text-sm);
-		color: var(--health-muted);
+		margin: var(--s-2) 0 0;
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 	}
 </style>

@@ -65,10 +65,10 @@
 	.settings-row {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--s-3);
 		width: 100%;
 		min-height: 56px;
-		padding: var(--space-3) var(--space-4);
+		padding: var(--s-3) var(--s-4);
 		text-align: left;
 		text-decoration: none;
 		color: inherit;
@@ -78,18 +78,18 @@
 	}
 
 	.settings-row.danger .settings-row__title {
-		color: var(--health-red);
+		color: var(--h-red);
 	}
 
 	.settings-row__icon {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 32px;
-		height: 32px;
-		border-radius: var(--radius-sm);
-		background: var(--health-surface-soft);
-		color: var(--health-muted);
+		width: 36px;
+		height: 36px;
+		border-radius: var(--r-xs);
+		background: var(--h-surface-2);
+		color: var(--h-text-muted);
 		flex-shrink: 0;
 	}
 
@@ -102,19 +102,19 @@
 	}
 
 	.settings-row__title {
-		font-size: var(--text-base);
+		font-size: var(--t-body);
 		font-weight: var(--weight-semibold);
-		color: var(--health-ink);
+		color: var(--h-text);
 	}
 
 	.settings-row__sub {
-		font-size: var(--text-sm);
-		color: var(--health-muted);
-		line-height: var(--leading-body);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+		line-height: var(--lh-body);
 	}
 
 	.settings-row__chev {
-		color: var(--health-faint);
+		color: var(--h-text-disabled);
 		flex-shrink: 0;
 	}
 </style>

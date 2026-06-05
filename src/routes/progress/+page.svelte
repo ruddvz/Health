@@ -142,7 +142,7 @@
 	});
 </script>
 
-<main class="screen stack">
+<main class="screen page-stack">
 	<AppHeader
 		title="Progress"
 		subtitle={$plan ? 'Trends and check-ins' : 'Track privately'}

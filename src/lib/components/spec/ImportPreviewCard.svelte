@@ -41,7 +41,7 @@
 
 	{#if warnings.length}
 		<div class="warn-block" role="status">
-			<p class="mono-caps warn-t">Warnings ({warnings.length})</p>
+			<p class="warn-t">Warnings ({warnings.length})</p>
 			<ul>
 				{#each warnings as w (w.code + w.path)}
 					<li>{w.message}</li>
@@ -73,112 +73,115 @@
 
 <style>
 	.preview {
-		padding: var(--space-4);
-		margin-bottom: var(--space-4);
-		border-radius: var(--radius-card, var(--radius-lg));
-		border: 1px solid var(--line-1);
+		padding: var(--s-4);
+		margin-bottom: var(--s-4);
+		border-radius: var(--r-card);
+		border: 1px solid var(--h-line);
 	}
 
 	.title {
-		margin: 0 0 4px;
-		font-size: 20px;
-		font-weight: 700;
-		color: var(--text-1);
+		margin: 0 0 var(--s-1);
+		font-size: var(--t-title-3);
+		font-weight: var(--weight-bold);
+		letter-spacing: -0.02em;
+		color: var(--h-text);
 	}
 
 	.sub {
-		margin: 0 0 var(--space-4);
-		font-size: 13px;
-		color: var(--text-3);
+		margin: 0 0 var(--s-4);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 	}
 
 	.grid {
 		display: grid;
-		gap: 10px;
-		margin-bottom: var(--space-3);
+		gap: var(--phone-card-gap);
+		margin-bottom: var(--s-3);
 	}
 
 	.cell {
-		padding: var(--space-3);
-		border-radius: var(--radius-sm);
-		background: var(--surface-2);
+		padding: var(--s-3);
+		border-radius: var(--r-card-inner);
+		background: var(--h-surface-2);
+		border: 1px solid var(--h-line-soft);
 	}
 
 	.lab {
-		margin: 0 0 4px;
-		font-size: 10px;
-		color: var(--text-3);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		margin: 0 0 var(--s-1);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 	}
 
 	.val {
 		margin: 0;
-		font-size: 14px;
-		color: var(--text-1);
-		line-height: 1.4;
+		font-size: var(--t-footnote);
+		color: var(--h-text);
+		line-height: var(--lh-body);
 	}
 
 	.warn-block {
-		margin-bottom: var(--space-3);
-		padding: var(--space-3);
-		border-radius: var(--radius-sm);
-		border: 1px solid rgba(255, 159, 10, 0.35);
-		background: rgba(255, 159, 10, 0.08);
+		margin-bottom: var(--s-3);
+		padding: var(--s-3);
+		border-radius: var(--r-card-inner);
+		border: 1px solid var(--h-orange-line);
+		background: var(--h-orange-soft);
 	}
 
 	.warn-t {
-		margin: 0 0 var(--space-2);
-		font-size: 10px;
-		color: var(--warning);
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-orange);
 	}
 
 	ul {
 		margin: 0;
 		padding-left: 1.1rem;
-		font-size: 13px;
-		line-height: 1.45;
-		color: var(--text-2);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text-soft);
 	}
 
 	.info {
-		margin: 0 0 var(--space-3);
+		margin: 0 0 var(--s-3);
 		padding-left: 1.1rem;
-		font-size: 13px;
-		color: var(--text-3);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 	}
 
 	.note {
-		margin: 0 0 var(--space-4);
-		font-size: 13px;
-		line-height: 1.45;
-		color: var(--text-3);
+		margin: 0 0 var(--s-4);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text-muted);
 	}
 
 	.actions {
 		display: flex;
-		gap: 10px;
+		gap: var(--phone-card-gap);
 	}
 
 	.ghost,
 	.apply {
 		flex: 1;
 		min-height: 48px;
-		border-radius: var(--radius-control, var(--radius-sm));
-		font-weight: 650;
-		font-size: 16px;
+		border-radius: var(--r-pill);
+		font-weight: var(--weight-semibold);
+		font-size: var(--t-body);
 		cursor: pointer;
 	}
 
 	.ghost {
-		border: 1px solid var(--line-2);
+		border: 1px solid var(--h-line-strong);
 		background: transparent;
-		color: var(--text-1);
+		color: var(--h-text);
 	}
 
 	.apply {
 		border: none;
-		background: var(--accent, var(--ios-blue));
-		color: #fff;
+		background: var(--h-accent);
+		color: var(--health-primary-text);
+		box-shadow: var(--shadow-glow);
 	}
 </style>

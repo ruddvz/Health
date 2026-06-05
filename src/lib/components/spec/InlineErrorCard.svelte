@@ -1,30 +1,60 @@
 <script lang="ts">
+	type Severity = 'info' | 'warning' | 'error' | 'success';
+
 	interface Props {
 		title: string;
 		body: string;
+		severity?: Severity;
 	}
-	let { title, body }: Props = $props();
+	let { title, body, severity = 'error' }: Props = $props();
 </script>
 
-<div class="card" role="alert" aria-live="polite">
+<div class="card" data-severity={severity} role="alert" aria-live="polite">
 	<p class="t">{title}</p>
 	<pre class="b">{body}</pre>
 </div>
 
 <style>
 	.card {
-		margin: var(--space-3) 0;
-		padding: var(--space-4);
-		border-radius: var(--radius-md);
-		border: 1px solid var(--red-line);
-		background: rgba(255, 42, 42, 0.09);
+		margin: var(--s-3) 0;
+		padding: var(--s-4);
+		border-radius: var(--r-card-inner);
+		border: 1px solid var(--h-red-line);
+		background: var(--h-red-soft);
+	}
+
+	.card[data-severity='info'] {
+		border-color: var(--h-blue-line);
+		background: var(--h-blue-soft);
+	}
+
+	.card[data-severity='warning'] {
+		border-color: var(--h-orange-line);
+		background: var(--h-orange-soft);
+	}
+
+	.card[data-severity='success'] {
+		border-color: var(--h-accent-line);
+		background: var(--h-accent-soft);
 	}
 
 	.t {
-		margin: 0 0 var(--space-2);
-		font-size: 15px;
-		font-weight: 650;
-		color: var(--red);
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-callout);
+		font-weight: var(--weight-semibold);
+		color: var(--h-red);
+	}
+
+	.card[data-severity='info'] .t {
+		color: var(--h-blue);
+	}
+
+	.card[data-severity='warning'] .t {
+		color: var(--h-orange);
+	}
+
+	.card[data-severity='success'] .t {
+		color: var(--h-accent);
 	}
 
 	.b {
@@ -32,8 +62,8 @@
 		white-space: pre-wrap;
 		word-break: break-word;
 		font-family: var(--font-mono);
-		font-size: 12px;
-		line-height: 1.45;
-		color: var(--text-2);
+		font-size: var(--t-caption);
+		line-height: var(--lh-body);
+		color: var(--h-text-soft);
 	}
 </style>

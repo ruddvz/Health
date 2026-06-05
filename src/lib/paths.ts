@@ -14,3 +14,9 @@ export function pathStartsWith(pathname: string, prefix: string): boolean {
 	const n = normalizePathname(pathname);
 	return n === prefix || n.startsWith(`${prefix}/`);
 }
+
+/** Build an in-app href respecting `paths.base` (for dynamic tab/button routes). */
+export function appResolve(route: string): string {
+	if (!base) return route;
+	return `${base}${route}`;
+}

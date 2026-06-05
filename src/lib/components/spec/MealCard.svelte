@@ -22,14 +22,6 @@
 
 {#if track}
 	<div class="wrap nothing-surface">
-		<div class="row-main">
-			<span class="mono-caps idx">{index}</span>
-			<div class="body">
-				<p class="mono-caps time">{time}</p>
-				<p class="n">{name}</p>
-				<p class="m">{kcal} kcal · P {protein} · C {carbs} · F {fat}</p>
-			</div>
-		</div>
 		<div class="track" role="group" aria-label="Meal intake for this slot">
 			<button
 				type="button"
@@ -51,12 +43,20 @@
 				>Reset</button
 			>
 		</div>
+		<div class="row-main">
+			<span class="idx">{index}</span>
+			<div class="body">
+				<p class="time">{time}</p>
+				<p class="n">{name}</p>
+				<p class="m">{kcal} kcal · P {protein} · C {carbs} · F {fat}</p>
+			</div>
+		</div>
 	</div>
 {:else}
 	<button type="button" class="card nothing-surface pressable" {onclick}>
-		<span class="mono-caps idx">{index}</span>
+		<span class="idx">{index}</span>
 		<div class="body">
-			<p class="mono-caps time">{time}</p>
+			<p class="time">{time}</p>
 			<p class="n">{name}</p>
 			<p class="m">{kcal} kcal · P {protein} · C {carbs} · F {fat}</p>
 		</div>
@@ -64,25 +64,31 @@
 {/if}
 
 <style>
+	.wrap,
+	.card {
+		border-radius: var(--r-card);
+	}
+
 	.wrap {
 		width: 100%;
-		margin-bottom: var(--space-2);
-		padding: var(--space-3) var(--space-4);
+		margin-bottom: var(--s-2);
+		padding: var(--s-3) var(--s-4);
 	}
 
 	.row-main {
 		display: flex;
-		gap: var(--space-3);
+		gap: var(--s-3);
 		align-items: flex-start;
+		margin-top: var(--s-3);
 	}
 
 	.card {
 		display: flex;
-		gap: var(--space-3);
+		gap: var(--s-3);
 		width: 100%;
-		min-height: 86px;
-		padding: var(--space-3) var(--space-4);
-		margin-bottom: var(--space-2);
+		min-height: 92px;
+		padding: var(--s-3) var(--s-4);
+		margin-bottom: var(--s-2);
 		text-align: left;
 		cursor: pointer;
 	}
@@ -91,12 +97,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 24px;
-		height: 24px;
-		border-radius: 6px;
-		background: var(--surface-3);
-		color: var(--text-3);
-		font-size: 9px;
+		width: 28px;
+		height: 28px;
+		border-radius: var(--r-xxs);
+		background: var(--h-surface-3);
+		color: var(--h-text-muted);
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
 		flex-shrink: 0;
 		margin-top: 2px;
 	}
@@ -108,46 +115,46 @@
 
 	.time {
 		margin: 0;
-		font-size: 9px;
-		color: var(--text-3);
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 	}
 
 	.n {
-		margin: 4px 0 0;
-		font-size: 16px;
-		font-weight: 650;
-		color: var(--text-1);
+		margin: var(--s-1) 0 0;
+		font-size: var(--t-body);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text);
 	}
 
 	.m {
-		margin: 6px 0 0;
-		font-size: 12px;
-		color: var(--text-2);
-		line-height: 1.35;
+		margin: var(--s-2) 0 0;
+		font-size: var(--t-caption);
+		color: var(--h-text-muted);
+		line-height: var(--lh-caption);
 	}
 
 	.track {
 		display: flex;
-		gap: 8px;
-		margin-top: var(--space-3);
+		gap: var(--s-2);
 	}
 
 	.tb {
 		flex: 1;
-		min-height: 36px;
-		border-radius: var(--radius-xs);
-		border: 1px solid var(--line-1);
-		background: rgba(0, 0, 0, 0.35);
-		color: var(--text-2);
-		font-size: 11px;
-		font-weight: 650;
+		min-height: 44px;
+		border-radius: var(--r-pill);
+		border: 1px solid var(--h-line);
+		background: var(--h-surface-3);
+		color: var(--h-text-soft);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
 	}
 
 	.tb[data-on='true'] {
-		border-color: var(--red-line);
-		color: var(--text-1);
-		box-shadow: inset 0 0 0 1px rgba(255, 42, 42, 0.25);
+		border-color: var(--h-accent-line);
+		color: var(--h-text);
+		background: var(--h-accent-soft);
 	}
 
 	.tb.ghost {

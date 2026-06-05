@@ -150,7 +150,7 @@
 	}
 </script>
 
-<main class="screen stack">
+<main class="screen page-stack">
 	{#if !$plan}
 		<AppHeader
 			title="Today"
@@ -212,9 +212,10 @@
 		/>
 
 		<NextActionCard
-			eyebrow="UP NEXT"
+			eyebrow="Up next"
 			title={nextAction.title}
 			subtitle={nextAction.subtitle}
+			ctaLabel="Open"
 			onclick={() => goto(resolve(nextAction.href))}
 		/>
 
@@ -308,19 +309,13 @@
 	.mini {
 		width: 44px;
 		height: 44px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-2);
-		background: rgba(0, 0, 0, 0.35);
-		color: var(--text-1);
-		font-weight: 800;
+		border-radius: var(--r-xs);
+		border: 1px solid var(--h-line-strong);
+		background: var(--h-surface-3);
+		color: var(--h-text);
+		font-weight: 760;
 		font-size: 18px;
 		line-height: 1;
 		cursor: pointer;
-	}
-
-	@supports (corner-shape: squircle) {
-		.mini {
-			corner-shape: squircle;
-		}
 	}
 </style>

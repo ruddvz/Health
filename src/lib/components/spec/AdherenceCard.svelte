@@ -11,7 +11,7 @@
 <section class="card nothing-surface" aria-label={title}>
 	<div class="head">
 		<div>
-			<p class="mono-caps t">{title}</p>
+			<p class="t">{title}</p>
 			<p class="val">{value}</p>
 			<p class="sub">{subtitle}</p>
 		</div>
@@ -27,37 +27,40 @@
 
 <style>
 	.card {
-		padding: var(--space-4);
-		margin-bottom: var(--space-3);
+		padding: var(--s-4);
+		margin-bottom: var(--s-3);
 	}
 
 	.t {
 		margin: 0;
-		color: var(--text-3);
-		font-size: 10px;
+		color: var(--h-text-faint);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
 	}
 
 	.val {
-		margin: var(--space-2) 0 0;
-		font-size: 22px;
-		font-weight: 650;
-		color: var(--text-1);
+		margin: var(--s-2) 0 0;
+		font-size: var(--t-title-2);
+		font-weight: var(--weight-bold);
+		letter-spacing: -0.02em;
+		color: var(--h-text);
 	}
 
 	.sub {
-		margin: 4px 0 0;
-		font-size: 13px;
-		color: var(--text-2);
+		margin: var(--s-1) 0 0;
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+		line-height: var(--lh-body);
 	}
 
 	.bars {
 		display: flex;
 		align-items: flex-end;
-		gap: 6px;
+		gap: var(--s-2);
 		height: 88px;
-		margin-top: var(--space-3);
-		padding-top: var(--space-2);
-		border-top: 1px solid var(--line-1);
+		margin-top: var(--s-3);
+		padding-top: var(--s-2);
+		border-top: 1px solid var(--h-line-soft);
 	}
 
 	.bwrap {
@@ -70,8 +73,8 @@
 	.b {
 		width: 100%;
 		min-height: 4px;
-		border-radius: 3px 3px 0 0;
-		background: var(--red);
-		opacity: 0.85;
+		border-radius: var(--r-xxs) var(--r-xxs) 0 0;
+		background: var(--h-accent);
+		opacity: 0.9;
 	}
 </style>

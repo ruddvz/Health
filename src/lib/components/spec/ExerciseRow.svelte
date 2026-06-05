@@ -9,29 +9,36 @@
 </script>
 
 <div class="row nothing-surface-2">
-	<span class="mono-caps idx">{index}</span>
+	<span class="idx">{index}</span>
 	<div class="mid">
 		<p class="n">{name}</p>
 		<p class="s">{setsReps}</p>
 	</div>
-	<p class="mono-caps r">{rest}</p>
+	<p class="r">{rest}</p>
 </div>
 
 <style>
 	.row {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
-		min-height: 58px;
-		padding: var(--space-2) var(--space-3);
-		margin-bottom: var(--space-2);
+		gap: var(--s-3);
+		min-height: 92px;
+		padding: var(--s-3) var(--s-4);
+		margin-bottom: var(--s-2);
 	}
 
 	.idx {
-		width: 22px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		border-radius: var(--r-xxs);
+		background: var(--h-surface-3);
 		text-align: center;
-		color: var(--text-3);
-		font-size: 9px;
+		color: var(--h-text-faint);
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
 		flex-shrink: 0;
 	}
 
@@ -42,21 +49,22 @@
 
 	.n {
 		margin: 0;
-		font-size: 15px;
-		font-weight: 600;
-		color: var(--text-1);
+		font-size: var(--t-callout);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text);
 	}
 
 	.s {
-		margin: 4px 0 0;
-		font-size: 12px;
-		color: var(--text-2);
+		margin: var(--s-1) 0 0;
+		font-size: var(--t-caption);
+		color: var(--h-text-muted);
 	}
 
 	.r {
 		margin: 0;
-		font-size: 9px;
-		color: var(--text-3);
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 		flex-shrink: 0;
 	}
 </style>

@@ -12,7 +12,7 @@
 </script>
 
 <section class="quick" aria-labelledby="quick-nav-title">
-	<h2 id="quick-nav-title" class="mono-caps lab">Quick navigation</h2>
+	<h2 id="quick-nav-title" class="lab">Quick navigation</h2>
 	<div class="grid">
 		{#each links as item (item.label)}
 			<a class="card pressable" class:full={item.full} href={resolve(item.href)}>
@@ -25,30 +25,32 @@
 
 <style>
 	.lab {
-		margin: 0 0 var(--space-2);
-		font-size: 10px;
-		color: var(--text-3);
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-title-3);
+		font-weight: var(--weight-bold);
+		letter-spacing: -0.02em;
+		color: var(--h-text);
 	}
 
 	.grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 10px;
-		margin-bottom: var(--space-4);
+		gap: var(--phone-card-gap);
+		margin-bottom: var(--s-4);
 	}
 
 	.card {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		min-height: 52px;
-		padding: 0 var(--space-3);
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-1);
-		background: var(--surface-2);
-		color: var(--text-1);
-		font-size: 14px;
-		font-weight: 650;
+		min-height: 56px;
+		padding: 0 var(--s-4);
+		border-radius: var(--r-card-inner);
+		border: 1px solid var(--h-line);
+		background: var(--h-surface-2);
+		color: var(--h-text);
+		font-size: var(--t-footnote);
+		font-weight: var(--weight-semibold);
 		text-decoration: none;
 	}
 
@@ -57,7 +59,7 @@
 	}
 
 	.chev {
-		color: var(--text-3);
+		color: var(--h-text-faint);
 		font-size: 18px;
 	}
 </style>

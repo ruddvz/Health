@@ -48,6 +48,7 @@
 
 	const path = $derived(normalizePathname(page.url.pathname));
 	const showNav = $derived(path !== '/' && path !== '/import');
+	const showStatus = $derived(showNav);
 	const gated = $derived(isLockProtectedPath(path) && $requiresUnlock);
 </script>
 
@@ -57,7 +58,7 @@
 	<link rel="apple-touch-icon" href={`${base}/icons/icon-192.png`} />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-	<meta name="theme-color" content="#f7f4ee" />
+	<meta name="theme-color" content="#070a08" />
 	<meta
 		name="description"
 		content="Your private daily health plan — meals, training, and progress on your iPhone."
@@ -68,7 +69,7 @@
 {#if $planParseError}
 	<StorageRecoveryBanner message={$planParseError} />
 {/if}
-<AppShell {showNav}>
+<AppShell {showNav} {showStatus}>
 	{#if gated}
 		<UnlockGate />
 	{:else}

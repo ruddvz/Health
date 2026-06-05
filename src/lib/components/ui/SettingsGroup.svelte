@@ -20,28 +20,26 @@
 
 <style>
 	.settings-group {
-		margin-bottom: var(--space-5);
+		margin-bottom: var(--s-5);
 	}
 
 	.settings-group__title {
-		margin: 0 0 var(--space-2);
-		padding: 0 var(--space-1);
-		font-size: var(--text-xs);
+		margin: 0 0 var(--s-2);
+		padding: 0 var(--s-1);
+		font-size: var(--t-footnote);
 		font-weight: var(--weight-semibold);
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--health-muted);
+		color: var(--h-text-muted);
 	}
 
 	.settings-group__rows {
-		background: var(--health-surface);
-		border: 1px solid var(--health-line);
-		border-radius: var(--radius-lg);
+		background: var(--h-surface-solid);
+		border: 1px solid var(--h-line);
+		border-radius: var(--r-lg);
 		box-shadow: var(--shadow-card-soft);
 		overflow: hidden;
 	}
 
 	.settings-group__rows :global(.settings-row:not(:last-child)) {
-		border-bottom: 1px solid var(--health-line);
+		border-bottom: 1px solid var(--h-line-soft);
 	}
 </style>

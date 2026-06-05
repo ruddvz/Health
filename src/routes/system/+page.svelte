@@ -44,7 +44,7 @@
 	);
 </script>
 
-<main class="screen stack">
+<main class="screen page-stack">
 	<AppHeader title="System" subtitle="Privacy, data, and tools" pageLabel="Settings" />
 
 	<section class="status health-card" aria-live="polite">

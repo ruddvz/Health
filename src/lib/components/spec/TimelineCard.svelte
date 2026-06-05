@@ -14,13 +14,13 @@
 <div class="card nothing-surface" role="list">
 	{#each items as it, i (i)}
 		<div class="row" role="listitem" data-state={it.state}>
-			<span class="mono-caps time">{it.time}</span>
+			<span class="time">{it.time}</span>
 			<div class="mid">
 				<p class="t">{it.title}</p>
 				<p class="s">{it.subtitle}</p>
 			</div>
 			<span
-				class="st mono-caps"
+				class="st"
 				aria-label={it.state === 'done' ? 'Done' : it.state === 'next' ? 'Next' : 'Upcoming'}
 			>
 				{it.state === 'done' ? '✓' : it.state === 'next' ? '→' : '·'}
@@ -33,27 +33,38 @@
 	.card {
 		padding: 0;
 		overflow: hidden;
-		margin-bottom: var(--space-3);
+		margin-bottom: var(--s-3);
 	}
 
 	.row {
 		display: flex;
 		align-items: flex-start;
-		gap: var(--space-3);
-		padding: var(--space-3) var(--space-4);
-		border-bottom: 1px solid var(--line-1);
+		gap: var(--s-3);
+		padding: var(--s-3) var(--s-4);
+		border-bottom: 1px solid var(--h-line-soft);
 	}
 
 	.row:last-child {
 		border-bottom: none;
 	}
 
+	.row[data-state='next'] {
+		background: var(--h-accent-soft);
+		border-left: 3px solid var(--h-accent);
+		padding-left: calc(var(--s-4) - 3px);
+	}
+
 	.time {
 		width: 64px;
 		flex-shrink: 0;
 		margin: 2px 0 0;
-		font-size: 9px;
-		color: var(--text-3);
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
+	}
+
+	.row[data-state='next'] .time {
+		color: var(--h-accent);
 	}
 
 	.mid {
@@ -63,25 +74,34 @@
 
 	.t {
 		margin: 0;
-		font-size: 15px;
-		font-weight: 600;
-		color: var(--text-1);
+		font-size: var(--t-callout);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text);
+	}
+
+	.row[data-state='next'] .t {
+		color: var(--h-text);
 	}
 
 	.s {
-		margin: 4px 0 0;
-		font-size: 13px;
-		color: var(--text-2);
-		line-height: 1.35;
+		margin: var(--s-1) 0 0;
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+		line-height: var(--lh-caption);
 	}
 
 	.st {
 		margin-top: 2px;
-		color: var(--red);
-		font-size: 10px;
+		color: var(--h-text-faint);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
 	}
 
 	.row[data-state='done'] .st {
-		color: var(--success);
+		color: var(--h-accent);
+	}
+
+	.row[data-state='next'] .st {
+		color: var(--h-accent);
 	}
 </style>

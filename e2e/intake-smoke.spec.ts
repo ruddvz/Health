@@ -7,7 +7,7 @@ test.describe('Health PWA smoke', () => {
 	test('welcome then intake first step', async ({ page }) => {
 		await page.goto('.');
 		await expect(
-			page.getByRole('heading', { name: /daily health plan, without the noise/i })
+			page.getByRole('heading', { name: /Your private daily health plan/i })
 		).toBeVisible();
 		await page
 			.getByRole('button', { name: /Create plan prompt/ })

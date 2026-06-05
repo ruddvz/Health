@@ -5,13 +5,27 @@
 		label: string;
 		type?: 'button' | 'submit';
 		disabled?: boolean;
+		variant?: 'primary' | 'destructive';
 		onclick?: (e: MouseEvent) => void;
 		children?: Snippet;
 	}
-	let { label, type = 'button', disabled = false, onclick, children }: Props = $props();
+	let {
+		label,
+		type = 'button',
+		disabled = false,
+		variant = 'primary',
+		onclick,
+		children
+	}: Props = $props();
 </script>
 
-<button class="btn" {type} {disabled} {onclick}>
+<button
+	class="btn pressable"
+	class:btn--destructive={variant === 'destructive'}
+	{type}
+	{disabled}
+	{onclick}
+>
 	<span class="label">{label}</span>
 	{#if children}
 		<span class="slot">{@render children()}</span>
@@ -23,48 +37,33 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		gap: var(--space-2);
+		gap: var(--s-2);
 		width: 100%;
-		min-height: 52px;
-		padding: var(--space-3) var(--space-5);
-		border: 1px solid var(--red);
-		border-radius: var(--radius-sm);
-		background: var(--red);
-		color: #ffffff;
+		min-height: 54px;
+		padding: 0 20px;
+		border-radius: var(--r-pill);
+		border: 1px solid rgba(167, 255, 106, 0.28);
+		background: linear-gradient(180deg, rgba(167, 255, 106, 0.95), rgba(112, 242, 166, 0.86));
+		color: #081008;
 		font-family: var(--font-ui);
-		font-size: 12px;
-		font-weight: 650;
-		letter-spacing: 0.02em;
-		text-transform: none;
+		font-size: var(--t-callout);
+		font-weight: 760;
+		letter-spacing: -0.01em;
 		cursor: pointer;
-		box-shadow:
-			inset 0 1px 0 rgba(255, 255, 255, 0.18),
-			var(--shadow-red-glow);
+		box-shadow: 0 12px 28px rgba(112, 242, 166, 0.18);
 	}
 
-	@supports (corner-shape: squircle) {
-		.btn {
-			corner-shape: squircle;
-		}
+	.btn--destructive {
+		background: var(--h-red-soft);
+		border-color: var(--h-red-line);
+		color: var(--h-red);
+		box-shadow: var(--shadow-danger);
 	}
 
 	.btn:disabled {
 		opacity: 0.45;
 		cursor: not-allowed;
-		background: #3a1a1a;
-		border-color: #3a1a1a;
-		color: var(--text-3);
-	}
-
-	.btn:not(:disabled):hover {
-		background: var(--red-hover);
-		border-color: var(--red-hover);
-	}
-
-	.btn:not(:disabled):active {
-		background: var(--red-pressed);
-		border-color: var(--red-pressed);
-		transform: scale(0.985);
+		box-shadow: none;
 	}
 
 	.label {

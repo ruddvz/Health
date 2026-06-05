@@ -8,11 +8,11 @@
 
 <div class="host" aria-live="polite" aria-relevant="additions">
 	{#each $toasts as t (t.id)}
-		<div class="toast nothing-surface" data-tone={t.tone} role="status">
+		<div class="toast" data-tone={t.tone} role="status">
 			<p class="text">{t.text}</p>
 			<button
 				type="button"
-				class="close pressable"
+				class="close pressable touch-target"
 				aria-label="Dismiss"
 				onclick={() => dismiss(t.id)}>×</button
 			>
@@ -23,51 +23,63 @@
 <style>
 	.host {
 		position: fixed;
-		top: calc(var(--safe-top) + var(--space-3));
-		left: 50%;
-		transform: translateX(-50%);
-		z-index: 300;
-		width: min(100vw - var(--space-4) * 2, 400px);
+		bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 16px);
+		left: 16px;
+		right: 16px;
+		z-index: var(--z-toast);
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-2);
+		gap: var(--s-2);
 		pointer-events: none;
+		max-width: 400px;
+		margin-inline: auto;
+	}
+
+	@media (min-width: 768px) {
+		.host {
+			left: auto;
+			right: 24px;
+			bottom: 24px;
+			margin: 0;
+		}
 	}
 
 	.toast {
 		display: flex;
 		align-items: flex-start;
-		gap: var(--space-2);
-		padding: var(--space-3) var(--space-4);
-		border-radius: var(--radius-md);
+		gap: var(--s-2);
+		padding: 14px 16px;
+		border-radius: 20px;
 		pointer-events: auto;
-		box-shadow: var(--shadow-card);
+		background: var(--h-glass-strong);
+		border: 1px solid var(--h-line-strong);
+		box-shadow: var(--shadow-card-soft);
+		backdrop-filter: blur(var(--blur-nav));
+		-webkit-backdrop-filter: blur(var(--blur-nav));
 	}
 
 	.toast[data-tone='success'] {
-		border-color: rgba(52, 199, 89, 0.45);
+		border-color: var(--h-accent-line);
 	}
 
 	.toast[data-tone='error'] {
-		border-color: var(--red-line);
+		border-color: var(--h-red-line);
 	}
 
 	.text {
 		flex: 1;
 		margin: 0;
-		font-size: 14px;
-		line-height: 1.45;
-		color: var(--text-1);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text);
 	}
 
 	.close {
 		flex-shrink: 0;
-		width: 32px;
-		height: 32px;
 		border: none;
-		border-radius: var(--radius-xs);
+		border-radius: var(--r-xs);
 		background: transparent;
-		color: var(--text-3);
+		color: var(--h-text-muted);
 		font-size: 20px;
 		line-height: 1;
 		cursor: pointer;

@@ -1,65 +1,75 @@
 <script lang="ts">
 	import BottomTabBar from './BottomTabBar.svelte';
+	import TopStatusBar from './TopStatusBar.svelte';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
 		children: Snippet;
 		showNav?: boolean;
+		showStatus?: boolean;
 	}
-	let { children, showNav = true }: Props = $props();
+	let { children, showNav = true, showStatus = true }: Props = $props();
 </script>
 
-<div class="shell" class:shell--nav={showNav}>
-	<div class="shell__main">
-		{@render children()}
-	</div>
+<div class="app-shell" class:app-shell--nav={showNav}>
 	{#if showNav}
 		<BottomTabBar />
 	{/if}
+	<div class="app-shell__content">
+		{#if showStatus}
+			<TopStatusBar />
+		{/if}
+		<main class="app-shell__main">
+			{@render children()}
+		</main>
+	</div>
 </div>
 
 <style>
-	.shell {
+	.app-shell {
 		position: relative;
 		min-height: 100dvh;
 		display: flex;
 		flex-direction: column;
 	}
 
-	.shell__main {
+	.app-shell__content {
 		flex: 1;
+		min-width: 0;
+		width: 100%;
+	}
+
+	.app-shell__main {
 		width: 100%;
 		max-width: var(--page-max);
 		margin: 0 auto;
-		padding-left: max(var(--mobile-pad), env(safe-area-inset-left));
-		padding-right: max(var(--mobile-pad), env(safe-area-inset-right));
-		padding-top: max(12px, env(safe-area-inset-top));
+		padding-left: max(var(--page-x), env(safe-area-inset-left));
+		padding-right: max(var(--page-x), env(safe-area-inset-right));
 	}
 
-	.shell--nav .shell__main {
-		padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 16px);
+	.app-shell--nav .app-shell__main {
+		padding-bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 28px);
 	}
 
-	.shell:not(.shell--nav) .shell__main {
-		padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
+	.app-shell:not(.app-shell--nav) .app-shell__main {
+		padding-bottom: calc(var(--safe-bottom) + 20px);
 	}
 
-	@media (min-width: 900px) {
-		.shell--nav {
-			padding-left: 88px;
+	@media (min-width: 768px) {
+		.app-shell--nav {
+			display: grid;
+			grid-template-columns: 88px minmax(0, 1fr);
+			min-height: 100dvh;
 		}
 
-		.shell--nav .shell__main {
-			padding-bottom: var(--space-8);
-			padding-left: var(--desktop-pad);
-			padding-right: var(--desktop-pad);
+		.app-shell--nav .app-shell__main {
+			padding: 0 var(--desktop-pad) 40px;
 		}
 	}
 
 	@media (min-width: 1024px) {
-		.shell__main {
-			padding-left: var(--desktop-pad);
-			padding-right: var(--desktop-pad);
+		.app-shell--nav {
+			grid-template-columns: 248px minmax(0, 1fr);
 		}
 	}
 </style>
