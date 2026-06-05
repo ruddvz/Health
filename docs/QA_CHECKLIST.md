@@ -20,6 +20,8 @@ Visual regression (optional, updates baselines): `npm run test:e2e:screenshots`
 
 Manual checks below remain required for HTTPS passkeys, service worker updates, and cloud backup.
 
+**Release record:** see `docs/RELEASE_QA.md` for the latest automated gate result and iPhone sign-off table.
+
 ## iOS PWA
 
 Test on a real iPhone in **Safari** (install flow is not available in desktop Chrome alone).

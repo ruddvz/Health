@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Audit Definition of Done closeout
+
+- **Onboarding refactor:** `OnboardingFlow`, `StepAbout`–`StepLifestyle`, `ReviewImportSheet`, shared `onboarding-form.css`.
+- **Progress no-plan:** `EmptyState` + import/sample CTAs while logging remains available.
+- **Import:** confirm before replacing an existing on-device plan.
+- **iOS PWA:** `apple-touch-icon.png` (180×180), manifest + layout links.
+- **E2E:** delete-all-local-data flow; expanded no-plan/screenshot routes; SW verify includes train/progress/system.
+- **Release QA note:** `docs/RELEASE_QA.md` (automated gate + manual iPhone checklist).
+
 ### Master plan completion pass
 
 - **RequiresPlan** empty states on System → Phases, Grocery, Prep, Supplements, and Train session (no more silent redirect to Import).

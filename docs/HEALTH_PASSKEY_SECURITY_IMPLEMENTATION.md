@@ -16,7 +16,7 @@
 
 1. User imports JSON plan → optional **Protect your health plan** sheet.
 2. User sets **recovery PIN** (required) + **passkey** + **recovery codes** (required).
-3. Plan/progress/onboarding/settings migrate to **AES-GCM encrypted IndexedDB** vault.
+3. Plan/progress/onboarding/settings migrate to **AES-GCM encrypted IndexedDB** vault (with backup + rollback if encryption fails).
 4. Protected routes show **Unlock Health** (passkey and/or PIN).
 5. **System → Security** manages passkey, PIN, codes, auto-lock, remove passkey.
 

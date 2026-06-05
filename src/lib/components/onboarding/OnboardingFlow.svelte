@@ -127,7 +127,9 @@
 			<p class="bn-t">
 				Intake was expanded. Your previous answers are kept — review each step for new questions.
 			</p>
-			<button type="button" class="bn-dismiss pressable" onclick={dismissIntakeNotice}>Dismiss</button>
+			<button type="button" class="bn-dismiss pressable" onclick={dismissIntakeNotice}
+				>Dismiss</button
+			>
 		</div>
 	{/if}
 

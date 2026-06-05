@@ -6,11 +6,15 @@ import { importPlanViaPaste } from './helpers/importPlan';
 const minimalPlan = readFileSync(join(process.cwd(), 'samples/minimal-plan-v2.json'), 'utf8');
 
 const routes = [
-	{ name: 'welcome', path: './', needsPlan: false },
-	{ name: 'import', path: './import', needsPlan: false },
-	{ name: 'today-empty', path: './today', needsPlan: false },
-	{ name: 'system', path: './system', needsPlan: false },
-	{ name: 'diagnostics-empty', path: './system/diagnostics', needsPlan: false }
+	{ name: 'welcome', path: './' },
+	{ name: 'import', path: './import' },
+	{ name: 'today-empty', path: './today' },
+	{ name: 'meals-empty', path: './meals' },
+	{ name: 'train-empty', path: './train' },
+	{ name: 'progress-empty', path: './progress' },
+	{ name: 'system', path: './system' },
+	{ name: 'diagnostics-empty', path: './system/diagnostics' },
+	{ name: 'phases-empty', path: './system/phases' }
 ] as const;
 
 for (const route of routes) {

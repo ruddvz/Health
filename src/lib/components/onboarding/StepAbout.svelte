@@ -30,7 +30,9 @@
 			oninput={(e) => patchProfile({ name: (e.target as HTMLInputElement).value })}
 		/>
 		{#if fieldErrors['profile.name']}
-			<span id={intakeErrDomId('profile.name')} class="field-msg">{fieldErrors['profile.name']}</span>
+			<span id={intakeErrDomId('profile.name')} class="field-msg"
+				>{fieldErrors['profile.name']}</span
+			>
 		{/if}
 	</label>
 	<label class="field">
@@ -126,7 +128,8 @@
 			</div>
 		{/if}
 		{#if fieldErrors['profile.height']}
-			<span id={intakeErrDomId('profile.height')} class="field-msg">{fieldErrors['profile.height']}</span
+			<span id={intakeErrDomId('profile.height')} class="field-msg"
+				>{fieldErrors['profile.height']}</span
 			>
 		{/if}
 	</div>
@@ -172,7 +175,8 @@
 			/>
 		{/if}
 		{#if fieldErrors['profile.weight']}
-			<span id={intakeErrDomId('profile.weight')} class="field-msg">{fieldErrors['profile.weight']}</span
+			<span id={intakeErrDomId('profile.weight')} class="field-msg"
+				>{fieldErrors['profile.weight']}</span
 			>
 		{/if}
 	</div>

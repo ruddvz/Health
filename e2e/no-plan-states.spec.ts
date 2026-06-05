@@ -31,7 +31,7 @@ test.describe('No-plan empty states', () => {
 
 	test('Progress allows logging without plan', async ({ page }) => {
 		await page.goto('./progress');
-		await expect(page.getByText(/No plan loaded/i)).toBeVisible();
+		await expect(page.getByRole('heading', { name: /No plan loaded yet/i })).toBeVisible();
 		await expect(page.getByText('Log Check-in')).toBeVisible();
 	});
 

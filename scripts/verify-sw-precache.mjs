@@ -22,7 +22,17 @@ if (urls.length < 40) {
 	process.exit(1);
 }
 
-const required = ['/Health/', '404.html', 'today', 'import', 'meals', '_app/immutable/entry/app'];
+const required = [
+	'/Health/',
+	'404.html',
+	'today',
+	'import',
+	'meals',
+	'train',
+	'progress',
+	'system',
+	'_app/immutable/entry/app'
+];
 const missing = required.filter((r) => !urls.some((u) => u === r || u.includes(r)));
 if (missing.length) {
 	console.error('verify-sw-precache: missing precache entries:', missing.join(', '));

@@ -18,7 +18,7 @@
 	import { buildClaudePrompt, copyTextToClipboard } from '$lib/logic/buildClaudePrompt';
 	import { flattenGrocery } from '$lib/logic/planDerive';
 	import type { PlanV2 } from '$lib/types/planV2';
-	import { onboarding, persistProgress, progress, savePlan } from '$lib/stores/healthApp';
+	import { onboarding, persistProgress, plan, progress, savePlan } from '$lib/stores/healthApp';
 	import { securityConfig } from '$lib/stores/healthLock';
 	import { get } from 'svelte/store';
 	import { parsePlanJsonText } from '$lib/validation/planV2';
@@ -79,6 +79,16 @@
 
 	function confirmApply() {
 		if (!pendingPlan) return;
+		const existing = get(plan);
+		if (
+			existing &&
+			browser &&
+			!window.confirm(
+				'Replace your current plan on this device? Consider exporting a backup from System → Settings first.'
+			)
+		) {
+			return;
+		}
 		busy = true;
 		try {
 			savePlan(pendingPlan, pendingWarnings);

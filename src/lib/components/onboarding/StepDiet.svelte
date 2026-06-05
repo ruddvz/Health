@@ -35,7 +35,8 @@
 			<option value="pescatarian">Pescatarian</option>
 		</select>
 		{#if fieldErrors['diet.preference']}
-			<span id={intakeErrDomId('diet.preference')} class="field-msg">{fieldErrors['diet.preference']}</span
+			<span id={intakeErrDomId('diet.preference')} class="field-msg"
+				>{fieldErrors['diet.preference']}</span
 			>
 		{/if}
 	</label>
@@ -124,7 +125,8 @@
 			<option value="no">No</option>
 		</select>
 		{#if fieldErrors['diet.meal_prep']}
-			<span id={intakeErrDomId('diet.meal_prep')} class="field-msg">{fieldErrors['diet.meal_prep']}</span
+			<span id={intakeErrDomId('diet.meal_prep')} class="field-msg"
+				>{fieldErrors['diet.meal_prep']}</span
 			>
 		{/if}
 	</label>
