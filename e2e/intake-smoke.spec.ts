@@ -3,8 +3,13 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 test.describe('Health PWA smoke', () => {
-	test('home shows intake first step', async ({ page }) => {
+	test('welcome then intake first step', async ({ page }) => {
 		await page.goto('.');
+		await expect(page.getByRole('heading', { name: /private daily health plan/i })).toBeVisible();
+		await page
+			.getByRole('button', { name: /Create plan prompt/ })
+			.first()
+			.click();
 		await expect(page.getByText('About you').first()).toBeVisible();
 		await expect(page.getByText('Answers save automatically on this device.')).toBeVisible();
 	});

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### iOS PWA polish and no-plan UX
+
+- **Welcome launcher** on `/` before intake — create prompt, import JSON, demo sample plan, privacy copy, continue draft.
+- **No-plan empty states** on Today, Meals, Train, Progress (logging without plan), and Diagnostics (no false “schema parses”).
+- **Sample plan** loader from Import and welcome (`static/samples/rudra-plan-v2.json`).
+- **iOS PWA metadata** in `app.html`, manifest shortcuts, iOS semantic color tokens, reduced-motion CSS.
+- **About** page: PWA/standalone status, service worker status, cache refresh helper, iPhone install steps.
+- **Cloud API hardening**: CORS allowlist (`HEALTH_ALLOWED_ORIGINS`), production fail-closed without Supabase unless `HEALTH_ALLOW_MEMORY_STORE=true`.
+- **`quality` / `quality:e2e`** npm scripts; Playwright coverage for no-plan routes.
+- Reusable `EmptyState`, `NoPlanActions`, `WelcomeLauncher` components.
+
 ### Health Lock (local passkey app lock)
 
 - **Phase 1**: WebAuthn platform passkey / Face ID / Touch ID app lock for the static GitHub Pages PWA — no backend, data stays on device.

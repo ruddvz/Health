@@ -191,14 +191,15 @@
 	<ScreenHeaderBlock title="SECURITY" subtitle="Protect your health plan on this device" />
 
 	<section class="block nothing-surface hero">
-		<h2 class="title">Protect your health plan</h2>
+		<h2 class="title">Local Health Lock</h2>
 		<p class="p">
-			Use Face ID, Touch ID, Windows Hello, or your device passcode to unlock this app. Your plan
-			stays on this device. Health does not upload your meals, weight, supplements, or progress
-			data.
+			Health Lock keeps your plan private on this device. It works offline with Face ID, Touch ID,
+			or a recovery PIN. It is not a medical security system and does not upload your plan by
+			itself.
 		</p>
 		<p class="p muted">
-			Phase 1: local app lock only — no cloud accounts. Synced passkeys need a backend (Phase 3).
+			Cloud Passkey Account (below) is optional and only for encrypted backup when a backend is
+			configured. You do not need it for everyday local PWA use.
 		</p>
 	</section>
 

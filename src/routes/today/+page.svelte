@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
+	import EmptyState from '$lib/components/app/EmptyState.svelte';
+	import NoPlanActions from '$lib/components/app/NoPlanActions.svelte';
 	import PlanWarningsCard from '$lib/components/spec/PlanWarningsCard.svelte';
 	import PrivacySafetyCard from '$lib/components/spec/PrivacySafetyCard.svelte';
 	import QuickNavGrid from '$lib/components/spec/QuickNavGrid.svelte';
@@ -32,6 +33,7 @@
 		importWarnings,
 		onboarding,
 		persistActiveDayType,
+		persistOnboarding,
 		persistProgress,
 		persistSettings,
 		plan,
@@ -142,14 +144,41 @@
 		});
 	}
 
-	$effect(() => {
-		if (!browser) return;
-		if (!$plan) goto(resolve('/import'));
-	});
+	function startIntake() {
+		persistOnboarding({ ...get(onboarding), intakeLaunched: true });
+		goto(resolve('/'));
+	}
 </script>
 
-{#if $plan}
-	<main class="screen px-screen pt-safe stack">
+<main class="screen px-screen pt-safe stack">
+	{#if !$plan}
+		<ScreenHeaderBlock title="TODAY" subtitle="Daily command center" />
+
+		<EmptyState
+			title="No plan loaded yet"
+			body="Import a Health JSON plan or create one from your intake answers. Once loaded, Today will show your next meal, workout, water, macros, reminders, and safety checks."
+		>
+			{#snippet preview()}
+				<div class="preview-card">
+					<p class="pc-label">Next meal</p>
+					<p class="pc-val">—</p>
+				</div>
+				<div class="preview-card">
+					<p class="pc-label">Macros</p>
+					<p class="pc-val">—</p>
+				</div>
+				<div class="preview-card">
+					<p class="pc-label">Workout</p>
+					<p class="pc-val">—</p>
+				</div>
+				<div class="preview-card">
+					<p class="pc-label">Plan checks</p>
+					<p class="pc-val">—</p>
+				</div>
+			{/snippet}
+			<NoPlanActions onStartIntake={startIntake} />
+		</EmptyState>
+	{:else}
 		<ScreenHeaderBlock title="TODAY" subtitle="{greeting()}, {getUserName($plan)}">
 			{#snippet right()}
 				<a
@@ -251,8 +280,8 @@
 
 		<SectionLabel text="TIMELINE" />
 		<TimelineCard items={timeline} />
-	</main>
-{/if}
+	{/if}
+</main>
 
 <style>
 	.screen {

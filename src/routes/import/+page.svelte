@@ -8,6 +8,7 @@
 	import InlineErrorCard from '$lib/components/spec/InlineErrorCard.svelte';
 	import JsonDropZone from '$lib/components/spec/JsonDropZone.svelte';
 	import ListRowButton from '$lib/components/spec/ListRowButton.svelte';
+	import { loadSamplePlan } from '$lib/logic/loadSamplePlan';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import TextLinkButton from '$lib/components/spec/TextLinkButton.svelte';
@@ -174,6 +175,21 @@
 
 	<ListRowButton label="Paste JSON" chevron onclick={() => (pasteOpen = true)} />
 	<DashedUploadButton label="Upload Plan File" onclick={openPicker} />
+	<ListRowButton
+		label="Load sample plan (demo)"
+		chevron
+		onclick={async () => {
+			busy = true;
+			error = null;
+			try {
+				await loadSamplePlan();
+			} catch (e) {
+				error = e instanceof Error ? e.message : 'Could not load sample';
+			} finally {
+				busy = false;
+			}
+		}}
+	/>
 
 	<section class="steps nothing-surface" aria-labelledby="steps-h">
 		<h2 id="steps-h" class="mono-caps sec-title">After you copy</h2>

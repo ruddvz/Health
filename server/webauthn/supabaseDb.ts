@@ -265,6 +265,11 @@ let dbSingleton: DbAdapter | null = null;
 export async function getDb(): Promise<DbAdapter> {
 	if (dbSingleton) return dbSingleton;
 	const env = getWebAuthnEnv();
+	if (env.productionMisconfigured) {
+		throw new Error(
+			'Cloud passkey backend is not configured for production. Set Supabase env vars or HEALTH_ALLOW_MEMORY_STORE=true for dev.'
+		);
+	}
 	if (env.useMemoryStore) {
 		dbSingleton = memoryAdapter();
 		return dbSingleton;

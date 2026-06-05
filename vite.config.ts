@@ -13,16 +13,41 @@ export default defineConfig({
 			strategies: 'generateSW',
 			includeAssets: ['icons/icon-192.png', 'icons/icon-512.png', 'offline.html'],
 			manifest: {
+				id: `${basePath}/`,
 				name: 'Health — Personal Plan',
 				short_name: 'Health',
+				lang: 'en',
+				dir: 'ltr',
 				description: 'Private offline health plan companion',
 				start_url: `${basePath}/`,
 				scope: `${basePath}/`,
 				display: 'standalone',
-				background_color: '#0b0b0b',
-				theme_color: '#0b0b0b',
+				background_color: '#090a0c',
+				theme_color: '#090a0c',
 				orientation: 'portrait',
 				categories: ['health', 'fitness', 'lifestyle'],
+				shortcuts: [
+					{
+						name: 'Today',
+						url: `${basePath}/today`,
+						icons: [{ src: `${basePath}/icons/icon-192.png`, sizes: '192x192' }]
+					},
+					{
+						name: 'Meals',
+						url: `${basePath}/meals`,
+						icons: [{ src: `${basePath}/icons/icon-192.png`, sizes: '192x192' }]
+					},
+					{
+						name: 'Train',
+						url: `${basePath}/train`,
+						icons: [{ src: `${basePath}/icons/icon-192.png`, sizes: '192x192' }]
+					},
+					{
+						name: 'Progress',
+						url: `${basePath}/progress`,
+						icons: [{ src: `${basePath}/icons/icon-192.png`, sizes: '192x192' }]
+					}
+				],
 				icons: [
 					{
 						src: `${basePath}/icons/icon-192.png`,

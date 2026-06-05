@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
 	import ExerciseRow from '$lib/components/spec/ExerciseRow.svelte';
+	import EmptyState from '$lib/components/app/EmptyState.svelte';
+	import NoPlanActions from '$lib/components/app/NoPlanActions.svelte';
 	import RedActionButton from '$lib/components/nothing/RedActionButton.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
 	import WorkoutHeroCard from '$lib/components/spec/WorkoutHeroCard.svelte';
 	import { getTrainingDay } from '$lib/logic/planDerive';
 	import { liftStatsFromSessions, recentSessions } from '$lib/logic/workoutHistory';
-	import { plan, progress } from '$lib/stores/healthApp';
+	import { onboarding, persistOnboarding, plan, progress } from '$lib/stores/healthApp';
+	import { get } from 'svelte/store';
 
 	const day = $derived(getTrainingDay($plan, 0));
 	const exercises = $derived.by(() => {
@@ -31,13 +33,23 @@
 		}).format(new Date(t));
 	}
 
-	$effect(() => {
-		if (!browser) return;
-		if (!$plan) goto(resolve('/import'));
-	});
+	function startIntake() {
+		persistOnboarding({ ...get(onboarding), intakeLaunched: true });
+		goto(resolve('/'));
+	}
 </script>
 
-{#if $plan}
+{#if !$plan}
+	<main class="screen px-screen pt-safe stack">
+		<ScreenHeaderBlock title="TRAIN" />
+		<EmptyState
+			title="Training needs a plan"
+			body="Your program lives in training.weekly_split inside your Health JSON. Import a plan or load the demo sample to see today's workout, log sets, and track history."
+		>
+			<NoPlanActions onStartIntake={startIntake} />
+		</EmptyState>
+	</main>
+{:else}
 	<main class="screen px-screen pt-safe stack">
 		<ScreenHeaderBlock title="TRAIN" />
 

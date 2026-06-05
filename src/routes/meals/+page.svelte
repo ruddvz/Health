@@ -2,8 +2,9 @@
 	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
 	import CookModeSheet from '$lib/components/spec/CookModeSheet.svelte';
+	import EmptyState from '$lib/components/app/EmptyState.svelte';
+	import NoPlanActions from '$lib/components/app/NoPlanActions.svelte';
 	import ChipRow from '$lib/components/spec/ChipRow.svelte';
 	import MealCard from '$lib/components/spec/MealCard.svelte';
 	import QuickFixSheet from '$lib/components/spec/QuickFixSheet.svelte';
@@ -23,7 +24,9 @@
 	} from '$lib/logic/planDerive';
 	import {
 		activeDayType,
+		onboarding,
 		persistActiveDayType,
+		persistOnboarding,
 		persistProgress,
 		plan,
 		progress,
@@ -143,10 +146,10 @@
 		emF = '';
 	}
 
-	$effect(() => {
-		if (!browser) return;
-		if (!$plan) goto(resolve('/import'));
-	});
+	function startIntake() {
+		persistOnboarding({ ...get(onboarding), intakeLaunched: true });
+		goto(resolve('/'));
+	}
 
 	$effect(() => {
 		if (chip === 'Workout Day') persistActiveDayType('workout');
@@ -154,7 +157,17 @@
 	});
 </script>
 
-{#if $plan}
+{#if !$plan}
+	<main class="screen px-screen pt-safe stack">
+		<ScreenHeaderBlock title="MEALS" />
+		<EmptyState
+			title="Meals come from your plan"
+			body="Import a Health JSON plan or load the demo sample. Meals will appear here with macros, cook mode, swaps, and logging once a plan is loaded."
+		>
+			<NoPlanActions onStartIntake={startIntake} />
+		</EmptyState>
+	</main>
+{:else}
 	<main class="screen px-screen pt-safe stack">
 		<ScreenHeaderBlock title="MEALS" />
 
