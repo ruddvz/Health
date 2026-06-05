@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
+	import RequiresPlan from '$lib/components/app/RequiresPlan.svelte';
 	import PrepStepCard from '$lib/components/spec/PrepStepCard.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SectionTitleBlock from '$lib/components/spec/SectionTitleBlock.svelte';
@@ -24,14 +22,13 @@
 		pc[key] = !pc[key];
 		persistProgress({ ...cur, prepChecked: pc });
 	}
-
-	$effect(() => {
-		if (!browser) return;
-		if (!$plan) goto(resolve('/import'));
-	});
 </script>
 
-{#if $plan}
+<RequiresPlan
+	title="PREP"
+	emptyTitle="Prep guide needs a plan"
+	emptyBody="Sunday prep steps and timing come from your plan JSON. Import a plan or load the sample to track prep checkboxes locally."
+>
 	<main class="screen px-screen pt-safe stack">
 		<ScreenHeaderBlock title="PREP" />
 		<SectionTitleBlock
@@ -66,7 +63,7 @@
 				: 'Batch cooking saves time and keeps you consistent.') + ''}
 		/>
 	</main>
-{/if}
+</RequiresPlan>
 
 <style>
 	.safety {

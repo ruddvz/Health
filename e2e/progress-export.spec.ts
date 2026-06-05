@@ -11,4 +11,9 @@ test.describe('Progress export', () => {
 		await page.goto('./system/settings#progress-export');
 		await expect(page.getByRole('button', { name: 'Download progress JSON only' })).toBeVisible();
 	});
+
+	test('progress tab exports JSON', async ({ page }) => {
+		await page.goto('./progress');
+		await expect(page.getByRole('button', { name: 'Export progress JSON' })).toBeVisible();
+	});
 });

@@ -94,24 +94,42 @@ export async function hydrateFromLocalStorage() {
 
 export { hydrateFromVaultSnapshot } from '$lib/stores/vaultBridge';
 
+const PERSIST_DEBOUNCE_MS = 280;
+const persistTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+function debouncedPersistSlice(
+	key: 'plan' | 'progress' | 'onboarding' | 'settings' | 'activeDayType',
+	value: unknown
+) {
+	const prev = persistTimers.get(key);
+	if (prev) clearTimeout(prev);
+	persistTimers.set(
+		key,
+		setTimeout(() => {
+			persistTimers.delete(key);
+			void persistSlice(key, value);
+		}, PERSIST_DEBOUNCE_MS)
+	);
+}
+
 export function persistOnboarding(state: OnboardingState) {
 	onboarding.set(state);
-	void persistSlice('onboarding', state);
+	debouncedPersistSlice('onboarding', state);
 }
 
 export function persistActiveDayType(dt: DayType) {
 	activeDayType.set(dt);
-	void persistSlice('activeDayType', dt);
+	debouncedPersistSlice('activeDayType', dt);
 }
 
 export function persistProgress(p: ProgressV2) {
 	progress.set(p);
-	void persistSlice('progress', p);
+	debouncedPersistSlice('progress', p);
 }
 
 export function persistSettings(s: Record<string, unknown>) {
 	settings.set(s);
-	void persistSlice('settings', s);
+	debouncedPersistSlice('settings', s);
 }
 
 export function savePlan(p: PlanV2, warnings: string[]) {

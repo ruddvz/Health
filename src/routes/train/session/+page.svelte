@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import RequiresPlan from '$lib/components/app/RequiresPlan.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import { newId } from '$lib/logic/id';
 	import { getTrainingDay } from '$lib/logic/planDerive';
@@ -169,17 +170,18 @@
 	}
 
 	$effect(() => {
-		if (!browser) return;
-		if (!$plan) {
-			goto(resolve('/import'));
-			return;
-		}
+		if (!browser || !$plan) return;
 		void exercises.length;
 		ensureSession();
 	});
 </script>
 
-{#if $plan}
+<RequiresPlan
+	title="SESSION"
+	subtitle="Log sets and finish your workout"
+	emptyTitle="Workout session needs a plan"
+	emptyBody="Training sessions are built from your plan's weekly split. Import a plan or load the demo sample, then start a session from the Train tab."
+>
 	<main class="screen px-screen pt-safe stack">
 		<ScreenHeaderBlock title="SESSION" subtitle={String(day?.name ?? 'Workout')} />
 
@@ -250,7 +252,7 @@
 			<p class="empty">No exercises in plan.</p>
 		{/if}
 	</main>
-{/if}
+</RequiresPlan>
 
 <style>
 	.screen {

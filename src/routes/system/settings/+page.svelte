@@ -119,13 +119,7 @@
 	}
 
 	function exportProgressJson() {
-		if (!browser) return;
-		const blob = new Blob([JSON.stringify(get(progress), null, 2)], { type: 'application/json' });
-		const a = document.createElement('a');
-		a.href = URL.createObjectURL(blob);
-		a.download = 'health-progress.json';
-		a.click();
-		URL.revokeObjectURL(a.href);
+		import('$lib/logic/exportProgress').then((m) => m.downloadProgressJson(get(progress)));
 	}
 
 	function exportPlanOnly() {

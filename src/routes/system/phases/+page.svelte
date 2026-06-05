@@ -1,20 +1,18 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
+	import RequiresPlan from '$lib/components/app/RequiresPlan.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import { getPhaseCards } from '$lib/logic/phaseDisplay';
 	import { plan } from '$lib/stores/healthApp';
 
 	const cards = $derived(getPhaseCards($plan));
-
-	$effect(() => {
-		if (!browser) return;
-		if (!$plan) goto(resolve('/import'));
-	});
 </script>
 
-{#if $plan}
+<RequiresPlan
+	title="PHASES"
+	subtitle="Targets and focus by program phase"
+	emptyTitle="Phases need a plan"
+	emptyBody="Import a Health JSON plan or load the demo sample to see calorie targets, macros, and phase notes here."
+>
 	<main class="screen px-screen pt-safe stack">
 		<ScreenHeaderBlock title="PHASES" subtitle="Targets and focus by program phase" />
 
@@ -62,7 +60,7 @@
 			{/each}
 		{/if}
 	</main>
-{/if}
+</RequiresPlan>
 
 <style>
 	.screen {

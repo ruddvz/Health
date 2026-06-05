@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { hashSessionToken, issueSessionToken } from './sessionToken.js';
 
 export interface MemoryUser {
 	id: string;
@@ -67,17 +68,24 @@ export const memoryStore = {
 		if (c) c.counter = counter;
 	},
 	createSession(userId: string, ttlMs: number): string {
-		const token = randomUUID();
-		sessions.set(token, { userId, expires: Date.now() + ttlMs });
+		const token = issueSessionToken();
+		sessions.set(hashSessionToken(token), { userId, expires: Date.now() + ttlMs });
 		return token;
 	},
 	sessionUser(token: string): string | null {
-		const s = sessions.get(token);
+		const key = hashSessionToken(token);
+		const s = sessions.get(key);
 		if (!s || s.expires < Date.now()) {
-			sessions.delete(token);
+			sessions.delete(key);
 			return null;
 		}
 		return s.userId;
+	},
+	destroySession(token: string) {
+		sessions.delete(hashSessionToken(token));
+	},
+	deleteBackup(userId: string) {
+		backups.delete(userId);
 	},
 	saveBackup(userId: string, ciphertext: string, iv: string) {
 		backups.set(userId, {

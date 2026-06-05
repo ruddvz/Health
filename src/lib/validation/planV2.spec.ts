@@ -31,6 +31,21 @@ describe('validatePlanUnknown issues', () => {
 		}
 	});
 
+	it('warns when meals fall outside wake/sleep schedule', () => {
+		const raw = JSON.parse(readFileSync(samplePath, 'utf8')) as Record<string, unknown>;
+		raw.schedule = { wake_time: '06:00', sleep_time: '22:00' };
+		const mp = raw.meal_plan as Record<string, unknown>;
+		const wd = [...(mp.workout_day as unknown[])];
+		wd[0] = { ...(wd[0] as Record<string, unknown>), time: '23:30' };
+		mp.workout_day = wd;
+		raw.meal_plan = mp;
+		const r = validatePlanUnknown(raw);
+		expect(r.ok).toBe(true);
+		if (r.ok) {
+			expect(r.issues.some((i) => i.code === 'MEAL_OUTSIDE_SCHEDULE')).toBe(true);
+		}
+	});
+
 	it('rejects unsafe calorie targets', () => {
 		const raw = JSON.parse(readFileSync(samplePath, 'utf8')) as Record<string, unknown>;
 		const phases = [...(raw.phases as unknown[])];
