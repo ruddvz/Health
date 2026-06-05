@@ -15,7 +15,7 @@ The production app is a **SvelteKit + TypeScript** build deployed to GitHub Page
 | Health Lock (local passkey + vault)          | **Complete** — optional; recovery PIN required                       |
 | Cloud passkey / backup                       | **Partial** — UI gated; needs Vercel API + Supabase env              |
 | iOS PWA polish                               | **Partial** — manifest, safe-area, install prompt; device QA ongoing |
-| Onboarding component split                   | **Not yet** — root `+page.svelte` still large (refactor planned)     |
+| Onboarding component split                   | **Complete** — `OnboardingFlow` + per-step components                |
 
 ## What the legacy app included
 

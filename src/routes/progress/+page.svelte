@@ -2,6 +2,8 @@
 	import BottomSheet from '$lib/components/app/BottomSheet.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import EmptyState from '$lib/components/app/EmptyState.svelte';
+	import NoPlanActions from '$lib/components/app/NoPlanActions.svelte';
 	import AdherenceCard from '$lib/components/spec/AdherenceCard.svelte';
 	import ChartCard from '$lib/components/spec/ChartCard.svelte';
 	import CheckinCard from '$lib/components/spec/CheckinCard.svelte';
@@ -136,13 +138,12 @@
 	<ScreenHeaderBlock title="PROGRESS" />
 
 	{#if !$plan}
-		<p class="plan-note nothing-surface" role="status">
-			No plan loaded — you can still log weight, waist, and check-ins locally. Import a plan for
-			richer adherence insights and plan-aware warnings.
-			<button type="button" class="link pressable" onclick={startIntake}>Create plan prompt</button>
-			or
-			<a class="link" href={resolve('/import')}>import JSON</a>.
-		</p>
+		<EmptyState
+			title="No plan loaded yet"
+			body="You can still log weight, waist, and check-ins below. Import a plan for richer adherence insights and plan-aware context."
+		>
+			<NoPlanActions onStartIntake={startIntake} />
+		</EmptyState>
 	{/if}
 
 	<div class="actions">
@@ -336,27 +337,6 @@
 		line-height: 1.5;
 		color: var(--text-2);
 		border-radius: var(--radius-md);
-	}
-
-	.plan-note {
-		margin: 0 0 var(--space-4);
-		padding: var(--space-3) var(--space-4);
-		font-size: 14px;
-		line-height: 1.5;
-		color: var(--text-2);
-		border-radius: var(--radius-md);
-	}
-
-	.link {
-		color: var(--accent, var(--ios-blue, var(--text-1)));
-		font-weight: 600;
-		text-decoration: underline;
-		text-underline-offset: 2px;
-		border: none;
-		background: none;
-		padding: 0;
-		font-size: inherit;
-		cursor: pointer;
 	}
 
 	.empty,

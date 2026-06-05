@@ -11,7 +11,12 @@ export default defineConfig({
 		SvelteKitPWA({
 			registerType: 'prompt',
 			strategies: 'generateSW',
-			includeAssets: ['icons/icon-192.png', 'icons/icon-512.png', 'offline.html'],
+			includeAssets: [
+				'icons/icon-192.png',
+				'icons/icon-512.png',
+				'icons/apple-touch-icon.png',
+				'offline.html'
+			],
 			manifest: {
 				id: `${basePath}/`,
 				name: 'Health — Personal Plan',
@@ -49,6 +54,12 @@ export default defineConfig({
 					}
 				],
 				icons: [
+					{
+						src: `${basePath}/icons/apple-touch-icon.png`,
+						sizes: '180x180',
+						type: 'image/png',
+						purpose: 'any'
+					},
 					{
 						src: `${basePath}/icons/icon-192.png`,
 						sizes: '192x192',
