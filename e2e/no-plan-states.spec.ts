@@ -54,7 +54,7 @@ test.describe('No-plan empty states', () => {
 
 	test('System Prep shows no-plan state', async ({ page }) => {
 		await page.goto('./system/prep');
-		await expect(page.getByRole('heading', { name: /Prep schedule needs a plan/i })).toBeVisible();
+		await expect(page.getByRole('heading', { name: /Prep guide needs a plan/i })).toBeVisible();
 	});
 
 	test('System Supplements shows no-plan state', async ({ page }) => {
