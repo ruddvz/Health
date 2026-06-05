@@ -44,3 +44,15 @@ export async function downloadEncryptedBackup(): Promise<{
 	if (!body.backup) return null;
 	return body.backup;
 }
+
+export async function deleteCloudBackup(): Promise<void> {
+	const session = loadCloudSession();
+	if (!session) throw new Error('Sign in with a cloud passkey first.');
+
+	const res = await fetch(apiUrl('/api/health/backup'), {
+		method: 'DELETE',
+		headers: { Authorization: `Bearer ${session.sessionToken}` }
+	});
+	const body = (await res.json()) as { ok?: boolean; error?: string };
+	if (!res.ok || !body.ok) throw new Error(body.error ?? 'Backup delete failed.');
+}

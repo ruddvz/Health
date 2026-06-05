@@ -199,6 +199,28 @@ export async function handleBackupPut(request: Request): Promise<Response> {
 	return jsonResponse(request, { ok: true, updatedAt: new Date().toISOString() });
 }
 
+export async function handleLogout(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'logout');
+	if (blocked) return blocked;
+	const token = bearerToken(request);
+	if (!token) return errorResponse(request, 'Unauthorized', 401);
+	const db = await getDb();
+	await db.destroySession(token);
+	return jsonResponse(request, { ok: true });
+}
+
+export async function handleBackupDelete(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'backup-delete');
+	if (blocked) return blocked;
+	const token = bearerToken(request);
+	if (!token) return errorResponse(request, 'Unauthorized', 401);
+	const db = await getDb();
+	const userId = await db.sessionUser(token);
+	if (!userId) return errorResponse(request, 'Session expired', 401);
+	await db.deleteBackup(userId);
+	return jsonResponse(request, { ok: true, deleted: true });
+}
+
 export async function handleBackupGet(request: Request): Promise<Response> {
 	const blocked = guardRequest(request, 'backup-get');
 	if (blocked) return blocked;

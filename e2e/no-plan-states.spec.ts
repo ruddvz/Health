@@ -35,6 +35,12 @@ test.describe('No-plan empty states', () => {
 		await expect(page.getByText('Log Check-in')).toBeVisible();
 	});
 
+	test('System phases shows no-plan state instead of redirecting', async ({ page }) => {
+		await page.goto('./system/phases');
+		await expect(page.getByText('Phases need a plan')).toBeVisible();
+		await expect(page).toHaveURL(/\/system\/phases/);
+	});
+
 	test('Diagnostics does not claim schema parses without plan', async ({ page }) => {
 		await page.goto('./system/diagnostics');
 		await expect(page.getByText('No plan loaded')).toBeVisible();

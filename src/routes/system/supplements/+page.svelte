@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
+	import RequiresPlan from '$lib/components/app/RequiresPlan.svelte';
 	import ChipRow from '$lib/components/spec/ChipRow.svelte';
 	import ScheduleRow from '$lib/components/spec/ScheduleRow.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
@@ -29,14 +27,13 @@
 		sc[key] = !sc[key];
 		persistProgress({ ...cur, suppChecked: sc });
 	}
-
-	$effect(() => {
-		if (!browser) return;
-		if (!$plan) goto(resolve('/import'));
-	});
 </script>
 
-{#if $plan}
+<RequiresPlan
+	title="SUPPLEMENTS"
+	emptyTitle="Supplements need a plan"
+	emptyBody="Today's supplement schedule and stack details are read from your plan. Import JSON or load the demo sample — always follow label directions and your clinician's advice."
+>
 	<main class="screen px-screen pt-safe stack">
 		<ScreenHeaderBlock title="SUPPLEMENTS" />
 
@@ -72,7 +69,7 @@
 			label and consult a professional if you are pregnant, on medication, or have a medical condition.
 		</p>
 	</main>
-{/if}
+</RequiresPlan>
 
 <style>
 	.screen {

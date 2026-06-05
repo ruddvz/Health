@@ -7,7 +7,12 @@ import type {
 	RegistrationResponseJSON
 } from '@simplewebauthn/browser';
 import { cloudApiBaseUrl, isCloudApiConfigured } from '$lib/security/domainConfig';
-import { clearCloudSession, saveCloudSession, type CloudSession } from '$lib/cloud/cloudSession';
+import {
+	clearCloudSession,
+	loadCloudSession,
+	saveCloudSession,
+	type CloudSession
+} from '$lib/cloud/cloudSession';
 
 function apiUrl(path: string): string {
 	const base = cloudApiBaseUrl();
@@ -98,8 +103,23 @@ export async function signInCloudPasskey(email?: string): Promise<CloudSession> 
 	return session;
 }
 
-export function signOutCloud() {
+export async function revokeCloudSession(): Promise<void> {
+	const session = loadCloudSession();
+	if (session && isCloudApiConfigured()) {
+		try {
+			await fetch(apiUrl('/api/health/logout'), {
+				method: 'POST',
+				headers: { Authorization: `Bearer ${session.sessionToken}` }
+			});
+		} catch {
+			/* best-effort server revoke */
+		}
+	}
 	clearCloudSession();
+}
+
+export function signOutCloud() {
+	void revokeCloudSession();
 }
 
 export async function pingCloudApi(): Promise<{ ok: boolean; store?: string }> {

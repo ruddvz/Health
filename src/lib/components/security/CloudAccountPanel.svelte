@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { uploadEncryptedBackup, downloadEncryptedBackup } from '$lib/cloud/cloudBackup';
+	import {
+		deleteCloudBackup,
+		downloadEncryptedBackup,
+		uploadEncryptedBackup
+	} from '$lib/cloud/cloudBackup';
 	import {
 		isCloudPasskeyAvailable,
 		pingCloudApi,
 		registerCloudPasskey,
 		signInCloudPasskey,
-		signOutCloud
+		revokeCloudSession
 	} from '$lib/cloud/passkeyAccount';
 	import { loadCloudSession } from '$lib/cloud/cloudSession';
 	import { getPasskeyServerCapability } from '$lib/security/passkeyServer';
@@ -64,10 +68,29 @@
 		}
 	}
 
-	function signOut() {
-		signOutCloud();
-		session = null;
-		status = 'Signed out of cloud account.';
+	async function signOut() {
+		busy = true;
+		try {
+			await revokeCloudSession();
+			session = null;
+			status = 'Signed out of cloud account.';
+		} finally {
+			busy = false;
+		}
+	}
+
+	async function removeCloudBackup() {
+		if (!session) return;
+		busy = true;
+		error = null;
+		try {
+			await deleteCloudBackup();
+			status = 'Cloud backup deleted from server.';
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Delete failed';
+		} finally {
+			busy = false;
+		}
 	}
 
 	async function uploadBackup() {
@@ -223,6 +246,14 @@
 			onclick={downloadBackup}
 		>
 			Download encrypted backup
+		</button>
+		<button
+			type="button"
+			class="btn secondary pressable"
+			disabled={busy || !session}
+			onclick={removeCloudBackup}
+		>
+			Delete cloud backup
 		</button>
 	{:else}
 		<p class="p">{cap.reason}</p>

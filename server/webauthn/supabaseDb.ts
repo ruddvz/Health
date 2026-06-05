@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 import { getWebAuthnEnv } from './env.js';
 import { memoryStore } from './memoryStore.js';
+import { hashSessionToken, issueSessionToken } from './sessionToken.js';
 
 export interface DbUser {
 	id: string;
@@ -47,6 +48,7 @@ export interface DbAdapter {
 	} | null>;
 	createSession(userId: string, ttlMs: number): Promise<string>;
 	sessionUser(token: string): Promise<string | null>;
+	destroySession(token: string): Promise<void>;
 	saveBackup(userId: string, ciphertext: string, iv: string, version: number): Promise<void>;
 	getBackup(userId: string): Promise<{
 		ciphertext: string;
@@ -54,6 +56,7 @@ export interface DbAdapter {
 		version: number;
 		updatedAt: string;
 	} | null>;
+	deleteBackup(userId: string): Promise<void>;
 }
 
 function memoryAdapter(): DbAdapter {
@@ -116,12 +119,18 @@ function memoryAdapter(): DbAdapter {
 		async sessionUser(token) {
 			return memoryStore.sessionUser(token);
 		},
+		async destroySession(token) {
+			memoryStore.destroySession(token);
+		},
 		async saveBackup(userId, ciphertext, iv, version) {
 			memoryStore.saveBackup(userId, ciphertext, iv);
 			void version;
 		},
 		async getBackup(userId) {
 			return memoryStore.getBackup(userId) ?? null;
+		},
+		async deleteBackup(userId) {
+			memoryStore.deleteBackup(userId);
 		}
 	};
 }
@@ -215,23 +224,29 @@ function supabaseAdapter(client: SupabaseClient): DbAdapter {
 			return { challenge: data.challenge, userId: data.user_id, type: data.type };
 		},
 		async createSession(userId, ttlMs) {
-			const token = randomUUID();
+			const token = issueSessionToken();
+			const tokenHash = hashSessionToken(token);
 			const expires = new Date(Date.now() + ttlMs).toISOString();
 			await client.from('health_sessions').insert({
-				token,
+				token: tokenHash,
 				user_id: userId,
 				expires_at: expires
 			});
 			return token;
 		},
 		async sessionUser(token) {
+			const tokenHash = hashSessionToken(token);
 			const { data } = await client
 				.from('health_sessions')
 				.select('user_id, expires_at')
-				.eq('token', token)
+				.eq('token', tokenHash)
 				.maybeSingle();
 			if (!data || new Date(data.expires_at).getTime() < Date.now()) return null;
 			return data.user_id;
+		},
+		async destroySession(token) {
+			const tokenHash = hashSessionToken(token);
+			await client.from('health_sessions').delete().eq('token', tokenHash);
 		},
 		async saveBackup(userId, ciphertext, iv, version) {
 			const { error } = await client.from('encrypted_health_plans').upsert({
@@ -256,6 +271,9 @@ function supabaseAdapter(client: SupabaseClient): DbAdapter {
 				version: data.version,
 				updatedAt: data.updated_at
 			};
+		},
+		async deleteBackup(userId) {
+			await client.from('encrypted_health_plans').delete().eq('user_id', userId);
 		}
 	};
 }

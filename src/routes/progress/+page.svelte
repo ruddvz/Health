@@ -11,6 +11,7 @@
 	import { adherenceBars7d } from '$lib/logic/adherenceDerive';
 	import { logicalDateKey } from '$lib/logic/dateKey';
 	import { newId } from '$lib/logic/id';
+	import { downloadProgressJson } from '$lib/logic/exportProgress';
 	import { buildWeightChartModel } from '$lib/logic/weightSeries';
 	import { liftStatsFromSessions, recentSessions } from '$lib/logic/workoutHistory';
 	import {
@@ -89,6 +90,44 @@
 		persistOnboarding({ ...get(onboarding), intakeLaunched: true });
 		goto(resolve('/'));
 	}
+
+	function deleteWeightAt(index: number) {
+		const cur = get(progress);
+		const entries = [...(cur.weightEntries ?? [])];
+		const revIndex = entries.length - 1 - index;
+		if (revIndex < 0 || revIndex >= entries.length) return;
+		entries.splice(revIndex, 1);
+		persistProgress({ ...cur, weightEntries: entries });
+	}
+
+	function deleteCheckin(id: string) {
+		const cur = get(progress);
+		persistProgress({
+			...cur,
+			weeklyCheckins: (cur.weeklyCheckins ?? []).filter((c) => c.id !== id)
+		});
+	}
+
+	function exportProgress() {
+		downloadProgressJson(get(progress));
+	}
+
+	const insightLine = $derived.by(() => {
+		const entries = $progress.weightEntries ?? [];
+		if (entries.length < 2) {
+			return 'Log at least two weigh-ins to see a simple trend. This is informational only — not medical advice.';
+		}
+		const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+		const first = sorted[0]?.kg ?? 0;
+		const last = sorted[sorted.length - 1]?.kg ?? 0;
+		const delta = Math.round((last - first) * 10) / 10;
+		if (Math.abs(delta) < 0.2) {
+			return 'Weight has been relatively stable over your logged entries. Trends are approximate and not medical advice.';
+		}
+		return delta > 0
+			? `Weight is up about ${delta} kg from your first to latest logged entry. Use trends as context only — not medical advice.`
+			: `Weight is down about ${Math.abs(delta)} kg from your first to latest logged entry. Use trends as context only — not medical advice.`;
+	});
 </script>
 
 <main class="screen px-screen pt-safe stack">
@@ -103,6 +142,14 @@
 			<a class="link" href={resolve('/import')}>import JSON</a>.
 		</p>
 	{/if}
+
+	<div class="actions">
+		<button type="button" class="export-btn pressable" onclick={exportProgress}
+			>Export progress JSON</button
+		>
+	</div>
+
+	<p class="insight nothing-surface" role="note">{insightLine}</p>
 
 	<ChipRow chips={['Overview', 'Trends', 'Metrics']} selected={chip} onSelect={(c) => (chip = c)} />
 
@@ -160,9 +207,41 @@
 				{#each [...($progress.weightEntries ?? [])]
 					.reverse()
 					.slice(0, 14) as e, i (`${e.date}-${i}`)}
-					<li class="row">
-						<p class="mono-caps t">{e.date}</p>
-						<p class="b">{e.kg} kg</p>
+					<li class="row row-actions">
+						<div>
+							<p class="mono-caps t">{e.date}</p>
+							<p class="b">{e.kg} kg</p>
+						</div>
+						<button
+							type="button"
+							class="del pressable"
+							aria-label="Delete weight entry for {e.date}"
+							onclick={() => deleteWeightAt(i)}>Delete</button
+						>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+		<SectionLabel text="CHECK-INS" />
+		{#if ($progress.weeklyCheckins ?? []).length === 0}
+			<p class="empty">No check-ins yet.</p>
+		{:else}
+			<ul class="list nothing-surface">
+				{#each [...($progress.weeklyCheckins ?? [])].reverse().slice(0, 10) as c (c.id)}
+					<li class="row row-actions">
+						<div>
+							<p class="mono-caps t">{fmtShort(c.date)}</p>
+							<p class="b">
+								{c.weight_kg ? `${c.weight_kg} kg` : '—'}
+								{#if c.waist_cm}· waist {c.waist_cm} cm{/if}
+							</p>
+						</div>
+						<button
+							type="button"
+							class="del pressable"
+							aria-label="Delete check-in"
+							onclick={() => deleteCheckin(c.id)}>Delete</button
+						>
 					</li>
 				{/each}
 			</ul>
@@ -187,7 +266,6 @@
 		{:else}
 			<p class="empty">Complete a Train session with logged sets to see lift metrics.</p>
 		{/if}
-		<SectionLabel text="CHECK-INS" />
 		<p class="stat mono-caps">{($progress.weeklyCheckins ?? []).length} weekly entries</p>
 	{/if}
 </main>
@@ -243,6 +321,31 @@
 		padding-bottom: var(--space-6);
 	}
 
+	.actions {
+		margin-bottom: var(--space-3);
+	}
+
+	.export-btn {
+		width: 100%;
+		min-height: 44px;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--line-2);
+		background: var(--surface-2);
+		color: var(--text-1);
+		font-weight: 650;
+		font-size: 14px;
+		cursor: pointer;
+	}
+
+	.insight {
+		margin: 0 0 var(--space-4);
+		padding: var(--space-3) var(--space-4);
+		font-size: 13px;
+		line-height: 1.5;
+		color: var(--text-2);
+		border-radius: var(--radius-md);
+	}
+
 	.plan-note {
 		margin: 0 0 var(--space-4);
 		padding: var(--space-3) var(--space-4);
@@ -287,6 +390,25 @@
 	.row {
 		padding: var(--space-3) var(--space-4);
 		border-bottom: 1px solid var(--line-1);
+	}
+
+	.row-actions {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+	}
+
+	.del {
+		flex-shrink: 0;
+		padding: 8px 12px;
+		border-radius: var(--radius-xs);
+		border: 1px solid var(--line-2);
+		background: transparent;
+		color: var(--text-3);
+		font-size: 12px;
+		font-weight: 650;
+		cursor: pointer;
 	}
 
 	.row:last-child {

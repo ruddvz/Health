@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Master plan completion pass
+
+- **RequiresPlan** empty states on System → Phases, Grocery, Prep, Supplements, and Train session (no more silent redirect to Import).
+- **Progress:** export JSON on tab, delete weight/check-in entries, safe trend insight copy.
+- **Debounced local writes** for progress, onboarding, and settings (`healthApp.ts`).
+- **Cloud API:** `POST /api/health/logout`, `DELETE /api/health/backup`, session tokens stored as SHA-256 hashes server-side.
+- **Responsive shell:** centered phone column with tablet/desktop borders; docs copy of `HEALTH_REPO_MASTER_FIX_PLAN.md`.
+- Tests: meal-schedule validation, quick-fix presets, system phases no-plan e2e.
+
 ### iOS PWA polish and no-plan UX (continued)
 
 - **Structured validation** (`ValidationIssue` with codes, paths, fix hints) and expanded safety checks (allergies, meds+supplements, unsafe calories, schedule/meal times, duplicate phase ids).

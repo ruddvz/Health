@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
+	import RequiresPlan from '$lib/components/app/RequiresPlan.svelte';
 	import ChecklistRow from '$lib/components/spec/ChecklistRow.svelte';
 	import ChipRow from '$lib/components/spec/ChipRow.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
@@ -38,14 +36,13 @@
 	function checked(key: string) {
 		return !!get(progress).groceryChecked?.[key];
 	}
-
-	$effect(() => {
-		if (!browser) return;
-		if (!$plan) goto(resolve('/import'));
-	});
 </script>
 
-{#if $plan}
+<RequiresPlan
+	title="GROCERY"
+	emptyTitle="Grocery list needs a plan"
+	emptyBody="Your shopping list is built from the grocery section in your Health JSON. Import a plan or use the demo sample to check off items by store."
+>
 	<main class="screen px-screen pt-safe stack">
 		<ScreenHeaderBlock title="GROCERY" />
 		<p class="disclaimer">
@@ -91,7 +88,7 @@
 
 		<SecondaryButton label="+ Add Item" onclick={() => {}} />
 	</main>
-{/if}
+</RequiresPlan>
 
 <style>
 	.disclaimer {
