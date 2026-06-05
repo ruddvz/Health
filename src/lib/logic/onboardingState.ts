@@ -36,6 +36,7 @@ export function defaultOnboardingState(): OnboardingState {
 	return {
 		step: 1,
 		confirmed: false,
+		intakeLaunched: false,
 		intakeFormatVersion: 2,
 		expandedIntakeNoticePending: false,
 		profile: {
@@ -101,7 +102,8 @@ export function normalizeOnboarding(raw: unknown): OnboardingState {
 	const out: OnboardingState = {
 		...d,
 		step: clampStep(Number(raw.step)),
-		confirmed: bool(raw.confirmed)
+		confirmed: bool(raw.confirmed),
+		intakeLaunched: bool(raw.intakeLaunched)
 	};
 
 	const newShape = isRecord(raw.goal) && isRecord(raw.training) && isRecord(raw.diet);

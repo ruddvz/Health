@@ -8,13 +8,22 @@ import {
 import type { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
 import { getWebAuthnEnv } from './env.js';
 import { bearerToken, errorResponse, jsonResponse, readJson } from './http.js';
+import { checkRateLimit, rateLimitResponse } from './rateLimit.js';
 import { memoryStore } from './memoryStore.js';
 import { getDb } from './supabaseDb.js';
 
 const CHALLENGE_TTL_MS = 5 * 60_000;
 const SESSION_TTL_MS = 30 * 24 * 60 * 60_000;
 
+function guardRequest(request: Request, route: string): Response | null {
+	const rl = checkRateLimit(request, route, 40);
+	if (!rl.ok) return rateLimitResponse(request, rl.retryAfterSec);
+	return null;
+}
+
 export async function handleRegisterOptions(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'register-options');
+	if (blocked) return blocked;
 	const env = getWebAuthnEnv();
 	const body = await readJson<{ email?: string; displayName?: string }>(request);
 	const email = body.email?.trim().toLowerCase() || null;
@@ -46,10 +55,12 @@ export async function handleRegisterOptions(request: Request): Promise<Response>
 	const challengeId = randomUUID();
 	await db.saveChallenge(challengeId, options.challenge, user.id, 'registration', CHALLENGE_TTL_MS);
 
-	return jsonResponse({ ok: true, challengeId, userId: user.id, options });
+	return jsonResponse(request, { ok: true, challengeId, userId: user.id, options });
 }
 
 export async function handleRegisterVerify(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'register-verify');
+	if (blocked) return blocked;
 	const env = getWebAuthnEnv();
 	const body = await readJson<{
 		challengeId: string;
@@ -61,7 +72,7 @@ export async function handleRegisterVerify(request: Request): Promise<Response> 
 	const db = await getDb();
 	const pending = await db.consumeChallenge(body.challengeId);
 	if (!pending || pending.type !== 'registration' || pending.userId !== body.userId) {
-		return errorResponse('Challenge expired or invalid.', 400);
+		return errorResponse(request, 'Challenge expired or invalid.', 400);
 	}
 
 	const verification = await verifyRegistrationResponse({
@@ -73,7 +84,7 @@ export async function handleRegisterVerify(request: Request): Promise<Response> 
 	});
 
 	if (!verification.verified || !verification.registrationInfo) {
-		return errorResponse('Passkey registration could not be verified.', 400);
+		return errorResponse(request, 'Passkey registration could not be verified.', 400);
 	}
 
 	const { credential, credentialDeviceType, credentialBackedUp } = verification.registrationInfo;
@@ -88,7 +99,7 @@ export async function handleRegisterVerify(request: Request): Promise<Response> 
 	});
 
 	const sessionToken = await db.createSession(body.userId, SESSION_TTL_MS);
-	return jsonResponse({
+	return jsonResponse(request, {
 		ok: true,
 		verified: true,
 		sessionToken,
@@ -98,6 +109,8 @@ export async function handleRegisterVerify(request: Request): Promise<Response> 
 }
 
 export async function handleAuthenticateOptions(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'auth-options');
+	if (blocked) return blocked;
 	const env = getWebAuthnEnv();
 	const body = await readJson<{ email?: string }>(request).catch(() => ({}));
 	const db = await getDb();
@@ -105,7 +118,7 @@ export async function handleAuthenticateOptions(request: Request): Promise<Respo
 	let allowCredentials: { id: string; transports?: AuthenticatorTransport[] }[] | undefined;
 	if (body.email) {
 		const user = await db.findUserByEmail(body.email.trim().toLowerCase());
-		if (!user) return errorResponse('No account found for that email.', 404);
+		if (!user) return errorResponse(request, 'No account found for that email.', 404);
 		const creds = await db.listCredentials(user.id);
 		allowCredentials = creds.map((c) => ({
 			id: c.credentialId,
@@ -122,10 +135,12 @@ export async function handleAuthenticateOptions(request: Request): Promise<Respo
 	const challengeId = randomUUID();
 	await db.saveChallenge(challengeId, options.challenge, null, 'authentication', CHALLENGE_TTL_MS);
 
-	return jsonResponse({ ok: true, challengeId, options });
+	return jsonResponse(request, { ok: true, challengeId, options });
 }
 
 export async function handleAuthenticateVerify(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'auth-verify');
+	if (blocked) return blocked;
 	const env = getWebAuthnEnv();
 	const body = await readJson<{
 		challengeId: string;
@@ -135,11 +150,11 @@ export async function handleAuthenticateVerify(request: Request): Promise<Respon
 	const db = await getDb();
 	const pending = await db.consumeChallenge(body.challengeId);
 	if (!pending || pending.type !== 'authentication') {
-		return errorResponse('Challenge expired or invalid.', 400);
+		return errorResponse(request, 'Challenge expired or invalid.', 400);
 	}
 
 	const cred = await db.findCredential(body.response.id);
-	if (!cred) return errorResponse('Unknown passkey.', 400);
+	if (!cred) return errorResponse(request, 'Unknown passkey.', 400);
 
 	const verification = await verifyAuthenticationResponse({
 		response: body.response,
@@ -155,12 +170,12 @@ export async function handleAuthenticateVerify(request: Request): Promise<Respon
 		}
 	});
 
-	if (!verification.verified) return errorResponse('Passkey authentication failed.', 401);
+	if (!verification.verified) return errorResponse(request, 'Passkey authentication failed.', 401);
 
 	await db.updateCounter(cred.credentialId, verification.authenticationInfo.newCounter);
 	const sessionToken = await db.createSession(cred.userId, SESSION_TTL_MS);
 
-	return jsonResponse({
+	return jsonResponse(request, {
 		ok: true,
 		verified: true,
 		sessionToken,
@@ -169,39 +184,47 @@ export async function handleAuthenticateVerify(request: Request): Promise<Respon
 }
 
 export async function handleBackupPut(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'backup-put');
+	if (blocked) return blocked;
 	const token = bearerToken(request);
-	if (!token) return errorResponse('Unauthorized', 401);
+	if (!token) return errorResponse(request, 'Unauthorized', 401);
 	const db = await getDb();
 	const userId = await db.sessionUser(token);
-	if (!userId) return errorResponse('Session expired', 401);
+	if (!userId) return errorResponse(request, 'Session expired', 401);
 
 	const body = await readJson<{ ciphertext: string; iv: string; version?: number }>(request);
-	if (!body.ciphertext || !body.iv) return errorResponse('Missing ciphertext or iv', 400);
+	if (!body.ciphertext || !body.iv) return errorResponse(request, 'Missing ciphertext or iv', 400);
 
 	await db.saveBackup(userId, body.ciphertext, body.iv, body.version ?? 1);
-	return jsonResponse({ ok: true, updatedAt: new Date().toISOString() });
+	return jsonResponse(request, { ok: true, updatedAt: new Date().toISOString() });
 }
 
 export async function handleBackupGet(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'backup-get');
+	if (blocked) return blocked;
 	const token = bearerToken(request);
-	if (!token) return errorResponse('Unauthorized', 401);
+	if (!token) return errorResponse(request, 'Unauthorized', 401);
 	const db = await getDb();
 	const userId = await db.sessionUser(token);
-	if (!userId) return errorResponse('Session expired', 401);
+	if (!userId) return errorResponse(request, 'Session expired', 401);
 
 	const backup = await db.getBackup(userId);
-	if (!backup) return jsonResponse({ ok: true, backup: null });
-	return jsonResponse({ ok: true, backup });
+	if (!backup) return jsonResponse(request, { ok: true, backup: null });
+	return jsonResponse(request, { ok: true, backup });
 }
 
-/** Dev-only: memory store stats */
-export function handleHealth(): Response {
+/** Cloud backend status — no secrets exposed */
+export function handleHealth(request: Request): Response {
 	const env = getWebAuthnEnv();
-	return jsonResponse({
+	if (env.productionMisconfigured) {
+		return errorResponse(request, 'Cloud backend not configured for production.', 500);
+	}
+	return jsonResponse(request, {
 		ok: true,
 		rpID: env.rpID,
 		origin: env.origin,
-		store: env.useMemoryStore ? 'memory' : 'supabase'
+		store: env.useMemoryStore ? 'memory' : 'supabase',
+		mode: env.useMemoryStore ? 'dev-memory' : 'supabase'
 	});
 }
 

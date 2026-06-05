@@ -9,7 +9,8 @@ test.describe('Health Lock offer', () => {
 		await page.goto('./import');
 		await page.getByRole('button', { name: /paste json/i }).click();
 		await page.getByLabel('Plan JSON').fill(minimalPlan);
-		await page.getByRole('button', { name: 'Validate' }).click();
+		await page.getByRole('button', { name: 'Review' }).click();
+		await page.getByRole('button', { name: 'Apply plan' }).click();
 		await expect(page.getByRole('dialog', { name: /protect your health plan/i })).toBeVisible();
 		await page.getByRole('button', { name: /not now/i }).click();
 		await expect(page).toHaveURL(/\/today\/?$/);

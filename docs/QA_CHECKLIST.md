@@ -13,7 +13,26 @@ Playwright covers a subset of this list (`npm run test:e2e` after build):
 - Passkey offer “Not now” → Today (`e2e/passkey-offer.spec.ts`)
 - Progress JSON export section in Settings (`e2e/progress-export.spec.ts`)
 
+- No-plan empty states (`e2e/no-plan-states.spec.ts`)
+- Import: paste → **Review** → **Apply plan** (`e2e/helpers/importPlan.ts`)
+
+Visual regression (optional, updates baselines): `npm run test:e2e:screenshots`
+
 Manual checks below remain required for HTTPS passkeys, service worker updates, and cloud backup.
+
+## iOS PWA
+
+Test on a real iPhone in **Safari** (install flow is not available in desktop Chrome alone).
+
+- [ ] Open `https://ruddvz.github.io/Health/` in Safari.
+- [ ] **Share → Add to Home Screen** — icon and name look correct.
+- [ ] Launch from home screen — runs standalone (no Safari URL bar); status bar does not cover content (`viewport-fit=cover`).
+- [ ] Bottom tab bar does not cover primary buttons or sheet footers; content scrolls above nav safe area.
+- [ ] Keyboard does not permanently hide the active input on intake/import.
+- [ ] After first online visit, airplane mode still opens shell + last plan (offline).
+- [ ] After deploy: update snackbar or **System → About → Clear app cache and reload** refreshes assets.
+- [ ] **Appearance** light mode: readable contrast on cards, inputs, warnings (Settings).
+- [ ] Passkey / Face ID: only on **HTTPS** production origin (not `file://`).
 
 ## Navigation
 
@@ -25,7 +44,7 @@ Manual checks below remain required for HTTPS passkeys, service worker updates, 
 
 - [ ] Complete intake and generate prompt; optional schedule times appear in copied JSON profile.
 - [ ] **Skip to JSON** opens the prompt screen without completing intake.
-- [ ] **Paste JSON** + **Apply pasted JSON** loads a valid plan; malformed JSON shows an error.
+- [ ] **Paste JSON** → **Review** → preview card → **Apply plan**; malformed JSON shows an error in the sheet.
 
 ## Plan load
 

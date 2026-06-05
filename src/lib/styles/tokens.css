@@ -20,12 +20,23 @@
 	--line-2: rgba(255, 255, 255, 0.16);
 	--line-3: rgba(255, 255, 255, 0.24);
 
-	--red: #ff2a2a;
-	--red-hover: #ff4040;
-	--red-pressed: #d91f1f;
-	--red-soft: rgba(255, 42, 42, 0.14);
-	--red-line: rgba(255, 42, 42, 0.42);
+	--red: #ff453a;
+	--red-hover: #ff5e55;
+	--red-pressed: #d93d34;
+	--red-soft: rgba(255, 69, 58, 0.14);
+	--red-line: rgba(255, 69, 58, 0.42);
 
+	--ios-blue: #0a84ff;
+	--ios-green: #34c759;
+	--ios-red: #ff453a;
+	--ios-orange: #ff9f0a;
+	--ios-yellow: #ffd60a;
+	--ios-purple: #bf5af2;
+
+	--accent: var(--ios-blue);
+	--success: var(--ios-green);
+	--warning: var(--ios-orange);
+	--danger: var(--ios-red);
 	--shadow-card: 0 14px 40px rgba(0, 0, 0, 0.32);
 	--shadow-phone: 0 30px 90px rgba(0, 0, 0, 0.55);
 	--shadow-red-glow: 0 0 22px rgba(255, 42, 42, 0.28);
@@ -33,9 +44,6 @@
 	--white-soft: rgba(255, 255, 255, 0.92);
 	--black-soft: rgba(0, 0, 0, 0.55);
 
-	--success: #49d17d;
-	--warning: #ffcc4d;
-	--danger: #ff2a2a;
 	--info: #c9c9c9;
 	--chart-grid: rgba(255, 255, 255, 0.06);
 	--dot-grid-dot: rgba(255, 255, 255, 0.065);
@@ -47,6 +55,9 @@
 	--radius-lg: 22px;
 	--radius-xl: 28px;
 	--radius-pill: 999px;
+	--radius-card: 24px;
+	--radius-control: 16px;
+	--radius-sheet: 30px;
 	--radius-widget: 18px;
 	--radius-list: 14px;
 
@@ -73,4 +84,9 @@
 	--nav-h: 76px;
 	--safe-bottom: env(safe-area-inset-bottom, 0px);
 	--safe-top: env(safe-area-inset-top, 0px);
+
+	--input-bg: rgba(0, 0, 0, 0.35);
+	--modal-scrim: rgba(0, 0, 0, 0.55);
+	--warning-surface: rgba(255, 159, 10, 0.08);
+	--warning-border: rgba(255, 159, 10, 0.35);
 }

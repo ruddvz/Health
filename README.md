@@ -24,7 +24,7 @@ The snapshot in `legacy/` reflects the pre-SvelteKit feature set:
 
 ## Tech & privacy
 
-- **Production site:** SvelteKit static build (`npm run build` → `build/`), base path **`/Health`** on GitHub Pages.
+- **Production site:** SvelteKit static PWA (`npm run build` → `build/`), base path **`/Health`** on GitHub Pages. First launch shows a **welcome screen**; major tabs have **no-plan empty states** with import / intake / demo sample paths.
 - **Legacy:** single `legacy/index.html`, system fonts, strict CSP meta, no analytics; data in **localStorage** / **sessionStorage**.
 - Roadmaps: `HEALTH_APP_EXECUTION_PLAN.md`, `docs/HEALTH_APP_REBUILD_PLAN.md`, `docs/QA_CHECKLIST.md`.
 
@@ -68,17 +68,20 @@ After a deploy, the browser may keep an older service worker until it checks for
 ## Tests and checks
 
 ```bash
+npm run quality      # check + lint + test + build + verify:sw
+npm run quality:e2e  # quality + Playwright e2e
 npm test
 npm run check
 npm run lint
 npm run build && npm run verify:sw
+npm run test:e2e
 ```
 
-The last line is optional locally; **GitHub Actions** runs `verify:sw` after every production build.
+The `quality` script is the recommended pre-push gate. **GitHub Actions** runs `verify:sw` after every production build.
 
-## SvelteKit roadmap
+## SvelteKit app status
 
-Import/paste JSON, Zod validation, persistence, and full Today/Meals/Train/Progress behavior are tracked in **`docs/HEALTH_APP_REBUILD_PLAN.md`** (Phases 2–8). Until then, tab screens beyond basic layout are mostly placeholders.
+The SvelteKit build includes intake, import/paste, Today/Meals/Train/Progress with plan-driven UI, Health Lock, System hub, and iOS PWA polish. See **`CHANGELOG.md`** and **`docs/QA_CHECKLIST.md`** for regression checks.
 
 ## Reset data
 

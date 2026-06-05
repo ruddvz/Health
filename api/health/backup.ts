@@ -4,7 +4,7 @@ import { handleBackupGet, handleBackupPut } from '../../server/webauthn/handlers
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(request: Request): Promise<Response> {
-	if (request.method === 'OPTIONS') return corsPreflight();
+	if (request.method === 'OPTIONS') return corsPreflight(request);
 	try {
 		if (request.method === 'PUT' || request.method === 'POST')
 			return await handleBackupPut(request);

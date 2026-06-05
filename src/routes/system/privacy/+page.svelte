@@ -1,15 +1,18 @@
 <script lang="ts">
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
+	import PrivacySafetyCard from '$lib/components/spec/PrivacySafetyCard.svelte';
 </script>
 
 <main class="screen px-screen pt-safe stack">
 	<ScreenHeaderBlock title="PRIVACY" subtitle="100% local by design" />
 
+	<PrivacySafetyCard />
+
 	<section class="block nothing-surface">
 		<h2 class="mono-caps h">Private</h2>
 		<p class="p">
 			Nothing in your plan is uploaded to HEALTH servers — there are no HEALTH servers for plan
-			content.
+			content by default.
 		</p>
 
 		<h2 class="mono-caps h">Offline</h2>
@@ -20,7 +23,13 @@
 		<h2 class="mono-caps h">Personal</h2>
 		<p class="p">
 			You control exports and deletion from Settings. Optional Health Lock (PIN / Face ID) adds an
-			in-app privacy screen — still 100% on-device, with no HEALTH servers involved.
+			in-app privacy screen — still on-device unless you explicitly enable cloud backup.
+		</p>
+
+		<h2 class="mono-caps h">Cloud backup (optional)</h2>
+		<p class="p">
+			If configured, encrypted cloud backup uses a separate passkey account. Only encrypted payloads
+			leave your device — never your recovery PIN or backup password.
 		</p>
 	</section>
 </main>

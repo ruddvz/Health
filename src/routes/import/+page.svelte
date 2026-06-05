@@ -1,13 +1,16 @@
 <script lang="ts">
-	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import BottomSheet from '$lib/components/app/BottomSheet.svelte';
 	import PasskeyOfferSheet from '$lib/components/security/PasskeyOfferSheet.svelte';
 	import DashedUploadButton from '$lib/components/spec/DashedUploadButton.svelte';
+	import ImportPreviewCard from '$lib/components/spec/ImportPreviewCard.svelte';
 	import InlineErrorCard from '$lib/components/spec/InlineErrorCard.svelte';
 	import JsonDropZone from '$lib/components/spec/JsonDropZone.svelte';
 	import ListRowButton from '$lib/components/spec/ListRowButton.svelte';
+	import { loadSamplePlan } from '$lib/logic/loadSamplePlan';
+	import { buildImportPreview } from '$lib/logic/importPreview';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import StatusStrip from '$lib/components/spec/StatusStrip.svelte';
 	import TextLinkButton from '$lib/components/spec/TextLinkButton.svelte';
@@ -19,6 +22,7 @@
 	import { securityConfig } from '$lib/stores/healthLock';
 	import { get } from 'svelte/store';
 	import { parsePlanJsonText } from '$lib/validation/planV2';
+	import type { ValidationIssue } from '$lib/validation/issues';
 
 	let busy = $state(false);
 	let error = $state<string | null>(null);
@@ -29,13 +33,19 @@
 	let copyTimer: ReturnType<typeof setTimeout> | null = null;
 	let showPasskeyOffer = $state(false);
 
-	const importTitle = 'Bring in your\nhealth plan';
+	let pendingPlan = $state<PlanV2 | null>(null);
+	let pendingIssues = $state<ValidationIssue[]>([]);
+	let pendingWarnings = $state<string[]>([]);
 
-	/** Avoid raw `{` / `}` in markup (Svelte parses them as blocks). */
+	const importTitle = 'Bring in your\nhealth plan';
 	const OPEN_BRACE = '{';
 	const CLOSE_BRACE = '}';
 
 	const promptBody = $derived(buildClaudePrompt($onboarding));
+	const preview = $derived(pendingPlan ? buildImportPreview(pendingPlan, pendingIssues) : null);
+
+	const HEALTH_DISCLAIMER =
+		'Health is a planning and tracking companion. It does not provide medical diagnosis or emergency advice. Review major diet, supplement, medication, injury, pregnancy, diabetes, eating-disorder, or medical-condition decisions with a qualified professional.';
 
 	function mergeGroceryCheckedIntoProgress(planObj: PlanV2) {
 		const items = flattenGrocery(planObj);
@@ -47,23 +57,43 @@
 		persistProgress({ ...cur, groceryChecked: next });
 	}
 
-	function applyParsed(text: string) {
+	function clearPending() {
+		pendingPlan = null;
+		pendingIssues = [];
+		pendingWarnings = [];
+	}
+
+	function reviewParsed(text: string): boolean {
 		error = null;
 		const r = parsePlanJsonText(text);
 		if (!r.ok) {
 			error = r.error;
+			clearPending();
 			return false;
 		}
-		savePlan(r.plan, r.warnings);
-		mergeGroceryCheckedIntoProgress(r.plan);
-		const lockOn = get(securityConfig).enabled;
-		if (!lockOn && browser) {
-			sessionStorage.setItem(SS_OFFER_PASSKEY, '1');
-			showPasskeyOffer = true;
-		} else {
-			goto(resolve('/today'));
-		}
+		pendingPlan = r.plan;
+		pendingIssues = r.issues;
+		pendingWarnings = r.warnings;
 		return true;
+	}
+
+	function confirmApply() {
+		if (!pendingPlan) return;
+		busy = true;
+		try {
+			savePlan(pendingPlan, pendingWarnings);
+			mergeGroceryCheckedIntoProgress(pendingPlan);
+			clearPending();
+			const lockOn = get(securityConfig).enabled;
+			if (!lockOn && browser) {
+				sessionStorage.setItem(SS_OFFER_PASSKEY, '1');
+				showPasskeyOffer = true;
+			} else {
+				goto(resolve('/today'));
+			}
+		} finally {
+			busy = false;
+		}
 	}
 
 	async function readFile(f: File) {
@@ -74,7 +104,7 @@
 		busy = true;
 		try {
 			const text = await f.text();
-			applyParsed(text);
+			reviewParsed(text);
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Could not read file';
 		} finally {
@@ -124,9 +154,8 @@
 		}, 2500);
 	}
 
-	function validatePaste() {
-		applyParsed(pasteText);
-		if (!error) pasteOpen = false;
+	function reviewPaste() {
+		if (reviewParsed(pasteText)) pasteOpen = false;
 	}
 
 	function declinePasskeyOffer() {
@@ -152,50 +181,78 @@
 		subtitle="Use your JSON plan to power your dashboard."
 	/>
 
-	<JsonDropZone {busy} onFiles={onDropFiles} onBrowse={openPicker} />
+	<p class="safety" role="note">{HEALTH_DISCLAIMER}</p>
 
-	<section class="prompt-block nothing-surface" aria-labelledby="prompt-h">
-		<h2 id="prompt-h" class="mono-caps sec-title">Claude prompt</h2>
-		<p class="sec-sub">
-			Built from your saved intake answers. Blank fields appear as "not specified" in the profile
-			JSON. You can always copy from the box if the button fails.
-		</p>
-		<ListRowButton
-			label={copyHint?.startsWith('Copied') ? 'Copied ✓' : 'Copy prompt'}
-			onclick={copyPrompt}
+	{#if preview && pendingPlan}
+		<ImportPreviewCard
+			{preview}
+			issues={pendingIssues}
+			{busy}
+			onApply={confirmApply}
+			onCancel={clearPending}
 		/>
-		{#if copyHint}
-			<p class="copy-hint" role="status">{copyHint}</p>
-		{/if}
-		<label class="sr-only" for="prompt-ta">Generated Claude prompt</label>
-		<textarea id="prompt-ta" class="prompt-ta" readonly rows="12" value={promptBody}></textarea>
-		<TextLinkButton text="Edit intake answers" onclick={() => goto(resolve('/'))} />
-	</section>
+	{:else}
+		<JsonDropZone {busy} onFiles={onDropFiles} onBrowse={openPicker} />
 
-	<ListRowButton label="Paste JSON" chevron onclick={() => (pasteOpen = true)} />
-	<DashedUploadButton label="Upload Plan File" onclick={openPicker} />
+		<section class="prompt-block nothing-surface" aria-labelledby="prompt-h">
+			<h2 id="prompt-h" class="mono-caps sec-title">Claude prompt</h2>
+			<p class="sec-sub">
+				Built from your saved intake answers. Blank fields appear as "not specified" in the profile
+				JSON.
+			</p>
+			<ListRowButton
+				label={copyHint?.startsWith('Copied') ? 'Copied ✓' : 'Copy prompt'}
+				onclick={copyPrompt}
+			/>
+			{#if copyHint}
+				<p class="copy-hint" role="status">{copyHint}</p>
+			{/if}
+			<label class="sr-only" for="prompt-ta">Generated Claude prompt</label>
+			<textarea id="prompt-ta" class="prompt-ta" readonly rows="12" value={promptBody}></textarea>
+			<TextLinkButton text="Edit intake answers" onclick={() => goto(resolve('/'))} />
+		</section>
 
-	<section class="steps nothing-surface" aria-labelledby="steps-h">
-		<h2 id="steps-h" class="mono-caps sec-title">After you copy</h2>
-		<ol class="steps-list">
-			<li><strong>Step 1</strong> — Open claude.ai (or the Claude app).</li>
-			<li><strong>Step 2</strong> — Paste the prompt into a new conversation and send.</li>
-			<li>
-				<strong>Step 3</strong> — Wait for the reply; you want plain JSON only (message starts with
-				<kbd>{OPEN_BRACE}</kbd> and ends with <kbd>{CLOSE_BRACE}</kbd>).
-			</li>
-			<li><strong>Step 4</strong> — If Claude used a code fence, copy only the JSON inside it.</li>
-			<li>
-				<strong>Step 5</strong> — Save as <kbd>myplan.json</kbd> or use <strong>Paste JSON</strong> below.
-			</li>
-			<li><strong>Step 6</strong> — Return here and upload the file or paste to validate.</li>
-		</ol>
-	</section>
+		<ListRowButton label="Paste JSON" chevron onclick={() => (pasteOpen = true)} />
+		<DashedUploadButton label="Upload Plan File" onclick={openPicker} />
+		<ListRowButton
+			label="Load sample plan (demo)"
+			chevron
+			onclick={async () => {
+				busy = true;
+				error = null;
+				try {
+					await loadSamplePlan();
+				} catch (e) {
+					error = e instanceof Error ? e.message : 'Could not load sample';
+				} finally {
+					busy = false;
+				}
+			}}
+		/>
 
-	<p class="helper">
-		Your uploaded plan is stored only in this browser. Clipboard copy works best over
-		<strong>HTTPS</strong>; if copy fails, use the prompt box and your browser’s copy command.
-	</p>
+		<section class="steps nothing-surface" aria-labelledby="steps-h">
+			<h2 id="steps-h" class="mono-caps sec-title">After you copy</h2>
+			<ol class="steps-list">
+				<li><strong>Step 1</strong> — Open claude.ai (or the Claude app).</li>
+				<li><strong>Step 2</strong> — Paste the prompt into a new conversation and send.</li>
+				<li>
+					<strong>Step 3</strong> — Wait for plain JSON (starts with <kbd>{OPEN_BRACE}</kbd>, ends
+					with
+					<kbd>{CLOSE_BRACE}</kbd>).
+				</li>
+				<li>
+					<strong>Step 4</strong> — Save as <kbd>myplan.json</kbd> or use
+					<strong>Paste JSON</strong>.
+				</li>
+				<li><strong>Step 5</strong> — Review the preview, then tap <strong>Apply plan</strong>.</li>
+			</ol>
+		</section>
+
+		<p class="helper">
+			Your plan is stored only in this browser. Clipboard copy works best over <strong>HTTPS</strong
+			>.
+		</p>
+	{/if}
 
 	{#if error}
 		<InlineErrorCard title="Import blocked" body={error} />
@@ -206,34 +263,17 @@
 	<PasskeyOfferSheet ondecline={declinePasskeyOffer} />
 {/if}
 
-{#if pasteOpen}
-	<div class="modal" role="presentation">
-		<button type="button" class="backdrop" aria-label="Close" onclick={() => (pasteOpen = false)}
-		></button>
-		<div
-			class="sheet nothing-surface"
-			use:focusTrap={{ onEscape: () => (pasteOpen = false) }}
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="paste-h"
+<BottomSheet open={pasteOpen} title="Paste JSON" onClose={() => (pasteOpen = false)}>
+	<textarea class="ta" rows="10" bind:value={pasteText} aria-label="Plan JSON"></textarea>
+	{#if error}
+		<p class="paste-err" role="alert">{error}</p>
+	{/if}
+	{#snippet footer()}
+		<button type="button" class="ghost pressable" onclick={() => (pasteOpen = false)}>Cancel</button
 		>
-			<h2 id="paste-h" class="mono-caps h">Paste JSON</h2>
-			<textarea class="ta" rows="10" bind:value={pasteText} aria-label="Plan JSON"></textarea>
-			{#if error}
-				<p class="paste-err" role="alert">{error}</p>
-			{/if}
-			{#if error}
-				<InlineErrorCard title="Import blocked" body={error} />
-			{/if}
-			<div class="row">
-				<button type="button" class="ghost pressable" onclick={() => (pasteOpen = false)}
-					>Cancel</button
-				>
-				<button type="button" class="red pressable" onclick={validatePaste}>Validate</button>
-			</div>
-		</div>
-	</div>
-{/if}
+		<button type="button" class="red pressable" onclick={reviewPaste}>Review</button>
+	{/snippet}
+</BottomSheet>
 
 <style>
 	.screen {
@@ -241,11 +281,21 @@
 		padding-bottom: var(--space-8);
 	}
 
+	.safety {
+		margin: 0 0 var(--space-4);
+		padding: var(--space-3) var(--space-4);
+		font-size: 13px;
+		line-height: 1.5;
+		color: var(--text-3);
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--line-1);
+		background: var(--surface-1);
+	}
+
 	.helper {
 		margin: var(--space-3) 0 0;
 		font-size: 12px;
 		line-height: calc(17 / 12);
-		font-weight: 400;
 		color: var(--text-3);
 	}
 
@@ -298,7 +348,7 @@
 		padding: var(--space-3);
 		border-radius: var(--radius-xs);
 		border: 1px solid var(--line-1);
-		background: rgba(0, 0, 0, 0.45);
+		background: var(--input-bg);
 		color: var(--text-2);
 		font-family: var(--font-mono);
 		font-size: 11px;
@@ -324,53 +374,7 @@
 		padding: 0 4px;
 		border-radius: 4px;
 		border: 1px solid var(--line-2);
-		background: rgba(0, 0, 0, 0.35);
-	}
-
-	.modal {
-		position: fixed;
-		inset: 0;
-		z-index: 200;
-		display: flex;
-		align-items: flex-end;
-		justify-content: center;
-	}
-
-	.backdrop {
-		position: absolute;
-		inset: 0;
-		border: none;
-		background: rgba(0, 0, 0, 0.55);
-		cursor: pointer;
-	}
-
-	.sheet {
-		position: relative;
-		width: min(100vw, 430px);
-		padding: var(--space-4);
-		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-		border: 1px solid var(--line-1);
-		max-height: 90dvh;
-		overflow: auto;
-	}
-
-	@supports (corner-shape: squircle) {
-		.sheet {
-			corner-shape: squircle;
-		}
-	}
-
-	.h {
-		margin: 0 0 var(--space-3);
-		font-size: 11px;
-		color: var(--text-2);
-	}
-
-	.paste-err {
-		margin: 0 0 var(--space-3);
-		font-size: 13px;
-		line-height: 1.45;
-		color: var(--red);
+		background: var(--input-bg);
 	}
 
 	.ta {
@@ -379,7 +383,7 @@
 		padding: var(--space-3);
 		border-radius: var(--radius-xs);
 		border: 1px solid var(--line-1);
-		background: rgba(0, 0, 0, 0.45);
+		background: var(--input-bg);
 		color: var(--text-2);
 		font-family: var(--font-mono);
 		font-size: 12px;
@@ -387,10 +391,10 @@
 		resize: vertical;
 	}
 
-	.row {
-		display: flex;
-		gap: var(--space-2);
-		margin-top: var(--space-3);
+	.paste-err {
+		margin: var(--space-2) 0;
+		font-size: 13px;
+		color: var(--danger, var(--red));
 	}
 
 	.ghost,

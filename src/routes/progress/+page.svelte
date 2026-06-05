@@ -2,7 +2,6 @@
 	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
 	import AdherenceCard from '$lib/components/spec/AdherenceCard.svelte';
 	import ChartCard from '$lib/components/spec/ChartCard.svelte';
 	import CheckinCard from '$lib/components/spec/CheckinCard.svelte';
@@ -14,7 +13,14 @@
 	import { newId } from '$lib/logic/id';
 	import { buildWeightChartModel } from '$lib/logic/weightSeries';
 	import { liftStatsFromSessions, recentSessions } from '$lib/logic/workoutHistory';
-	import { persistProgress, plan, progress, settings } from '$lib/stores/healthApp';
+	import {
+		onboarding,
+		persistOnboarding,
+		persistProgress,
+		plan,
+		progress,
+		settings
+	} from '$lib/stores/healthApp';
 	import type { WeeklyCheckinEntry } from '$lib/types/planV2';
 	import { get } from 'svelte/store';
 
@@ -79,108 +85,112 @@
 		}).format(new Date(t));
 	}
 
-	$effect(() => {
-		if (!browser) return;
-		if (!$plan) goto(resolve('/import'));
-	});
+	function startIntake() {
+		persistOnboarding({ ...get(onboarding), intakeLaunched: true });
+		goto(resolve('/'));
+	}
 </script>
 
-{#if $plan}
-	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="PROGRESS" />
+<main class="screen px-screen pt-safe stack">
+	<ScreenHeaderBlock title="PROGRESS" />
 
-		<ChipRow
-			chips={['Overview', 'Trends', 'Metrics']}
-			selected={chip}
-			onSelect={(c) => (chip = c)}
+	{#if !$plan}
+		<p class="plan-note nothing-surface" role="status">
+			No plan loaded — you can still log weight, waist, and check-ins locally. Import a plan for
+			richer adherence insights and plan-aware warnings.
+			<button type="button" class="link pressable" onclick={startIntake}>Create plan prompt</button>
+			or
+			<a class="link" href={resolve('/import')}>import JSON</a>.
+		</p>
+	{/if}
+
+	<ChipRow chips={['Overview', 'Trends', 'Metrics']} selected={chip} onSelect={(c) => (chip = c)} />
+
+	{#if chip === 'Overview'}
+		<ChartCard
+			title="WEIGHT TREND"
+			value={chart.valueLabel}
+			delta={chart.deltaLabel}
+			labels={chart.labels}
+			series={chart.series}
 		/>
 
-		{#if chip === 'Overview'}
-			<ChartCard
-				title="WEIGHT TREND"
-				value={chart.valueLabel}
-				delta={chart.deltaLabel}
-				labels={chart.labels}
-				series={chart.series}
-			/>
+		<AdherenceCard
+			title="ADHERENCE"
+			value={`${adherencePct}%`}
+			subtitle="7 day blend (water · training · check-ins)"
+			{bars}
+		/>
 
-			<AdherenceCard
-				title="ADHERENCE"
-				value={`${adherencePct}%`}
-				subtitle="7 day blend (water · training · check-ins)"
-				{bars}
-			/>
-
-			<SectionLabel text="RECENT WORKOUTS" />
-			{#if sessions.length === 0}
-				<p class="empty">Finish a session from Train to build history here.</p>
-			{:else}
-				<ul class="list nothing-surface">
-					{#each sessions as s (s.id)}
-						<li class="row">
-							<p class="mono-caps t">{fmtShort(s.finishedAt)}</p>
-							<p class="b">{s.exercises.length} exercises · logged sets</p>
-						</li>
-					{/each}
-				</ul>
-			{/if}
-
-			<CheckinCard
-				title="WEEKLY CHECK-IN"
-				question="How was your week?"
-				subtitle="Log weight, waist, energy, sleep, and notes."
-				cta="Log Check-in"
-				onclick={() => (checkOpen = true)}
-			/>
-		{:else if chip === 'Trends'}
-			<ChartCard
-				title="WEIGHT TREND"
-				value={chart.valueLabel}
-				delta={chart.deltaLabel}
-				labels={chart.labels}
-				series={chart.series}
-			/>
-			<AdherenceCard title="ADHERENCE" value={`${adherencePct}%`} subtitle="7 day average" {bars} />
-			<SectionLabel text="WEIGHT LOG" />
-			{#if ($progress.weightEntries ?? []).length === 0}
-				<p class="empty">Log weight in a weekly check-in to build your trend.</p>
-			{:else}
-				<ul class="list nothing-surface">
-					{#each [...($progress.weightEntries ?? [])]
-						.reverse()
-						.slice(0, 14) as e, i (`${e.date}-${i}`)}
-						<li class="row">
-							<p class="mono-caps t">{e.date}</p>
-							<p class="b">{e.kg} kg</p>
-						</li>
-					{/each}
-				</ul>
-			{/if}
+		<SectionLabel text="RECENT WORKOUTS" />
+		{#if sessions.length === 0}
+			<p class="empty">Finish a session from Train to build history here.</p>
 		{:else}
-			<SectionLabel text="TRAINING VOLUME" />
-			<p class="stat mono-caps">{histSessions.length} sessions logged</p>
-			{#if liftStats.length}
-				<SectionLabel text="LAST LOGGED WEIGHTS" />
-				<div class="lift nothing-surface">
-					{#each liftStats as ls (ls.name)}
-						<div class="lr">
-							<p class="nm">{ls.name}</p>
-							<p class="vals mono-caps">
-								Last {ls.lastKg !== null ? `${ls.lastKg} kg` : '—'} · Best {ls.bestKg !== null
-									? `${ls.bestKg} kg`
-									: '—'}
-							</p>
-						</div>
-					{/each}
-				</div>
-			{:else}
-				<p class="empty">Complete a Train session with logged sets to see lift metrics.</p>
-			{/if}
-			<SectionLabel text="CHECK-INS" />
-			<p class="stat mono-caps">{($progress.weeklyCheckins ?? []).length} weekly entries</p>
+			<ul class="list nothing-surface">
+				{#each sessions as s (s.id)}
+					<li class="row">
+						<p class="mono-caps t">{fmtShort(s.finishedAt)}</p>
+						<p class="b">{s.exercises.length} exercises · logged sets</p>
+					</li>
+				{/each}
+			</ul>
 		{/if}
-	</main>
-{/if}
+
+		<CheckinCard
+			title="WEEKLY CHECK-IN"
+			question="How was your week?"
+			subtitle="Log weight, waist, energy, sleep, and notes."
+			cta="Log Check-in"
+			onclick={() => (checkOpen = true)}
+		/>
+	{:else if chip === 'Trends'}
+		<ChartCard
+			title="WEIGHT TREND"
+			value={chart.valueLabel}
+			delta={chart.deltaLabel}
+			labels={chart.labels}
+			series={chart.series}
+		/>
+		<AdherenceCard title="ADHERENCE" value={`${adherencePct}%`} subtitle="7 day average" {bars} />
+		<SectionLabel text="WEIGHT LOG" />
+		{#if ($progress.weightEntries ?? []).length === 0}
+			<p class="empty">Log weight in a weekly check-in to build your trend.</p>
+		{:else}
+			<ul class="list nothing-surface">
+				{#each [...($progress.weightEntries ?? [])]
+					.reverse()
+					.slice(0, 14) as e, i (`${e.date}-${i}`)}
+					<li class="row">
+						<p class="mono-caps t">{e.date}</p>
+						<p class="b">{e.kg} kg</p>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	{:else}
+		<SectionLabel text="TRAINING VOLUME" />
+		<p class="stat mono-caps">{histSessions.length} sessions logged</p>
+		{#if liftStats.length}
+			<SectionLabel text="LAST LOGGED WEIGHTS" />
+			<div class="lift nothing-surface">
+				{#each liftStats as ls (ls.name)}
+					<div class="lr">
+						<p class="nm">{ls.name}</p>
+						<p class="vals mono-caps">
+							Last {ls.lastKg !== null ? `${ls.lastKg} kg` : '—'} · Best {ls.bestKg !== null
+								? `${ls.bestKg} kg`
+								: '—'}
+						</p>
+					</div>
+				{/each}
+			</div>
+		{:else}
+			<p class="empty">Complete a Train session with logged sets to see lift metrics.</p>
+		{/if}
+		<SectionLabel text="CHECK-INS" />
+		<p class="stat mono-caps">{($progress.weeklyCheckins ?? []).length} weekly entries</p>
+	{/if}
+</main>
 
 {#if checkOpen}
 	<div class="modal" role="presentation">
@@ -231,6 +241,27 @@
 	.screen {
 		flex: 1;
 		padding-bottom: var(--space-6);
+	}
+
+	.plan-note {
+		margin: 0 0 var(--space-4);
+		padding: var(--space-3) var(--space-4);
+		font-size: 14px;
+		line-height: 1.5;
+		color: var(--text-2);
+		border-radius: var(--radius-md);
+	}
+
+	.link {
+		color: var(--accent, var(--ios-blue, var(--text-1)));
+		font-weight: 600;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		border: none;
+		background: none;
+		padding: 0;
+		font-size: inherit;
+		cursor: pointer;
 	}
 
 	.empty,
