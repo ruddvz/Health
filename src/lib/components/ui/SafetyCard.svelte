@@ -15,23 +15,22 @@
 
 <style>
 	.safety {
-		padding: var(--space-4);
-		background: var(--health-surface-soft);
+		padding: var(--s-4);
+		background: var(--h-orange-soft);
+		border-color: var(--h-orange-line);
 	}
 
 	.safety__label {
-		margin: 0 0 var(--space-2);
-		font-size: var(--text-xs);
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-caption);
 		font-weight: var(--weight-semibold);
-		color: var(--health-amber);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		color: var(--h-orange);
 	}
 
 	.safety__body {
 		margin: 0;
-		font-size: var(--text-sm);
-		line-height: var(--leading-relaxed);
-		color: var(--health-muted);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text-soft);
 	}
 </style>

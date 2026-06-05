@@ -28,7 +28,7 @@
 	.cb {
 		width: 20px;
 		height: 20px;
-		accent-color: var(--red);
+		accent-color: var(--h-accent);
 		flex-shrink: 0;
 	}
 

@@ -1,58 +1,84 @@
 <script lang="ts">
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
+
 	interface Props {
 		eyebrow: string;
 		title: string;
 		subtitle: string;
+		detail?: string;
+		micro?: string;
+		ctaLabel?: string;
 		onclick?: () => void;
 	}
-	let { eyebrow, title, subtitle, onclick }: Props = $props();
+	let { eyebrow, title, subtitle, detail, micro, ctaLabel = 'Open', onclick }: Props = $props();
 </script>
 
-<button type="button" class="card nothing-surface pressable" {onclick}>
-	<div class="left">
-		<p class="mono-caps e">{eyebrow}</p>
-		<p class="t">{title}</p>
-		<p class="s">{subtitle}</p>
-	</div>
-	<span class="cta" aria-hidden="true">→</span>
-</button>
+<section class="hero-card next-action">
+	<p class="pill">{eyebrow}</p>
+	<h2 class="title">{title}</h2>
+	<p class="subtitle">{subtitle}</p>
+	{#if detail}
+		<p class="detail">{detail}</p>
+	{/if}
+	{#if micro}
+		<p class="micro">{micro}</p>
+	{/if}
+	{#if onclick}
+		<div class="cta">
+			<HealthButton variant="primary" size="lg" block {onclick}>{ctaLabel}</HealthButton>
+		</div>
+	{/if}
+</section>
 
 <style>
-	.card {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-3);
-		width: 100%;
-		min-height: 84px;
-		padding: var(--space-4);
-		margin-bottom: var(--space-3);
-		text-align: left;
-		cursor: pointer;
+	.next-action {
+		margin-bottom: var(--phone-card-gap);
 	}
 
-	.e {
-		margin: 0 0 var(--space-1);
-		color: var(--text-3);
-		font-size: 9px;
+	.pill {
+		display: inline-flex;
+		margin: 0 0 var(--s-3);
+		padding: 6px 12px;
+		border-radius: var(--r-pill);
+		border: 1px solid var(--h-accent-line);
+		background: var(--h-accent-soft);
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--h-accent);
 	}
 
-	.t {
+	.title {
+		margin: 0 0 var(--s-2);
+		font-size: clamp(28px, 7vw, 32px);
+		font-weight: 760;
+		line-height: var(--lh-title);
+		letter-spacing: -0.03em;
+		color: var(--h-text);
+	}
+
+	.subtitle {
 		margin: 0;
-		font-size: 17px;
-		font-weight: 650;
-		color: var(--text-1);
+		font-size: var(--t-callout);
+		color: var(--h-text-soft);
+		line-height: var(--lh-body);
 	}
 
-	.s {
-		margin: 4px 0 0;
-		font-size: 13px;
-		color: var(--text-2);
+	.detail {
+		margin: var(--s-3) 0 0;
+		font-size: var(--t-title-3);
+		font-weight: var(--weight-bold);
+		color: var(--h-text);
+	}
+
+	.micro {
+		margin: var(--s-2) 0 0;
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 	}
 
 	.cta {
-		font-size: 22px;
-		color: var(--red);
-		line-height: 1;
+		margin-top: var(--s-5);
 	}
 </style>

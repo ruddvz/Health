@@ -25,7 +25,6 @@
 </script>
 
 <header class="app-header">
-	<div class="app-header__mark" aria-hidden="true">H</div>
 	<div class="app-header__copy">
 		{#if pageLabel}
 			<p class="app-header__eyebrow">{pageLabel}</p>
@@ -42,14 +41,18 @@
 	</div>
 	{#if rightAction === 'lock'}
 		<a
-			class="app-header__lock pressable"
+			class="app-header__action pressable"
 			href={resolve('/system/security')}
 			aria-label="Health Lock status"
 		>
 			{$securityConfig.enabled ? 'Locked' : 'Local'}
 		</a>
 	{:else if rightAction === 'settings'}
-		<a class="app-header__lock pressable" href={resolve('/system/settings')} aria-label="Settings">
+		<a
+			class="app-header__action pressable"
+			href={resolve('/system/settings')}
+			aria-label="Settings"
+		>
 			Settings
 		</a>
 	{/if}
@@ -59,74 +62,61 @@
 	.app-header {
 		position: sticky;
 		top: 0;
-		z-index: 40;
-		display: grid;
-		grid-template-columns: 44px minmax(0, 1fr) auto;
-		gap: 12px;
-		align-items: center;
-		padding: calc(env(safe-area-inset-top) + 10px) 0 10px;
-		margin-bottom: var(--space-3);
-		background: linear-gradient(to bottom, var(--health-bg) 76%, transparent);
-		backdrop-filter: blur(18px);
-		-webkit-backdrop-filter: blur(18px);
-	}
-
-	.app-header__mark {
-		width: 44px;
-		height: 44px;
-		border-radius: 16px;
-		display: grid;
-		place-items: center;
-		background: var(--health-primary);
-		color: var(--health-primary-text);
-		font-weight: var(--weight-bold);
-		font-size: var(--text-lg);
-		box-shadow: var(--shadow-card-soft);
+		z-index: var(--z-header);
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: var(--s-3);
+		padding: calc(var(--safe-top) + var(--s-2)) 0 var(--s-3);
+		margin: var(--s-2) 0 var(--s-4);
+		background: linear-gradient(to bottom, var(--h-bg) 76%, transparent);
+		backdrop-filter: blur(var(--blur-nav));
+		-webkit-backdrop-filter: blur(var(--blur-nav));
 	}
 
 	.app-header__copy {
 		min-width: 0;
+		flex: 1;
 	}
 
 	.app-header__copy h1 {
 		margin: 0;
-		font-size: 22px;
-		line-height: 1.1;
+		font-size: clamp(28px, 7vw, var(--t-title-1));
+		line-height: var(--lh-title);
 		letter-spacing: -0.03em;
 		font-weight: var(--weight-bold);
-		color: var(--health-ink);
+		color: var(--h-text);
 	}
 
 	.app-header__eyebrow {
-		margin: 0 0 3px;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		font-size: var(--text-2xs);
-		font-weight: var(--weight-bold);
-		color: var(--health-muted-2);
+		margin: 0 0 var(--s-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 	}
 
 	.app-header__sub {
-		margin: 2px 0 0;
-		color: var(--health-muted);
-		font-size: var(--text-sm);
-		line-height: 1.25;
+		margin: var(--s-2) 0 0;
+		color: var(--h-text-muted);
+		font-size: var(--t-callout);
+		line-height: var(--lh-body);
 	}
 
 	.app-header__chip {
-		margin-top: 6px;
+		margin-top: var(--s-2);
 	}
 
-	.app-header__lock {
-		min-height: 38px;
-		border: 1px solid var(--health-line);
-		border-radius: var(--radius-pill);
-		padding: 0 12px;
+	.app-header__action {
+		flex-shrink: 0;
+		min-height: 44px;
+		border: 1px solid var(--h-line);
+		border-radius: var(--r-pill);
+		padding: 0 var(--s-3);
 		display: inline-flex;
 		align-items: center;
-		background: var(--health-surface-raised);
-		color: var(--health-ink);
-		font-size: var(--text-xs);
+		background: var(--h-surface);
+		color: var(--h-text);
+		font-size: var(--t-caption);
 		font-weight: var(--weight-semibold);
 		text-decoration: none;
 		box-shadow: var(--shadow-card-soft);

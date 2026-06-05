@@ -46,12 +46,12 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: var(--space-4);
+		gap: var(--s-4);
 	}
 
 	.dots {
 		display: flex;
-		gap: 12px;
+		gap: var(--s-3);
 		min-height: 16px;
 	}
 
@@ -59,30 +59,31 @@
 		width: 12px;
 		height: 12px;
 		border-radius: 50%;
-		border: 1px solid var(--line-2);
+		border: 1px solid var(--h-line-strong);
 		background: transparent;
 	}
 
 	.dot.filled {
-		background: var(--red);
-		border-color: var(--red);
+		background: var(--h-accent);
+		border-color: var(--h-accent);
+		box-shadow: 0 0 8px var(--h-accent-line);
 	}
 
 	.grid {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		gap: 10px;
+		gap: var(--phone-card-gap);
 		width: min(280px, 100%);
 	}
 
 	.key {
 		min-height: 52px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-1);
-		background: var(--surface-2);
-		color: var(--text-1);
-		font-size: 22px;
-		font-weight: 600;
+		border-radius: var(--r-card-inner);
+		border: 1px solid var(--h-line);
+		background: var(--h-surface-2);
+		color: var(--h-text);
+		font-size: var(--t-title-2);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
 	}
 
@@ -94,7 +95,7 @@
 	}
 
 	.key.del {
-		font-size: 18px;
+		font-size: var(--t-title-3);
 	}
 
 	.key:disabled {

@@ -68,7 +68,7 @@
 	}
 
 	.ico {
-		color: var(--red);
+		color: var(--h-accent);
 		font-size: 10px;
 		flex-shrink: 0;
 	}

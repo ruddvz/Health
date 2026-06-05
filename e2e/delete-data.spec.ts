@@ -16,12 +16,12 @@ test.describe('Delete local data', () => {
 
 		await expect(page).toHaveURL(/\/Health\/?$/);
 		await expect(
-			page.getByRole('heading', { name: /daily health plan, without the noise/i })
+			page.getByRole('heading', { name: /Your private daily health plan/i })
 		).toBeVisible({
 			timeout: 15_000
 		});
 
 		await page.goto('./today');
-		await expect(page.getByText('Build your daily command center')).toBeVisible();
+		await expect(page.getByText('Import a plan to unlock Today')).toBeVisible();
 	});
 });

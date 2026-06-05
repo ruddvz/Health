@@ -6,14 +6,14 @@ export type ThemeMode = 'dark' | 'light';
 
 export function themeFromSettings(raw: Record<string, unknown>): ThemeMode {
 	const t = raw.theme;
-	return t === 'dark' ? 'dark' : 'light';
+	return t === 'light' ? 'light' : 'dark';
 }
 
 export function applyTheme(mode: ThemeMode) {
 	if (!browser) return;
 	document.documentElement.dataset.theme = mode === 'light' ? 'light' : 'dark';
 	const meta = document.querySelector('meta[name="theme-color"]');
-	if (meta) meta.setAttribute('content', mode === 'light' ? '#f7f4ee' : '#11100e');
+	if (meta) meta.setAttribute('content', mode === 'light' ? '#f4f7f1' : '#070a08');
 }
 
 export function syncThemeFromSettings(raw?: Record<string, unknown>) {

@@ -9,7 +9,7 @@
 </script>
 
 <div class="row nothing-surface-2">
-	<span class="mono-caps lab">{label}</span>
+	<span class="lab">{label}</span>
 	{#if phaseCount > 1}
 		<label class="sr" for="phase-select">Select phase</label>
 		<select
@@ -22,7 +22,7 @@
 			{/each}
 		</select>
 	{:else}
-		<span class="chev mono-caps" aria-hidden="true">▾</span>
+		<span class="chev" aria-hidden="true">▾</span>
 	{/if}
 </div>
 
@@ -31,34 +31,32 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-3);
+		gap: var(--s-3);
 		min-height: 44px;
-		padding: 10px var(--space-4);
-		margin-bottom: var(--space-2);
+		padding: var(--s-3) var(--s-4);
+		margin-bottom: var(--s-2);
 	}
 
 	.lab {
 		margin: 0;
-		font-size: 10px;
-		color: var(--text-2);
-		letter-spacing: 0.09em;
+		font-size: var(--t-footnote);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-soft);
 	}
 
 	.sel {
 		appearance: none;
-		min-height: 36px;
-		padding: 0 36px 0 12px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-2);
-		background: rgba(0, 0, 0, 0.35)
-			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23777771' d='M1 1.5L6 6l5-4.5'/%3E%3C/svg%3E")
+		min-height: 44px;
+		padding: 0 36px 0 var(--s-3);
+		border-radius: var(--r-pill);
+		border: 1px solid var(--h-line-strong);
+		background: var(--h-surface-3)
+			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23737f77' d='M1 1.5L6 6l5-4.5'/%3E%3C/svg%3E")
 			no-repeat right 10px center;
-		color: var(--text-1);
-		font-family: var(--font-mono);
-		font-size: 10px;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
+		color: var(--h-text);
+		font-family: var(--font-ui);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
 	}
 
@@ -70,8 +68,8 @@
 
 	.chev {
 		margin: 0;
-		font-size: 10px;
-		color: var(--text-3);
+		font-size: var(--t-caption);
+		color: var(--h-text-faint);
 	}
 
 	.sr {

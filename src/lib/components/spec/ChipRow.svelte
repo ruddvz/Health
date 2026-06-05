@@ -25,25 +25,35 @@
 <style>
 	.row {
 		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-2);
-		margin-bottom: var(--space-3);
+		flex-wrap: nowrap;
+		gap: var(--s-2);
+		margin-bottom: var(--s-3);
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+		padding-bottom: var(--s-1);
+	}
+
+	.row::-webkit-scrollbar {
+		display: none;
 	}
 
 	.chip {
-		border: 1px solid var(--line-1);
-		background: var(--surface-1);
-		color: var(--text-2);
-		font-size: 12px;
-		font-weight: 600;
-		padding: 8px 12px;
-		border-radius: 999px;
+		flex-shrink: 0;
+		border: 1px solid var(--h-line);
+		background: var(--h-surface-solid);
+		color: var(--h-text-muted);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		min-height: 36px;
+		padding: 0 var(--s-4);
+		border-radius: var(--r-pill);
 		cursor: pointer;
 	}
 
 	.chip.on {
-		border-color: var(--red-line);
-		color: var(--red);
-		background: var(--red-soft);
+		border-color: var(--h-accent-line);
+		color: var(--h-accent);
+		background: var(--h-accent-soft);
 	}
 </style>

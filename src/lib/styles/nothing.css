@@ -1,39 +1,23 @@
-/* Legacy class names — mapped to wellness surfaces */
-
-.nothing-surface {
-	background: var(--health-surface);
-	border: 1px solid var(--health-line);
-	border-radius: var(--radius-xl);
-	box-shadow: var(--shadow-card-soft);
-	overflow: hidden;
-}
-
-.nothing-surface-2 {
-	background: var(--health-surface-soft);
-	border: 1px solid var(--health-line);
-	border-radius: var(--radius-lg);
-	box-shadow: var(--shadow-card-soft);
-	overflow: hidden;
-}
+/* Legacy class aliases — surfaces inherit from global.css card primitives */
 
 .mono-caps {
-	font-size: var(--text-2xs);
-	font-weight: var(--weight-bold);
-	letter-spacing: 0.12em;
+	font-size: var(--t-caption-2);
+	font-weight: var(--weight-semibold);
+	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: var(--health-muted-2);
+	color: var(--h-text-faint);
 }
 
 .pressable {
 	transition:
-		transform var(--motion-fast) ease,
-		opacity var(--motion-fast) ease,
-		box-shadow var(--motion-fast) ease;
+		transform var(--dur-fast) var(--ease-standard),
+		opacity var(--dur-fast) var(--ease-standard),
+		box-shadow var(--dur-med) var(--ease-standard);
 }
 
 .pressable:active {
-	transform: scale(0.975);
-	opacity: 0.88;
+	transform: scale(0.985);
+	opacity: 0.92;
 }
 
 @media (prefers-reduced-motion: reduce) {

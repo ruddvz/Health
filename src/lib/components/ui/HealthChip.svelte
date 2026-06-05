@@ -26,33 +26,33 @@
 	.chip {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
-		min-height: 28px;
-		padding: 0 10px;
-		border-radius: var(--radius-pill);
-		background: var(--health-surface-soft);
-		border: 1px solid var(--health-line);
-		color: var(--health-muted);
-		font-size: var(--text-xs);
+		gap: var(--s-2);
+		min-height: 32px;
+		padding: 0 var(--s-3);
+		border-radius: var(--r-pill);
+		background: var(--h-surface-2);
+		border: 1px solid var(--h-line);
+		color: var(--h-text-muted);
+		font-size: var(--t-caption);
 		font-weight: var(--weight-semibold);
 	}
 
 	.chip--green {
-		background: var(--health-green-soft);
-		color: var(--health-green);
-		border-color: transparent;
+		background: var(--h-accent-soft);
+		color: var(--h-accent);
+		border-color: var(--h-accent-line);
 	}
 
 	.chip--amber {
-		background: var(--health-amber-soft);
-		color: var(--health-amber);
-		border-color: transparent;
+		background: var(--h-orange-soft);
+		color: var(--h-orange);
+		border-color: var(--h-orange-line);
 	}
 
 	.chip--blue {
-		background: var(--health-blue-soft);
-		color: var(--health-blue);
-		border-color: transparent;
+		background: var(--h-blue-soft);
+		color: var(--h-blue);
+		border-color: var(--h-blue-line);
 	}
 
 	.chip--purple {
@@ -62,8 +62,8 @@
 	}
 
 	.chip--red {
-		background: var(--health-red-soft);
-		color: var(--health-red);
-		border-color: transparent;
+		background: var(--h-red-soft);
+		color: var(--h-red);
+		border-color: var(--h-red-line);
 	}
 </style>

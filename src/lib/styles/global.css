@@ -10,7 +10,7 @@ html {
 	min-height: 100%;
 	-webkit-text-size-adjust: 100%;
 	text-size-adjust: 100%;
-	background: var(--health-bg);
+	background: var(--h-bg);
 }
 
 body {
@@ -19,13 +19,15 @@ body {
 	width: 100%;
 	overflow-x: hidden;
 	background:
-		radial-gradient(circle at 8% -10%, rgba(31, 143, 95, 0.14), transparent 34%),
-		radial-gradient(circle at 100% 0%, rgba(199, 122, 18, 0.12), transparent 30%), var(--health-bg);
-	color: var(--health-ink);
+		radial-gradient(circle at 20% -10%, rgba(167, 255, 106, 0.11), transparent 32%),
+		radial-gradient(circle at 90% 6%, rgba(100, 210, 255, 0.08), transparent 30%),
+		linear-gradient(180deg, var(--h-bg-2), var(--h-bg));
+	color: var(--h-text);
 	font-family: var(--font-ui);
-	font-size: var(--text-base);
-	line-height: var(--leading-body);
+	font-size: var(--t-body);
+	line-height: var(--lh-body);
 	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
 }
 
 button,
@@ -42,58 +44,104 @@ a {
 }
 
 a {
-	color: var(--health-blue);
+	color: var(--h-blue);
 	text-decoration: none;
 }
 
 a:hover {
-	color: var(--health-ink);
+	color: var(--h-text);
 }
 
 :focus-visible {
-	outline: 3px solid rgba(35, 116, 171, 0.42);
-	outline-offset: 3px;
+	outline: 2px solid var(--h-accent-line);
+	outline-offset: 2px;
 }
 
 ::selection {
-	background: var(--health-green-soft);
-	color: var(--health-ink);
+	background: var(--h-accent-soft);
+	color: var(--h-text);
 }
 
-.health-card {
-	background: var(--health-surface);
-	border: 1px solid var(--health-line);
-	border-radius: var(--radius-xl);
-	box-shadow: var(--shadow-card-soft);
+/* Card primitives */
+.card,
+.health-card,
+.nothing-surface {
+	position: relative;
+	border-radius: var(--r-card);
 	padding: 18px;
+	background: linear-gradient(180deg, var(--h-surface), var(--h-surface-2));
+	border: 1px solid var(--h-line);
+	box-shadow: var(--shadow-card-soft);
+	overflow: hidden;
 }
 
+.hero-card,
 .health-hero-card {
-	background:
-		radial-gradient(circle at 20% 0%, rgba(31, 143, 95, 0.16), transparent 36%),
-		radial-gradient(circle at 100% 10%, rgba(199, 122, 18, 0.14), transparent 34%),
-		var(--health-surface);
-	border: 1px solid var(--health-line);
-	border-radius: var(--radius-2xl);
-	box-shadow: var(--shadow-card);
+	border-radius: var(--r-2xl);
 	padding: 22px;
+	min-height: 172px;
+	background:
+		radial-gradient(circle at 88% 8%, rgba(167, 255, 106, 0.16), transparent 36%),
+		linear-gradient(180deg, rgba(24, 36, 31, 0.92), rgba(12, 18, 15, 0.92));
+	border: 1px solid var(--h-line-strong);
+	box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+
+html[data-theme='light'] .hero-card,
+html[data-theme='light'] .health-hero-card {
+	background:
+		radial-gradient(circle at 88% 8%, rgba(67, 199, 95, 0.12), transparent 36%),
+		linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 251, 244, 0.95));
+}
+
+.nothing-surface-2 {
+	background: var(--h-surface-2);
+	border: 1px solid var(--h-line);
+	border-radius: var(--r-card-inner);
+	box-shadow: var(--shadow-card-soft);
+	overflow: hidden;
 }
 
 .health-glass {
-	background: var(--health-glass);
-	border: 1px solid rgba(255, 255, 255, 0.38);
-	box-shadow: var(--shadow-float);
-	backdrop-filter: blur(22px) saturate(1.35);
-	-webkit-backdrop-filter: blur(22px) saturate(1.35);
+	background: var(--h-glass-strong);
+	border: 1px solid var(--h-line-strong);
+	box-shadow: var(--shadow-nav);
+	backdrop-filter: blur(var(--blur-nav)) saturate(1.2);
+	-webkit-backdrop-filter: blur(var(--blur-nav)) saturate(1.2);
+}
+
+.interactive,
+.pressable {
+	transition:
+		transform var(--dur-fast) var(--ease-standard),
+		background var(--dur-med) var(--ease-standard),
+		border-color var(--dur-med) var(--ease-standard),
+		box-shadow var(--dur-med) var(--ease-standard);
+}
+
+.interactive:active,
+.pressable:active {
+	transform: scale(0.985);
 }
 
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,
 	*::after {
-		animation-duration: 0.001ms !important;
+		animation-duration: 0.01ms !important;
 		animation-iteration-count: 1 !important;
 		scroll-behavior: auto !important;
-		transition-duration: 0.001ms !important;
+		transition-duration: 0.01ms !important;
+	}
+
+	.interactive:active,
+	.pressable:active {
+		transform: none;
+	}
+}
+
+@media (display-mode: standalone) {
+	.top-status {
+		padding-top: calc(var(--safe-top) + 8px);
 	}
 }

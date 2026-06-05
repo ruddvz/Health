@@ -5,10 +5,12 @@
 	import CookModeSheet from '$lib/components/spec/CookModeSheet.svelte';
 	import EmptyState from '$lib/components/app/EmptyState.svelte';
 	import NoPlanActions from '$lib/components/app/NoPlanActions.svelte';
-	import ChipRow from '$lib/components/spec/ChipRow.svelte';
+	import SegmentedControl from '$lib/components/spec/SegmentedControl.svelte';
 	import MealCard from '$lib/components/spec/MealCard.svelte';
 	import QuickFixSheet from '$lib/components/spec/QuickFixSheet.svelte';
-	import AppHeader from '$lib/components/app/AppHeader.svelte';
+	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
+	import { ROUTES } from '$lib/appRoutes';
 	import SecondaryButton from '$lib/components/spec/SecondaryButton.svelte';
 	import TargetGapCard from '$lib/components/spec/TargetGapCard.svelte';
 	import { logicalDateKey } from '$lib/logic/dateKey';
@@ -36,7 +38,7 @@
 	import { showToast } from '$lib/stores/toast';
 	import { get } from 'svelte/store';
 
-	let chip = $state<'Workout Day' | 'Rest Day' | 'All'>('Workout Day');
+	let dayFilter = $state<'workout' | 'rest' | 'all'>('workout');
 	let quickFixOpen = $state(false);
 	let addOpen = $state(false);
 	let emName = $state('');
@@ -49,20 +51,24 @@
 
 	const logDay = $derived(logicalDateKey(new Date(), $settings));
 	const dayTypeForTrack = $derived<DayType | null>(
-		chip === 'Rest Day' ? 'rest' : chip === 'Workout Day' ? 'workout' : null
+		dayFilter === 'rest' ? 'rest' : dayFilter === 'workout' ? 'workout' : null
 	);
 
 	const meals = $derived.by(() => {
-		if (chip === 'All') {
+		if (dayFilter === 'all') {
 			const a = getMealsForDay($plan, 'workout');
 			const b = getMealsForDay($plan, 'rest');
 			return [...a, ...b];
 		}
-		return getMealsForDay($plan, chip === 'Rest Day' ? 'rest' : 'workout');
+		return getMealsForDay($plan, dayFilter === 'rest' ? 'rest' : 'workout');
 	});
 
 	const dayForEmergency = $derived<DayType>(
-		chip === 'Rest Day' ? 'rest' : chip === 'Workout Day' ? 'workout' : ($activeDayType as DayType)
+		dayFilter === 'rest'
+			? 'rest'
+			: dayFilter === 'workout'
+				? 'workout'
+				: ($activeDayType as DayType)
 	);
 	const emergency = $derived(getEmergencyMeals($plan, dayForEmergency));
 
@@ -154,19 +160,14 @@
 	}
 
 	$effect(() => {
-		if (chip === 'Workout Day') persistActiveDayType('workout');
-		else if (chip === 'Rest Day') persistActiveDayType('rest');
+		if (dayFilter === 'workout') persistActiveDayType('workout');
+		else if (dayFilter === 'rest') persistActiveDayType('rest');
 	});
 </script>
 
 {#if !$plan}
-	<main class="screen stack">
-		<AppHeader
-			title="Meals"
-			subtitle="Nutrition from your plan"
-			pageLabel="Meals"
-			planState="none"
-		/>
+	<main class="screen page-stack">
+		<ScreenHeaderBlock title="Meals" subtitle="Nutrition from your plan" />
 		<EmptyState
 			title="Meals appear after import"
 			body="Load a plan to see meal cards, macros, cook mode, swaps, and grocery prep."
@@ -175,26 +176,46 @@
 		</EmptyState>
 	</main>
 {:else}
-	<main class="screen stack">
-		<AppHeader title="Meals" subtitle="Today's nutrition" pageLabel="Meals" planState="loaded" />
+	<main class="screen page-stack">
+		<ScreenHeaderBlock title="Meals" subtitle="Today's nutrition" />
 
-		<ChipRow
-			chips={['Workout Day', 'Rest Day', 'All']}
-			selected={chip}
-			onSelect={(c) => (chip = c as typeof chip)}
+		<SegmentedControl
+			options={[
+				{ label: 'Workout day', value: 'workout' },
+				{ label: 'Rest day', value: 'rest' },
+				{ label: 'All', value: 'all' }
+			]}
+			selected={dayFilter}
+			onSelect={(v) => (dayFilter = v as typeof dayFilter)}
 		/>
 
-		{#if gap}
-			<TargetGapCard
-				title={gap.title}
-				message={gap.message}
-				metrics={gap.metrics}
-				cta="Quick Fix"
-				onCta={() => (quickFixOpen = true)}
-			/>
-		{/if}
+		<section class="card macro-target">
+			<h2 class="macro-target__title">Macro targets</h2>
+			<div class="macro-target__grid">
+				<div>
+					<span class="lbl">Calories</span><span class="val"
+						>{Math.round(planned.kcal)} / {Math.round(targets.kcal)}</span
+					>
+				</div>
+				<div>
+					<span class="lbl">Protein</span><span class="val"
+						>{Math.round(planned.protein)}g / {Math.round(targets.protein)}g</span
+					>
+				</div>
+				<div>
+					<span class="lbl">Carbs</span><span class="val"
+						>{Math.round(planned.carbs)}g / {Math.round(targets.carbs)}g</span
+					>
+				</div>
+				<div>
+					<span class="lbl">Fat</span><span class="val"
+						>{Math.round(planned.fat)}g / {Math.round(targets.fat)}g</span
+					>
+				</div>
+			</div>
+		</section>
 
-		{#each meals as m, i (`${chip}-${m.slot}-${i}`)}
+		{#each meals as m, i (`${dayFilter}-${m.slot}-${i}`)}
 			<MealCard
 				index={m.slot}
 				time={m.time}
@@ -225,6 +246,16 @@
 			</div>
 		{/each}
 
+		{#if gap}
+			<TargetGapCard
+				title={gap.title}
+				message={gap.message}
+				metrics={gap.metrics}
+				cta="Quick Fix"
+				onCta={() => (quickFixOpen = true)}
+			/>
+		{/if}
+
 		{#if emergency.length}
 			<section class="emerg nothing-surface">
 				<p class="mono-caps emerg-t">Backup / busy-day options</p>
@@ -234,7 +265,12 @@
 			</section>
 		{/if}
 
-		<SecondaryButton label="+ Add Meal" onclick={() => (addOpen = true)} />
+		<div class="cross-links">
+			<HealthButton variant="soft" href={ROUTES.systemGrocery}>Grocery list</HealthButton>
+			<HealthButton variant="soft" href={ROUTES.systemPrep}>Prep steps</HealthButton>
+		</div>
+
+		<SecondaryButton label="+ Add meal" onclick={() => (addOpen = true)} />
 	</main>
 {/if}
 
@@ -291,14 +327,46 @@
 		padding: var(--space-2) var(--space-4) var(--space-3);
 		border-radius: 0 0 var(--radius-widget) var(--radius-widget);
 	}
+	.macro-target__title {
+		margin: 0 0 var(--s-3);
+		font-size: var(--t-body-lg);
+		font-weight: var(--weight-bold);
+		color: var(--h-text);
+	}
+
+	.macro-target__grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--s-3);
+	}
+
+	.macro-target__grid .lbl {
+		display: block;
+		font-size: var(--t-caption);
+		color: var(--h-text-muted);
+		margin-bottom: 2px;
+	}
+
+	.macro-target__grid .val {
+		font-size: var(--t-callout);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text);
+	}
+
+	.cross-links {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--s-2);
+	}
+
 	.cook {
 		width: 100%;
 		min-height: 44px;
 		margin-top: 8px;
-		border-radius: var(--radius-xs);
-		border: 1px solid var(--line-2);
-		background: rgba(255, 42, 42, 0.1);
-		color: var(--text-1);
+		border-radius: var(--r-control);
+		border: 1px solid var(--h-accent-line);
+		background: var(--h-accent-soft);
+		color: var(--h-text);
 		font-weight: 650;
 		cursor: pointer;
 	}

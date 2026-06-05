@@ -13,42 +13,48 @@
 			<p class="t">{title}</p>
 			<p class="s">{subtitle}</p>
 		</div>
-		<span class="mono-caps tg">{tag}</span>
+		<span class="tg">{tag}</span>
 	</div>
 </div>
 
 <style>
 	.card {
-		padding: var(--space-3) var(--space-4);
-		margin-bottom: var(--space-2);
+		padding: var(--s-3) var(--s-4);
+		margin-bottom: var(--s-2);
+		border: 1px solid var(--h-blue-line);
+		background: linear-gradient(180deg, var(--h-blue-soft), var(--h-surface));
 	}
 
 	.row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-3);
+		gap: var(--s-3);
+		min-height: 64px;
 	}
 
 	.t {
 		margin: 0;
-		font-size: 15px;
-		font-weight: 600;
-		color: var(--text-1);
+		font-size: var(--t-callout);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text);
 	}
 
 	.s {
-		margin: 4px 0 0;
-		font-size: 12px;
-		color: var(--text-2);
+		margin: var(--s-1) 0 0;
+		font-size: var(--t-caption);
+		color: var(--h-text-muted);
+		line-height: var(--lh-caption);
 	}
 
 	.tg {
-		font-size: 8px;
-		color: var(--text-3);
-		border: 1px solid var(--line-1);
-		padding: 4px 8px;
-		border-radius: 999px;
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
+		color: var(--h-blue);
+		border: 1px solid var(--h-blue-line);
+		background: var(--h-blue-soft);
+		padding: var(--s-1) var(--s-2);
+		border-radius: var(--r-pill);
 		flex-shrink: 0;
 	}
 </style>

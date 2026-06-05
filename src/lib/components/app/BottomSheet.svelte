@@ -18,7 +18,7 @@
 	<div class="modal" role="presentation">
 		<button type="button" class="backdrop" aria-label="Close" onclick={onClose}></button>
 		<div
-			class="sheet nothing-surface"
+			class="sheet health-glass"
 			use:focusTrap={{ onEscape: onClose }}
 			role="dialog"
 			aria-modal="true"
@@ -42,7 +42,7 @@
 	.modal {
 		position: fixed;
 		inset: 0;
-		z-index: 200;
+		z-index: var(--z-sheet);
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
@@ -52,7 +52,9 @@
 		position: absolute;
 		inset: 0;
 		border: none;
-		background: var(--modal-scrim, rgba(0, 0, 0, 0.55));
+		background: var(--modal-scrim);
+		backdrop-filter: blur(var(--blur-sheet));
+		-webkit-backdrop-filter: blur(var(--blur-sheet));
 		cursor: pointer;
 	}
 
@@ -60,36 +62,36 @@
 		position: relative;
 		width: min(100vw, 430px);
 		max-height: 86dvh;
-		padding: var(--space-4);
-		padding-bottom: calc(var(--space-4) + var(--safe-bottom));
-		border-radius: var(--radius-sheet, 30px) var(--radius-sheet, 30px) 0 0;
-		border: 1px solid var(--line-1);
+		padding: var(--s-4);
+		padding-bottom: calc(var(--s-4) + var(--safe-bottom));
+		border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+		border: 1px solid var(--h-line-strong);
 		overflow: auto;
 	}
 
 	.handle {
 		width: 36px;
 		height: 4px;
-		margin: 0 auto var(--space-3);
-		border-radius: var(--radius-pill);
-		background: var(--line-2);
+		margin: 0 auto var(--s-3);
+		border-radius: var(--r-pill);
+		background: var(--h-line-strong);
 	}
 
 	.h {
-		margin: 0 0 var(--space-3);
-		font-size: 11px;
-		color: var(--text-2);
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
+		margin: 0 0 var(--s-3);
+		font-size: var(--t-title-3);
+		font-weight: var(--weight-bold);
+		letter-spacing: -0.02em;
+		color: var(--h-text);
 	}
 
 	.body {
-		margin-bottom: var(--space-2);
+		margin-bottom: var(--s-2);
 	}
 
 	.footer {
 		display: flex;
-		gap: var(--space-2);
-		margin-top: var(--space-3);
+		gap: var(--s-2);
+		margin-top: var(--s-3);
 	}
 </style>

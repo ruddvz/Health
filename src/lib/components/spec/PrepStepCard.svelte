@@ -16,31 +16,32 @@
 			<p class="t">{title}</p>
 			<p class="s">{subtitle}</p>
 		</div>
-		<span class="mono-caps tm">{time}</span>
+		<span class="tm">{time}</span>
 	</label>
 </div>
 
 <style>
 	.card {
 		padding: 0;
-		margin-bottom: var(--space-2);
+		margin-bottom: var(--s-2);
 		overflow: hidden;
 	}
 
 	.row {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
-		padding: var(--space-3) var(--space-4);
+		gap: var(--s-3);
+		padding: var(--s-3) var(--s-4);
 		min-height: 76px;
 		cursor: pointer;
 	}
 
 	.cb {
-		width: 20px;
-		height: 20px;
-		accent-color: var(--red);
+		width: 22px;
+		height: 22px;
+		accent-color: var(--h-accent);
 		flex-shrink: 0;
+		cursor: pointer;
 	}
 
 	.mid {
@@ -50,21 +51,22 @@
 
 	.t {
 		margin: 0;
-		font-size: 15px;
-		font-weight: 600;
-		color: var(--text-1);
+		font-size: var(--t-callout);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text);
 	}
 
 	.s {
-		margin: 4px 0 0;
-		font-size: 13px;
-		color: var(--text-2);
-		line-height: 1.35;
+		margin: var(--s-1) 0 0;
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+		line-height: var(--lh-caption);
 	}
 
 	.tm {
-		font-size: 9px;
-		color: var(--text-3);
+		font-size: var(--t-caption-2);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
 		flex-shrink: 0;
 	}
 </style>

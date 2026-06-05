@@ -11,11 +11,11 @@
 	let { options, selected, onSelect }: Props = $props();
 </script>
 
-<div class="seg nothing-surface-2" role="group">
+<div class="segmented" role="group">
 	{#each options as o (o.value)}
 		<button
 			type="button"
-			class="btn pressable"
+			class="seg-btn pressable"
 			class:on={selected === o.value}
 			aria-pressed={selected === o.value}
 			onclick={() => onSelect?.(o.value)}
@@ -26,42 +26,33 @@
 </div>
 
 <style>
-	.seg {
-		display: flex;
-		padding: 3px;
-		gap: 2px;
-		border-radius: var(--radius-sm);
-		margin-bottom: var(--space-3);
+	.segmented {
+		display: grid;
+		grid-auto-flow: column;
+		gap: 4px;
+		min-height: 44px;
+		padding: 4px;
+		border-radius: var(--r-pill);
+		background: rgba(255, 255, 255, 0.055);
+		border: 1px solid var(--h-line);
+		margin-bottom: var(--s-3);
 	}
 
-	@supports (corner-shape: squircle) {
-		.seg {
-			corner-shape: squircle;
-		}
-	}
-
-	.btn {
-		flex: 1;
+	.seg-btn {
 		border: none;
 		background: transparent;
-		padding: 8px 10px;
-		border-radius: 9px;
-		font-size: 13px;
-		font-weight: 600;
-		color: var(--text-2);
+		padding: 8px 12px;
+		border-radius: var(--r-pill);
+		font-size: var(--t-footnote);
+		font-weight: 650;
+		color: var(--h-text-muted);
 		cursor: pointer;
-		min-height: 38px;
+		min-height: 36px;
 	}
 
-	@supports (corner-shape: squircle) {
-		.btn {
-			corner-shape: squircle;
-		}
-	}
-
-	.btn.on {
-		background: var(--red);
-		color: #fff;
-		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+	.seg-btn.on {
+		background: var(--h-surface-3);
+		color: var(--h-text);
+		box-shadow: inset 0 0 0 1px var(--h-line-strong);
 	}
 </style>

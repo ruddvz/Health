@@ -93,12 +93,12 @@
 
 	.bar-fill {
 		height: 100%;
-		background: var(--red);
+		background: var(--h-accent);
 		border-radius: 2px;
 	}
 
 	.action {
 		margin: var(--space-2) 0 0;
-		color: var(--red);
+		color: var(--h-accent);
 	}
 </style>

@@ -47,7 +47,7 @@
 	}
 
 	.dot.filled {
-		background: var(--red);
-		border-color: var(--red);
+		background: var(--h-accent);
+		border-color: var(--h-accent-line);
 	}
 </style>

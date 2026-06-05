@@ -13,7 +13,7 @@
 <header class="head">
 	<div class="left">
 		{#if eyebrow}
-			<p class="eyebrow mono-caps">{eyebrow}</p>
+			<p class="eyebrow">{eyebrow}</p>
 		{/if}
 		<h1 class="title">{title}</h1>
 		{#if subtitle}
@@ -30,8 +30,8 @@
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
-		gap: var(--space-3);
-		margin-bottom: 14px;
+		gap: var(--s-3);
+		margin: 8px 0 18px;
 	}
 
 	.left {
@@ -40,31 +40,38 @@
 	}
 
 	.eyebrow {
-		margin: 0 0 var(--space-1);
-		color: var(--text-3);
+		margin: 0 0 6px;
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--h-text-faint);
 	}
 
 	.title {
 		margin: 0;
-		font-family: var(--font-mono);
-		font-size: 31px;
-		font-weight: 700;
-		letter-spacing: 0.075em;
-		line-height: calc(36 / 31);
-		text-transform: uppercase;
-		color: var(--text-1);
-		white-space: pre-line;
+		font-size: clamp(28px, 7vw, var(--t-title-1));
+		font-weight: 760;
+		letter-spacing: -0.03em;
+		line-height: var(--lh-title);
+		color: var(--h-text);
 	}
 
 	.sub {
-		margin: var(--space-2) 0 0;
-		font-size: 14px;
-		line-height: calc(21 / 14);
-		color: var(--text-2);
+		margin: 6px 0 0;
+		font-size: var(--t-callout);
+		line-height: var(--lh-body);
+		color: var(--h-text-muted);
 	}
 
 	.right {
 		flex-shrink: 0;
-		padding-top: 2px;
+		padding-top: 4px;
+	}
+
+	@media (min-width: 768px) {
+		.head {
+			margin-bottom: 24px;
+		}
 	}
 </style>
