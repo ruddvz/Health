@@ -15,7 +15,7 @@
 		"format": "prettier --write .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
-		"test:e2e": "playwright test",
+		"test:e2e": "playwright test --project=chromium",
 		"test:e2e:screenshots": "playwright test e2e/screenshots-routes.spec.ts",
 		"test:e2e:screenshots:update": "playwright test e2e/screenshots-routes.spec.ts --update-snapshots",
 		"quality": "npm run check && npm run lint && npm test && npm run build && npm run verify:sw",
