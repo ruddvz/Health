@@ -8,13 +8,22 @@ import {
 import type { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
 import { getWebAuthnEnv } from './env.js';
 import { bearerToken, errorResponse, jsonResponse, readJson } from './http.js';
+import { checkRateLimit, rateLimitResponse } from './rateLimit.js';
 import { memoryStore } from './memoryStore.js';
 import { getDb } from './supabaseDb.js';
 
 const CHALLENGE_TTL_MS = 5 * 60_000;
 const SESSION_TTL_MS = 30 * 24 * 60 * 60_000;
 
+function guardRequest(request: Request, route: string): Response | null {
+	const rl = checkRateLimit(request, route, 40);
+	if (!rl.ok) return rateLimitResponse(request, rl.retryAfterSec);
+	return null;
+}
+
 export async function handleRegisterOptions(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'register-options');
+	if (blocked) return blocked;
 	const env = getWebAuthnEnv();
 	const body = await readJson<{ email?: string; displayName?: string }>(request);
 	const email = body.email?.trim().toLowerCase() || null;
@@ -50,6 +59,8 @@ export async function handleRegisterOptions(request: Request): Promise<Response>
 }
 
 export async function handleRegisterVerify(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'register-verify');
+	if (blocked) return blocked;
 	const env = getWebAuthnEnv();
 	const body = await readJson<{
 		challengeId: string;
@@ -98,6 +109,8 @@ export async function handleRegisterVerify(request: Request): Promise<Response> 
 }
 
 export async function handleAuthenticateOptions(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'auth-options');
+	if (blocked) return blocked;
 	const env = getWebAuthnEnv();
 	const body = await readJson<{ email?: string }>(request).catch(() => ({}));
 	const db = await getDb();
@@ -126,6 +139,8 @@ export async function handleAuthenticateOptions(request: Request): Promise<Respo
 }
 
 export async function handleAuthenticateVerify(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'auth-verify');
+	if (blocked) return blocked;
 	const env = getWebAuthnEnv();
 	const body = await readJson<{
 		challengeId: string;
@@ -169,6 +184,8 @@ export async function handleAuthenticateVerify(request: Request): Promise<Respon
 }
 
 export async function handleBackupPut(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'backup-put');
+	if (blocked) return blocked;
 	const token = bearerToken(request);
 	if (!token) return errorResponse(request, 'Unauthorized', 401);
 	const db = await getDb();
@@ -183,6 +200,8 @@ export async function handleBackupPut(request: Request): Promise<Response> {
 }
 
 export async function handleBackupGet(request: Request): Promise<Response> {
+	const blocked = guardRequest(request, 'backup-get');
+	if (blocked) return blocked;
 	const token = bearerToken(request);
 	if (!token) return errorResponse(request, 'Unauthorized', 401);
 	const db = await getDb();

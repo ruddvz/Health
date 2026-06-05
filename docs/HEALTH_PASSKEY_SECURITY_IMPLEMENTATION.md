@@ -112,4 +112,13 @@ When extending Health Lock:
 
 API routes: `/api/webauthn/register/options`, `verify`, `authenticate/options`, `verify`, `/api/health/backup`, `/api/health/status`
 
-Without Supabase credentials the API uses an in-memory store (dev/demo only).
+## API security (production)
+
+- **CORS:** `HEALTH_ALLOWED_ORIGINS` — comma-separated allowlist. Defaults include `https://ruddvz.github.io`. Local dev also allows `http://localhost:5173` when `NODE_ENV !== 'production'`. Responses use `Vary: Origin`.
+- **Database mode:** If `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set, the API uses Supabase. Otherwise:
+  - **Development:** set `HEALTH_ALLOW_MEMORY_STORE=true` to use in-memory storage (data is lost on cold start).
+  - **Production:** missing Supabase **without** that flag returns HTTP 500 from `/api/health/status` and throws on passkey routes — fail closed.
+- **Request bodies:** JSON bodies are capped at 256 KB (`readJson` in `server/webauthn/http.ts`).
+- **Rate limiting:** In-memory per-IP limits on register/auth/backup handlers (suitable for demo; use edge rate limiting for high traffic).
+
+Without Supabase and without `HEALTH_ALLOW_MEMORY_STORE=true` in production, cloud passkey features are intentionally unavailable.

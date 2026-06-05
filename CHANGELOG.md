@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### iOS PWA polish and no-plan UX (continued)
+
+- **Structured validation** (`ValidationIssue` with codes, paths, fix hints) and expanded safety checks (allergies, meds+supplements, unsafe calories, schedule/meal times, duplicate phase ids).
+- **Import preview** — Review pasted/uploaded JSON before Apply; health disclaimer on import screen.
+- **`BottomSheet`** component; import paste uses shared sheet.
+- **System hub** — live PWA version, standalone status, service worker status, storage estimate.
+- **Privacy** page includes health disclaimer card.
+- **API:** JSON body size cap (256 KB), per-route rate limits, production fail-closed validation for blocking issues.
+- **Playwright** screenshot regression (`npm run test:e2e:screenshots`) for mobile + iPhone-width viewports.
+- Docs: iOS PWA QA section, passkey API security notes.
+
 ### iOS PWA polish and no-plan UX
 
 - **Welcome launcher** on `/` before intake — create prompt, import JSON, demo sample plan, privacy copy, continue draft.

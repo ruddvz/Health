@@ -70,26 +70,6 @@ export function collectPlanWarnings(plan: PlanV2 | null): string[] {
 		);
 	}
 
-	const wl = num((plan as Record<string, unknown>).water_target_litres);
-	if (wl != null && wl > 4) {
-		warnings.push(
-			'Water target is above 4 L/day — confirm this fits your clinician’s advice and climate.'
-		);
-	}
-
-	const sup = plan.supplements as Record<string, unknown> | undefined;
-	const planRec = plan as Record<string, unknown>;
-	if (
-		sup &&
-		typeof sup === 'object' &&
-		!planRec.safety &&
-		!(sup.safety && typeof sup.safety === 'object')
-	) {
-		warnings.push(
-			'Supplement section has no explicit safety block — treat claims as general wellness, not medical facts.'
-		);
-	}
-
 	return dedupe(warnings);
 }
 

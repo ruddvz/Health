@@ -32,6 +32,11 @@ html[data-theme='light'] {
 
 	--chart-grid: rgba(0, 0, 0, 0.06);
 	--dot-grid-dot: rgba(0, 0, 0, 0.055);
+
+	--input-bg: rgba(0, 0, 0, 0.04);
+	--modal-scrim: rgba(0, 0, 0, 0.45);
+	--warning-surface: rgba(255, 159, 10, 0.12);
+	--warning-border: rgba(255, 159, 10, 0.35);
 }
 
 html[data-theme='light'] .nothing-surface {

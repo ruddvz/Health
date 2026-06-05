@@ -8,21 +8,40 @@
 	import { LS_PLAN } from '$lib/constants/storage';
 	import { onboarding, persistOnboarding, importWarnings, plan } from '$lib/stores/healthApp';
 	import { parsePlanJsonText } from '$lib/validation/planV2';
+	import type { ValidationIssue } from '$lib/validation/issues';
 	import { get } from 'svelte/store';
 
 	const hasPlan = $derived(Boolean($plan));
 
 	const diag = $derived.by(() => {
-		if (!browser)
-			return { noPlan: true, error: null as string | null, parseWarnings: [] as string[] };
+		if (!browser) {
+			return {
+				noPlan: true,
+				issues: [] as ValidationIssue[],
+				parseWarnings: [] as string[]
+			};
+		}
 		const raw = localStorage.getItem(LS_PLAN);
-		if (!raw) return { noPlan: true, error: null, parseWarnings: [] as string[] };
+		if (!raw)
+			return { noPlan: true, issues: [] as ValidationIssue[], parseWarnings: [] as string[] };
 		const r = parsePlanJsonText(raw);
-		if (!r.ok) return { noPlan: false, error: r.error, parseWarnings: r.warnings };
-		return { noPlan: false, error: null, parseWarnings: r.warnings };
+		if (!r.ok) {
+			return { noPlan: false, issues: r.issues, parseWarnings: r.warnings };
+		}
+		return { noPlan: false, issues: r.issues, parseWarnings: r.warnings };
 	});
 
-	const allWarnings = $derived([...diag.parseWarnings, ...$importWarnings]);
+	const liveImport = $derived($importWarnings);
+	const displayIssues = $derived.by((): ValidationIssue[] => {
+		const fromParse = diag.issues.filter((i) => i.level !== 'info');
+		const extra: ValidationIssue[] = liveImport.map((m) => ({
+			level: 'warning',
+			code: 'IMPORT_RUNTIME',
+			path: 'import',
+			message: m
+		}));
+		return [...fromParse, ...extra];
+	});
 
 	function startIntake() {
 		persistOnboarding({ ...get(onboarding), intakeLaunched: true });
@@ -40,30 +59,37 @@
 		>
 			<NoPlanActions onStartIntake={startIntake} />
 		</EmptyState>
-	{:else if diag.error}
-		<section class="err nothing-surface" role="status">
-			<p class="mono-caps t">Validation error</p>
-			<p class="b">{diag.error}</p>
-		</section>
 	{:else}
-		<section class="ok nothing-surface" role="status">
-			<p class="mono-caps t">Schema</p>
-			<p class="b">Plan JSON parses and required sections are present.</p>
-		</section>
-	{/if}
-
-	{#if hasPlan && allWarnings.length}
-		<section class="warn nothing-surface">
-			<p class="mono-caps t">Warnings</p>
-			<ul>
-				{#each allWarnings as w, i (i)}
-					<li>{w}</li>
-				{/each}
-			</ul>
-		</section>
-	{/if}
-
-	{#if hasPlan && !diag.error && !diag.noPlan}
+		{@const errors = displayIssues.filter((i) => i.level === 'error')}
+		{@const warnings = displayIssues.filter((i) => i.level === 'warning')}
+		{#if errors.length === 0}
+			<section class="ok nothing-surface" role="status">
+				<p class="mono-caps t">Schema</p>
+				<p class="b">Plan JSON parses and required sections are present.</p>
+			</section>
+		{/if}
+		{#each errors as issue (issue.code + issue.path)}
+			<section class="err nothing-surface" role="alert">
+				<p class="mono-caps t">{issue.code}</p>
+				<p class="b">{issue.message}</p>
+				{#if issue.fixHint}
+					<p class="hint">{issue.fixHint}</p>
+				{/if}
+			</section>
+		{/each}
+		{#if warnings.length}
+			<section class="warn nothing-surface">
+				<p class="mono-caps t">Warnings ({warnings.length})</p>
+				<ul>
+					{#each warnings as issue (issue.code + issue.path)}
+						<li>
+							<span class="code">{issue.code}</span>
+							{issue.message}
+						</li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
 		<a class="import-link" href={resolve('/import')}>Re-import or replace plan</a>
 	{/if}
 </main>
@@ -94,16 +120,36 @@
 		line-height: 1.5;
 	}
 
+	.hint {
+		margin: var(--space-2) 0 0;
+		font-size: 13px;
+		color: var(--text-3);
+		line-height: 1.45;
+	}
+
 	.err .t {
 		color: var(--danger, var(--red));
 	}
 
 	ul {
 		margin: 0;
-		padding-left: 1.1rem;
-		color: var(--text-2);
+		padding-left: 0;
+		list-style: none;
 		font-size: 14px;
 		line-height: 1.55;
+		color: var(--text-2);
+	}
+
+	li {
+		margin-bottom: var(--space-2);
+	}
+
+	.code {
+		display: block;
+		font-size: 9px;
+		color: var(--text-3);
+		letter-spacing: 0.06em;
+		margin-bottom: 2px;
 	}
 
 	.import-link {

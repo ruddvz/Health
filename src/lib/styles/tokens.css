@@ -84,4 +84,9 @@
 	--nav-h: 76px;
 	--safe-bottom: env(safe-area-inset-bottom, 0px);
 	--safe-top: env(safe-area-inset-top, 0px);
+
+	--input-bg: rgba(0, 0, 0, 0.35);
+	--modal-scrim: rgba(0, 0, 0, 0.55);
+	--warning-surface: rgba(255, 159, 10, 0.08);
+	--warning-border: rgba(255, 159, 10, 0.35);
 }

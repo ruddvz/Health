@@ -23,8 +23,8 @@
 	.card {
 		padding: var(--space-4);
 		margin-bottom: var(--space-3);
-		border-color: rgba(255, 204, 77, 0.35);
-		background: rgba(255, 204, 77, 0.08);
+		border-color: var(--warning-border);
+		background: var(--warning-surface);
 	}
 
 	.t {

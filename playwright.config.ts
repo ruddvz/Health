@@ -9,8 +9,32 @@ export default defineConfig({
 	retries: process.env.CI ? 1 : 0,
 	timeout: 60_000,
 	expect: { timeout: 15_000 },
+	snapshotPathTemplate: '{testDir}/screenshots/{projectName}/{arg}{ext}',
+	projects: [
+		{
+			name: 'chromium',
+			testIgnore: /screenshots-routes\.spec\.ts/,
+			use: { ...devices['Pixel 5'] }
+		},
+		{
+			name: 'screenshots-mobile',
+			testMatch: /screenshots-routes\.spec\.ts/,
+			use: { ...devices['Pixel 5'] }
+		},
+		{
+			name: 'screenshots-iphone',
+			testMatch: /screenshots-routes\.spec\.ts/,
+			use: {
+				...devices['Pixel 5'],
+				viewport: { width: 393, height: 852 },
+				deviceScaleFactor: 3,
+				isMobile: true,
+				hasTouch: true,
+				userAgent: devices['iPhone 13'].userAgent
+			}
+		}
+	],
 	use: {
-		...devices['Pixel 5'],
 		baseURL
 	},
 	webServer: {

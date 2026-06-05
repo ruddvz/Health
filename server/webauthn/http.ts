@@ -55,8 +55,22 @@ export function errorResponse(request: Request, message: string, status = 400): 
 	return jsonResponse(request, { ok: false, error: message }, status);
 }
 
+export const MAX_JSON_BODY_BYTES = 256 * 1024;
+
 export async function readJson<T>(request: Request): Promise<T> {
-	return (await request.json()) as T;
+	const len = request.headers.get('content-length');
+	if (len) {
+		const n = Number(len);
+		if (Number.isFinite(n) && n > MAX_JSON_BODY_BYTES) {
+			throw new Error('Request body too large');
+		}
+	}
+	const text = await request.text();
+	if (text.length > MAX_JSON_BODY_BYTES) {
+		throw new Error('Request body too large');
+	}
+	if (!text.trim()) return {} as T;
+	return JSON.parse(text) as T;
 }
 
 export function bearerToken(request: Request): string | null {

@@ -1,19 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { importPlanViaPaste } from './helpers/importPlan';
 
 const minimalPlan = readFileSync(join(process.cwd(), 'samples/minimal-plan-v2.json'), 'utf8');
 
 test.describe('Plan loaded flow', () => {
 	test.beforeEach(async ({ page }) => {
-		await page.goto('./import');
-		await page.getByRole('button', { name: 'Paste JSON' }).click();
-		await page.getByLabel('Plan JSON').fill(minimalPlan);
-		await page.getByRole('button', { name: 'Validate' }).click();
-		const passkey = page.getByRole('dialog', { name: /protect your health plan/i });
-		if (await passkey.isVisible().catch(() => false)) {
-			await page.getByRole('button', { name: /not now/i }).click();
-		}
+		await importPlanViaPaste(page, minimalPlan);
 		await expect(page.getByText('TODAY').first()).toBeVisible({ timeout: 15_000 });
 	});
 
