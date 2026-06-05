@@ -8,31 +8,33 @@ test.describe('No-plan empty states', () => {
 	});
 
 	test('welcome screen explains the app', async ({ page }) => {
-		await expect(page.getByRole('heading', { name: /private daily health plan/i })).toBeVisible();
-		await expect(page.getByRole('button', { name: /Create plan prompt/ }).first()).toBeVisible();
-		await expect(page.getByRole('link', { name: /import json/i }).first()).toBeVisible();
+		await expect(
+			page.getByRole('heading', { name: /daily health plan, without the noise/i })
+		).toBeVisible();
+		await expect(page.getByRole('button', { name: /Create plan prompt/i }).first()).toBeVisible();
+		await expect(page.getByRole('link', { name: /Import my plan/i }).first()).toBeVisible();
 	});
 
 	test('Today shows no-plan state', async ({ page }) => {
 		await page.goto('./today');
-		await expect(page.getByText('No plan loaded yet')).toBeVisible();
-		await expect(page.getByRole('link', { name: 'Import JSON' })).toBeVisible();
+		await expect(page.getByText('Build your daily command center')).toBeVisible();
+		await expect(page.getByRole('link', { name: 'Import plan' })).toBeVisible();
 	});
 
 	test('Meals shows no-plan state', async ({ page }) => {
 		await page.goto('./meals');
-		await expect(page.getByText('Meals come from your plan')).toBeVisible();
+		await expect(page.getByText('Meals appear after import')).toBeVisible();
 	});
 
 	test('Train shows no-plan state', async ({ page }) => {
 		await page.goto('./train');
-		await expect(page.getByText('Training needs a plan')).toBeVisible();
+		await expect(page.getByText('Training unlocks with your plan')).toBeVisible();
 	});
 
 	test('Progress allows logging without plan', async ({ page }) => {
 		await page.goto('./progress');
-		await expect(page.getByRole('heading', { name: /No plan loaded yet/i })).toBeVisible();
-		await expect(page.getByText('Log Check-in')).toBeVisible();
+		await expect(page.getByRole('heading', { name: /Track progress privately/i })).toBeVisible();
+		await expect(page.getByRole('button', { name: /log check-in/i }).first()).toBeVisible();
 	});
 
 	test('Diagnostics does not claim schema parses without plan', async ({ page }) => {
@@ -44,7 +46,7 @@ test.describe('No-plan empty states', () => {
 	test('System Phases shows no-plan state', async ({ page }) => {
 		await page.goto('./system/phases');
 		await expect(page.getByRole('heading', { name: /Phases need a plan/i })).toBeVisible();
-		await expect(page.getByRole('link', { name: 'Import JSON' })).toBeVisible();
+		await expect(page.getByRole('link', { name: 'Import plan' })).toBeVisible();
 	});
 
 	test('System Grocery shows no-plan state', async ({ page }) => {

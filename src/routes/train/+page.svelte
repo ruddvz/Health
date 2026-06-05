@@ -4,8 +4,8 @@
 	import ExerciseRow from '$lib/components/spec/ExerciseRow.svelte';
 	import EmptyState from '$lib/components/app/EmptyState.svelte';
 	import NoPlanActions from '$lib/components/app/NoPlanActions.svelte';
-	import RedActionButton from '$lib/components/nothing/RedActionButton.svelte';
-	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
+	import AppHeader from '$lib/components/app/AppHeader.svelte';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
 	import WorkoutHeroCard from '$lib/components/spec/WorkoutHeroCard.svelte';
 	import { getTrainingDay } from '$lib/logic/planDerive';
@@ -40,18 +40,26 @@
 </script>
 
 {#if !$plan}
-	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="TRAIN" />
+	<main class="screen stack">
+		<AppHeader
+			title="Train"
+			subtitle="Workouts from your plan"
+			pageLabel="Train"
+			planState="none"
+		/>
 		<EmptyState
-			title="Training needs a plan"
-			body="Your program lives in training.weekly_split inside your Health JSON. Import a plan or load the demo sample to see today's workout, log sets, and track history."
+			title="Training unlocks with your plan"
+			body="Import a plan to see today's workout, log sets, use rest timers, and track history."
 		>
+			{#snippet preview()}
+				<p class="hint">Plan builder note: Health supports training.weekly_split.</p>
+			{/snippet}
 			<NoPlanActions onStartIntake={startIntake} />
 		</EmptyState>
 	</main>
 {:else}
-	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="TRAIN" />
+	<main class="screen stack">
+		<AppHeader title="Train" subtitle="Today's session" pageLabel="Train" planState="loaded" />
 
 		{#if day}
 			<WorkoutHeroCard
@@ -75,7 +83,9 @@
 				/>
 			{/each}
 
-			<RedActionButton label="Start Session" onclick={() => goto(resolve('/train/session'))} />
+			<HealthButton variant="primary" block onclick={() => goto(resolve('/train/session'))}>
+				Start workout
+			</HealthButton>
 
 			<SectionLabel text="RECENT SESSIONS" />
 			{#if sessions.length === 0}

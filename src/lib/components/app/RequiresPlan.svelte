@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import EmptyState from '$lib/components/app/EmptyState.svelte';
 	import NoPlanActions from '$lib/components/app/NoPlanActions.svelte';
-	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
+	import AppHeader from '$lib/components/app/AppHeader.svelte';
 	import { onboarding, persistOnboarding, plan } from '$lib/stores/healthApp';
 	import type { Snippet } from 'svelte';
 	import { get } from 'svelte/store';
@@ -11,12 +11,13 @@
 	interface Props {
 		title: string;
 		subtitle?: string;
+		pageLabel?: string;
 		emptyTitle: string;
 		emptyBody: string;
 		children: Snippet;
 	}
 
-	let { title, subtitle, emptyTitle, emptyBody, children }: Props = $props();
+	let { title, subtitle, pageLabel, emptyTitle, emptyBody, children }: Props = $props();
 
 	function startIntake() {
 		persistOnboarding({ ...get(onboarding), intakeLaunched: true });
@@ -27,8 +28,8 @@
 {#if $plan}
 	{@render children()}
 {:else}
-	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock {title} {subtitle} />
+	<main class="screen stack">
+		<AppHeader {title} {subtitle} pageLabel={pageLabel ?? title} planState="none" />
 		<EmptyState title={emptyTitle} body={emptyBody}>
 			<NoPlanActions onStartIntake={startIntake} />
 		</EmptyState>
@@ -38,6 +39,5 @@
 <style>
 	.screen {
 		flex: 1;
-		padding-bottom: var(--space-6);
 	}
 </style>

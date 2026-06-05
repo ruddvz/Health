@@ -1,65 +1,82 @@
 :root {
-	color-scheme: dark;
+	color-scheme: light;
 
-	/* Tokens aligned with assets/health_pwa_nothing_os_visual_spec.json */
-	--bg: #0b0b0b;
-	--bg-elevated: #101010;
-	--bg-grid: #101010;
+	/* Health wellness tokens */
+	--health-bg: #f7f4ee;
+	--health-bg-2: #fffaf0;
+	--health-surface: #ffffff;
+	--health-surface-soft: #fbf7ef;
+	--health-surface-raised: rgba(255, 255, 255, 0.84);
+	--health-glass: rgba(255, 255, 255, 0.72);
 
-	--surface-1: #121212;
-	--surface-2: #181818;
-	--surface-3: #202020;
-	--surface-hover: #242424;
+	--health-ink: #14110f;
+	--health-ink-2: #332d29;
+	--health-muted: #746b61;
+	--health-muted-2: #9c9286;
+	--health-faint: #c9bfb1;
 
-	--text-1: #f4f4f0;
-	--text-2: #b9b9b2;
-	--text-3: #777771;
-	--text-disabled: #555550;
+	--health-line: rgba(42, 33, 24, 0.1);
+	--health-line-strong: rgba(42, 33, 24, 0.18);
 
-	--line-1: rgba(255, 255, 255, 0.08);
-	--line-2: rgba(255, 255, 255, 0.16);
-	--line-3: rgba(255, 255, 255, 0.24);
+	--health-green: #1f8f5f;
+	--health-green-soft: #e8f7ef;
+	--health-amber: #c77a12;
+	--health-amber-soft: #fff1d8;
+	--health-blue: #2374ab;
+	--health-blue-soft: #e8f3fb;
+	--health-purple: #6c5ce7;
+	--health-purple-soft: #efecff;
+	--health-red: #c83232;
+	--health-red-soft: #fdecec;
 
-	--red: #ff453a;
-	--red-hover: #ff5e55;
-	--red-pressed: #d93d34;
-	--red-soft: rgba(255, 69, 58, 0.14);
-	--red-line: rgba(255, 69, 58, 0.42);
+	--health-primary: #14110f;
+	--health-primary-text: #ffffff;
+	--health-secondary: #ffffff;
+	--health-secondary-text: #14110f;
 
-	--ios-blue: #0a84ff;
-	--ios-green: #34c759;
-	--ios-red: #ff453a;
-	--ios-orange: #ff9f0a;
-	--ios-yellow: #ffd60a;
-	--ios-purple: #bf5af2;
-
-	--accent: var(--ios-blue);
-	--success: var(--ios-green);
-	--warning: var(--ios-orange);
-	--danger: var(--ios-red);
-	--shadow-card: 0 14px 40px rgba(0, 0, 0, 0.32);
-	--shadow-phone: 0 30px 90px rgba(0, 0, 0, 0.55);
-	--shadow-red-glow: 0 0 22px rgba(255, 42, 42, 0.28);
-
-	--white-soft: rgba(255, 255, 255, 0.92);
-	--black-soft: rgba(0, 0, 0, 0.55);
-
-	--info: #c9c9c9;
-	--chart-grid: rgba(255, 255, 255, 0.06);
-	--dot-grid-dot: rgba(255, 255, 255, 0.065);
-
-	/* design_tokens.radii + NothingWidget.border_radius 18 */
 	--radius-xs: 8px;
 	--radius-sm: 12px;
 	--radius-md: 16px;
 	--radius-lg: 22px;
 	--radius-xl: 28px;
+	--radius-2xl: 34px;
 	--radius-pill: 999px;
-	--radius-card: 24px;
-	--radius-control: 16px;
-	--radius-sheet: 30px;
-	--radius-widget: 18px;
-	--radius-list: 14px;
+
+	--shadow-card: 0 14px 34px rgba(35, 28, 20, 0.08);
+	--shadow-card-soft: 0 8px 22px rgba(35, 28, 20, 0.06);
+	--shadow-float: 0 20px 50px rgba(35, 28, 20, 0.16);
+
+	--page-max: 1120px;
+	--mobile-pad: 16px;
+	--desktop-pad: 32px;
+	--topbar-h: 72px;
+	--tabbar-h: 76px;
+
+	/* Typography */
+	--text-2xs: 10px;
+	--text-xs: 12px;
+	--text-sm: 13px;
+	--text-base: 15px;
+	--text-md: 17px;
+	--text-lg: 20px;
+	--text-xl: 24px;
+	--text-2xl: 30px;
+	--text-hero: 38px;
+
+	--leading-tight: 1.08;
+	--leading-title: 1.16;
+	--leading-body: 1.45;
+	--leading-relaxed: 1.62;
+
+	--weight-regular: 400;
+	--weight-medium: 500;
+	--weight-semibold: 650;
+	--weight-bold: 760;
+
+	--font-ui:
+		-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI',
+		sans-serif;
+	--font-mono: 'SF Mono', ui-monospace, monospace;
 
 	--space-1: 4px;
 	--space-2: 8px;
@@ -72,21 +89,100 @@
 	--space-10: 40px;
 	--space-12: 48px;
 
-	--motion-fast: 120ms;
+	--motion-fast: 140ms;
 	--motion-base: 180ms;
 	--motion-slow: 260ms;
 	--motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-	--font-ui:
-		-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', Inter, system-ui, sans-serif;
-	--font-mono: 'SF Mono', 'Roboto Mono', 'IBM Plex Mono', ui-monospace, monospace;
-
-	--nav-h: 76px;
+	--nav-h: var(--tabbar-h);
 	--safe-bottom: env(safe-area-inset-bottom, 0px);
 	--safe-top: env(safe-area-inset-top, 0px);
 
-	--input-bg: rgba(0, 0, 0, 0.35);
+	--input-bg: rgba(20, 17, 15, 0.04);
+	--modal-scrim: rgba(20, 17, 15, 0.42);
+	--warning-surface: var(--health-amber-soft);
+	--warning-border: rgba(199, 122, 18, 0.35);
+
+	/* Legacy aliases (existing components) */
+	--bg: var(--health-bg);
+	--bg-elevated: var(--health-bg-2);
+	--bg-grid: var(--health-bg);
+	--surface-1: var(--health-surface);
+	--surface-2: var(--health-surface-soft);
+	--surface-3: var(--health-surface-soft);
+	--surface-hover: var(--health-surface-soft);
+	--text-1: var(--health-ink);
+	--text-2: var(--health-ink-2);
+	--text-3: var(--health-muted);
+	--text-disabled: var(--health-muted-2);
+	--line-1: var(--health-line);
+	--line-2: var(--health-line-strong);
+	--line-3: var(--health-line-strong);
+	--red: var(--health-red);
+	--red-hover: #d93d34;
+	--red-pressed: #b02a2a;
+	--red-soft: var(--health-red-soft);
+	--red-line: rgba(200, 50, 50, 0.38);
+	--accent: var(--health-blue);
+	--success: var(--health-green);
+	--warning: var(--health-amber);
+	--danger: var(--health-red);
+	--ios-blue: var(--health-blue);
+	--ios-green: var(--health-green);
+	--ios-red: var(--health-red);
+	--ios-orange: var(--health-amber);
+	--ios-yellow: #e6b422;
+	--ios-purple: var(--health-purple);
+	--shadow-phone: var(--shadow-float);
+	--shadow-red-glow: none;
+	--dot-grid-dot: transparent;
+	--chart-grid: var(--health-line);
+	--radius-card: var(--radius-xl);
+	--radius-control: var(--radius-md);
+	--radius-sheet: var(--radius-2xl);
+	--radius-widget: var(--radius-lg);
+	--radius-list: var(--radius-md);
+}
+
+html[data-theme='dark'] {
+	color-scheme: dark;
+
+	--health-bg: #11100e;
+	--health-bg-2: #171512;
+	--health-surface: #1d1a17;
+	--health-surface-soft: #24211d;
+	--health-surface-raised: rgba(29, 26, 23, 0.86);
+	--health-glass: rgba(29, 26, 23, 0.72);
+
+	--health-ink: #fff9ef;
+	--health-ink-2: #eee3d5;
+	--health-muted: #b8ac9d;
+	--health-muted-2: #8f8376;
+	--health-faint: #5f554b;
+
+	--health-line: rgba(255, 249, 239, 0.1);
+	--health-line-strong: rgba(255, 249, 239, 0.18);
+
+	--health-green: #63d99f;
+	--health-green-soft: rgba(99, 217, 159, 0.14);
+	--health-amber: #f2b65b;
+	--health-amber-soft: rgba(242, 182, 91, 0.14);
+	--health-blue: #76c6ff;
+	--health-blue-soft: rgba(118, 198, 255, 0.14);
+	--health-purple: #a89cff;
+	--health-purple-soft: rgba(168, 156, 255, 0.14);
+	--health-red: #ff8a8a;
+	--health-red-soft: rgba(255, 138, 138, 0.14);
+
+	--health-primary: #fff9ef;
+	--health-primary-text: #11100e;
+	--health-secondary: #24211d;
+	--health-secondary-text: #fff9ef;
+
+	--shadow-card: 0 14px 34px rgba(0, 0, 0, 0.32);
+	--shadow-card-soft: 0 8px 22px rgba(0, 0, 0, 0.24);
+	--shadow-float: 0 20px 50px rgba(0, 0, 0, 0.45);
+
+	--input-bg: rgba(255, 255, 255, 0.06);
 	--modal-scrim: rgba(0, 0, 0, 0.55);
-	--warning-surface: rgba(255, 159, 10, 0.08);
-	--warning-border: rgba(255, 159, 10, 0.35);
 }

@@ -8,7 +8,7 @@
 	import ChipRow from '$lib/components/spec/ChipRow.svelte';
 	import MealCard from '$lib/components/spec/MealCard.svelte';
 	import QuickFixSheet from '$lib/components/spec/QuickFixSheet.svelte';
-	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
+	import AppHeader from '$lib/components/app/AppHeader.svelte';
 	import SecondaryButton from '$lib/components/spec/SecondaryButton.svelte';
 	import TargetGapCard from '$lib/components/spec/TargetGapCard.svelte';
 	import { logicalDateKey } from '$lib/logic/dateKey';
@@ -160,18 +160,23 @@
 </script>
 
 {#if !$plan}
-	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="MEALS" />
+	<main class="screen stack">
+		<AppHeader
+			title="Meals"
+			subtitle="Nutrition from your plan"
+			pageLabel="Meals"
+			planState="none"
+		/>
 		<EmptyState
-			title="Meals come from your plan"
-			body="Import a Health JSON plan or load the demo sample. Meals will appear here with macros, cook mode, swaps, and logging once a plan is loaded."
+			title="Meals appear after import"
+			body="Load a plan to see meal cards, macros, cook mode, swaps, and grocery prep."
 		>
 			<NoPlanActions onStartIntake={startIntake} />
 		</EmptyState>
 	</main>
 {:else}
-	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="MEALS" />
+	<main class="screen stack">
+		<AppHeader title="Meals" subtitle="Today's nutrition" pageLabel="Meals" planState="loaded" />
 
 		<ChipRow
 			chips={['Workout Day', 'Rest Day', 'All']}

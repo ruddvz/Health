@@ -1,7 +1,10 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import { loadSamplePlan } from '$lib/logic/loadSamplePlan';
 	import { hasOnboardingDraft } from '$lib/logic/onboardingDraft';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
+	import HealthChip from '$lib/components/ui/HealthChip.svelte';
+	import PrivacyCard from '$lib/components/ui/PrivacyCard.svelte';
+	import SafetyCard from '$lib/components/ui/SafetyCard.svelte';
 	import type { OnboardingState } from '$lib/types/planV2';
 
 	interface Props {
@@ -18,9 +21,7 @@
 	const showContinue = $derived(hasOnboardingDraft(onboarding));
 
 	async function onSample() {
-		if (
-			!confirm('Load the demo sample plan? It is labeled as a demo and stored only on this device.')
-		) {
+		if (!confirm('Load the demo plan? It stays on this device and you can replace it anytime.')) {
 			return;
 		}
 		sampleBusy = true;
@@ -28,63 +29,67 @@
 		try {
 			await loadSamplePlan();
 		} catch (e) {
-			sampleError = e instanceof Error ? e.message : 'Could not load sample plan';
+			sampleError = e instanceof Error ? e.message : 'Could not load demo plan';
 		} finally {
 			sampleBusy = false;
 		}
 	}
 </script>
 
-<main class="welcome px-screen pt-safe stack">
-	<header class="hero nothing-surface">
-		<p class="brand mono-caps">Health</p>
-		<h1 class="headline">Your private daily health plan, offline on your iPhone.</h1>
+<main class="welcome stack">
+	<section class="hero health-hero-card">
+		<p class="eyebrow">Private iPhone PWA</p>
+		<h1 class="headline">Your daily health plan, without the noise.</h1>
 		<p class="sub">
-			Build or import a structured plan — then use Today, Meals, Train, and Progress without raw
-			JSON.
+			Import a structured plan once. Health turns it into meals, training, progress, reminders, and
+			check-ins that stay on your device.
 		</p>
-	</header>
-
-	<section class="paths" aria-label="Get started">
-		<button type="button" class="path-card pressable" onclick={onStartIntake}>
-			<p class="path-title">Create plan prompt</p>
-			<p class="path-sub">Answer a few questions and copy a Claude prompt for your JSON plan.</p>
-		</button>
-		<a class="path-card pressable" href={resolve('/import')}>
-			<p class="path-title">Import JSON</p>
-			<p class="path-sub">Paste or upload a plan you already have.</p>
-		</a>
-	</section>
-
-	<section class="demo nothing-surface">
-		<p class="demo-label">Demo</p>
-		<p class="demo-body">
-			Load a labeled sample plan to explore the app before importing your own.
-		</p>
-		<button type="button" class="sample-btn pressable" disabled={sampleBusy} onclick={onSample}>
-			{sampleBusy ? 'Loading sample…' : 'Load sample plan (demo)'}
-		</button>
+		<div class="hero-actions">
+			<HealthButton variant="primary" block disabled={sampleBusy} onclick={onSample}>
+				{sampleBusy ? 'Loading demo…' : 'Load demo plan'}
+			</HealthButton>
+			<HealthButton variant="secondary" block href="/import">Import my plan</HealthButton>
+		</div>
+		<div class="trust">
+			<HealthChip tone="green">Local-first</HealthChip>
+			<HealthChip tone="blue">Offline-ready</HealthChip>
+			<HealthChip>No account</HealthChip>
+		</div>
 		{#if sampleError}
 			<p class="sample-err" role="alert">{sampleError}</p>
 		{/if}
 	</section>
 
-	<section class="privacy nothing-surface">
-		<p class="privacy-title">Privacy</p>
-		<p class="privacy-body">
-			No account required. Data stays on this device unless you enable Health Lock encryption or
-			optional cloud backup later.
-		</p>
-		<p class="privacy-body safety">
-			Health is a planning companion — not medical diagnosis or emergency advice. Review major diet,
-			supplement, medication, or training changes with a qualified professional.
-		</p>
+	<section class="actions" aria-label="Get started">
+		<article class="action-card health-card">
+			<p class="action-label">Fastest start</p>
+			<h2>Explore with a sample plan</h2>
+			<p>See Today, Meals, Training, and Progress immediately.</p>
+			<HealthButton variant="soft" block disabled={sampleBusy} onclick={onSample}
+				>Load demo</HealthButton
+			>
+		</article>
+		<article class="action-card health-card">
+			<p class="action-label">Have a plan</p>
+			<h2>Paste or upload your plan</h2>
+			<p>Your plan is validated on this device before it is saved.</p>
+			<HealthButton variant="soft" block href="/import">Import plan</HealthButton>
+		</article>
+		<article class="action-card health-card">
+			<p class="action-label">Need a plan</p>
+			<h2>Answer intake questions</h2>
+			<p>Generate a prompt you can use to create a compatible plan.</p>
+			<HealthButton variant="soft" block onclick={onStartIntake}>Create plan prompt</HealthButton>
+		</article>
 	</section>
 
+	<PrivacyCard />
+	<SafetyCard />
+
 	{#if showContinue}
-		<button type="button" class="continue pressable" onclick={onContinueDraft}>
+		<HealthButton variant="ghost" block onclick={onContinueDraft}>
 			Continue intake draft · step {onboarding.step} of 6
-		</button>
+		</HealthButton>
 	{/if}
 </main>
 
@@ -94,144 +99,93 @@
 		padding-bottom: var(--space-8);
 	}
 
-	.hero {
-		padding: var(--space-5) var(--space-4);
-		margin-bottom: var(--space-4);
-		border-radius: var(--radius-card, var(--radius-lg));
-	}
-
-	.brand {
-		margin: 0 0 var(--space-3);
-		font-size: 11px;
-		color: var(--text-3);
+	.eyebrow {
+		margin: 0 0 var(--space-2);
+		font-size: var(--text-2xs);
+		font-weight: var(--weight-bold);
 		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--health-muted-2);
 	}
 
 	.headline {
 		margin: 0 0 var(--space-3);
-		font-size: 26px;
-		font-weight: 700;
-		line-height: 1.15;
+		font-size: clamp(28px, 7vw, var(--text-hero));
+		font-weight: var(--weight-bold);
+		line-height: var(--leading-tight);
 		letter-spacing: -0.03em;
-		color: var(--text-1);
+		color: var(--health-ink);
 	}
 
 	.sub {
-		margin: 0;
-		font-size: 15px;
-		line-height: 1.5;
-		color: var(--text-2);
+		margin: 0 0 var(--space-5);
+		font-size: var(--text-base);
+		line-height: var(--leading-relaxed);
+		color: var(--health-muted);
 	}
 
-	.paths {
+	.hero-actions {
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: var(--space-2);
 		margin-bottom: var(--space-4);
 	}
 
-	.path-card {
-		display: block;
-		width: 100%;
-		padding: var(--space-4);
-		text-align: left;
-		border-radius: var(--radius-control, var(--radius-md));
-		border: 1px solid var(--line-1);
-		background: var(--surface-1);
-		color: inherit;
-		cursor: pointer;
-		text-decoration: none;
+	.trust {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
 	}
 
-	.path-title {
-		margin: 0 0 6px;
-		font-size: 17px;
-		font-weight: 650;
-		color: var(--text-1);
+	.actions {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
 	}
 
-	.path-sub {
-		margin: 0;
-		font-size: 14px;
-		line-height: 1.45;
-		color: var(--text-2);
-	}
-
-	.demo {
-		padding: var(--space-4);
-		margin-bottom: var(--space-4);
-		border-radius: var(--radius-md);
-	}
-
-	.demo-label {
+	.action-card h2 {
 		margin: 0 0 var(--space-2);
-		font-size: 11px;
-		color: var(--text-3);
-		letter-spacing: 0.08em;
+		font-size: var(--text-md);
+		font-weight: var(--weight-bold);
+		color: var(--health-ink);
+	}
+
+	.action-card p {
+		margin: 0 0 var(--space-4);
+		font-size: var(--text-sm);
+		color: var(--health-muted);
+		line-height: var(--leading-body);
+	}
+
+	.action-label {
+		margin: 0 0 var(--space-2);
+		font-size: var(--text-2xs);
+		font-weight: var(--weight-bold);
+		letter-spacing: 0.1em;
 		text-transform: uppercase;
-	}
-
-	.demo-body {
-		margin: 0 0 var(--space-3);
-		font-size: 14px;
-		line-height: 1.45;
-		color: var(--text-2);
-	}
-
-	.privacy {
-		padding: var(--space-4);
-		margin-top: var(--space-2);
-		border-radius: var(--radius-md);
-	}
-
-	.privacy-title {
-		margin: 0 0 var(--space-2);
-		font-size: 13px;
-		font-weight: 650;
-		color: var(--text-1);
-	}
-
-	.privacy-body {
-		margin: 0 0 var(--space-2);
-		font-size: 14px;
-		line-height: 1.5;
-		color: var(--text-2);
-	}
-
-	.privacy-body.safety {
-		font-size: 13px;
-		color: var(--text-3);
-	}
-
-	.continue {
-		width: 100%;
-		min-height: 48px;
-		margin-top: var(--space-4);
-		padding: 12px 16px;
-		border-radius: var(--radius-control, var(--radius-sm));
-		border: 1px solid var(--line-2);
-		background: var(--surface-2);
-		color: var(--text-1);
-		font-size: 15px;
-		font-weight: 600;
-		cursor: pointer;
-	}
-
-	.sample-btn {
-		width: 100%;
-		min-height: 44px;
-		padding: 10px 14px;
-		border: 1px dashed var(--line-2);
-		border-radius: var(--radius-control, var(--radius-sm));
-		background: transparent;
-		color: var(--text-2);
-		font-size: 15px;
-		cursor: pointer;
+		color: var(--health-amber);
 	}
 
 	.sample-err {
-		margin: var(--space-2) 0 0;
-		font-size: 13px;
-		color: var(--danger, var(--red));
+		margin: var(--space-3) 0 0;
+		font-size: var(--text-sm);
+		color: var(--health-red);
+	}
+
+	@media (min-width: 1024px) {
+		.welcome {
+			display: grid;
+			grid-template-columns: 1.1fr 1fr;
+			gap: var(--space-6);
+			align-items: start;
+		}
+
+		.hero {
+			grid-row: span 2;
+		}
+
+		.actions {
+			grid-column: 2;
+		}
 	}
 </style>

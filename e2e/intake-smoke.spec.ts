@@ -6,7 +6,9 @@ import { importPlanViaPaste } from './helpers/importPlan';
 test.describe('Health PWA smoke', () => {
 	test('welcome then intake first step', async ({ page }) => {
 		await page.goto('.');
-		await expect(page.getByRole('heading', { name: /private daily health plan/i })).toBeVisible();
+		await expect(
+			page.getByRole('heading', { name: /daily health plan, without the noise/i })
+		).toBeVisible();
 		await page
 			.getByRole('button', { name: /Create plan prompt/ })
 			.first()
@@ -19,6 +21,6 @@ test.describe('Health PWA smoke', () => {
 		const sample = readFileSync(join(process.cwd(), 'samples', 'minimal-plan-v2.json'), 'utf-8');
 		await importPlanViaPaste(page, sample);
 		await expect(page).toHaveURL(/\/today/, { timeout: 15000 });
-		await expect(page.getByText('TODAY').first()).toBeVisible();
+		await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
 	});
 });

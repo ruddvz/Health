@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import { loadSamplePlan } from '$lib/logic/loadSamplePlan';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
 
 	interface Props {
 		onStartIntake?: () => void;
@@ -12,42 +12,28 @@
 	let sampleError = $state<string | null>(null);
 
 	async function onSample() {
-		if (
-			!confirm(
-				'Load the demo sample plan? It is labeled as a demo and stored only on this device. You can replace it anytime via Import.'
-			)
-		) {
-			return;
-		}
+		if (!confirm('Load the demo plan? It stays on this device.')) return;
 		sampleBusy = true;
 		sampleError = null;
 		try {
 			await loadSamplePlan();
 		} catch (e) {
-			sampleError = e instanceof Error ? e.message : 'Could not load sample plan';
+			sampleError = e instanceof Error ? e.message : 'Could not load demo plan';
 		} finally {
 			sampleBusy = false;
 		}
 	}
 </script>
 
-<a class="btn-primary" href={resolve('/import')}>Import JSON</a>
+<HealthButton variant="primary" block disabled={sampleBusy} onclick={onSample}>
+	{sampleBusy ? 'Loading demo…' : 'Load demo plan'}
+</HealthButton>
+<HealthButton variant="secondary" block href="/import">Import plan</HealthButton>
 {#if onStartIntake}
-	<button type="button" class="btn-secondary pressable" onclick={onStartIntake}>
-		Create plan prompt
-	</button>
+	<HealthButton variant="ghost" block onclick={onStartIntake}>Create plan prompt</HealthButton>
 {:else}
-	<a class="btn-secondary" href={resolve('/')}>Create plan prompt</a>
+	<HealthButton variant="ghost" block href="/">Create plan prompt</HealthButton>
 {/if}
-<button
-	type="button"
-	class="btn-ghost pressable"
-	disabled={sampleBusy}
-	onclick={onSample}
-	aria-busy={sampleBusy}
->
-	{sampleBusy ? 'Loading sample…' : 'Load sample plan (demo)'}
-</button>
 {#if sampleError}
 	<p class="err" role="alert">{sampleError}</p>
 {/if}
@@ -55,8 +41,8 @@
 <style>
 	.err {
 		margin: var(--space-2) 0 0;
-		font-size: 13px;
-		color: var(--danger, var(--red));
-		line-height: 1.4;
+		font-size: var(--text-sm);
+		color: var(--health-red);
+		line-height: var(--leading-body);
 	}
 </style>

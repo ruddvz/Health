@@ -30,7 +30,7 @@ for (const route of routes) {
 
 test('screenshot today with plan', async ({ page }) => {
 	await importPlanViaPaste(page, minimalPlan);
-	await expect(page.getByText('TODAY').first()).toBeVisible();
+	await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
 	await expect(page).toHaveScreenshot('today-with-plan.png', {
 		fullPage: true,
 		maxDiffPixelRatio: 0.02

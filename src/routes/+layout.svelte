@@ -8,7 +8,6 @@
 	import '$lib/styles/utilities.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import AppShell from '$lib/components/app/AppShell.svelte';
-	import TopStatusBar from '$lib/components/app/TopStatusBar.svelte';
 	import InstallPrompt from '$lib/components/app/InstallPrompt.svelte';
 	import ToastHost from '$lib/components/app/ToastHost.svelte';
 	import UnlockGate from '$lib/components/security/UnlockGate.svelte';
@@ -16,13 +15,7 @@
 	import { isLockProtectedPath } from '$lib/security/routeLock';
 	import { syncThemeFromSettings } from '$lib/theme';
 	import StorageRecoveryBanner from '$lib/components/app/StorageRecoveryBanner.svelte';
-	import {
-		activeDayType,
-		hydrateFromLocalStorage,
-		plan,
-		planParseError,
-		settings
-	} from '$lib/stores/healthApp';
+	import { hydrateFromLocalStorage, planParseError, settings } from '$lib/stores/healthApp';
 	import {
 		hydrateSecurity,
 		lockOnHidden,
@@ -56,17 +49,6 @@
 	const path = $derived(normalizePathname(page.url.pathname));
 	const showNav = $derived(path !== '/' && path !== '/import');
 	const gated = $derived(isLockProtectedPath(path) && $requiresUnlock);
-
-	const weekLabel = $derived.by(() => {
-		const p = $plan;
-		const phases = p?.phases;
-		if (Array.isArray(phases) && phases[0]) {
-			const ph = phases[0] as Record<string, unknown>;
-			const w = ph.weeks;
-			return typeof w === 'string' ? `WEEK ${w}` : 'WEEK 01';
-		}
-		return 'WEEK —';
-	});
 </script>
 
 <svelte:head>
@@ -75,17 +57,14 @@
 	<link rel="apple-touch-icon" href={`${base}/icons/icon-192.png`} />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-	<meta name="theme-color" content="#0b0b0b" />
+	<meta name="theme-color" content="#f7f4ee" />
 	<meta
 		name="description"
-		content="Personal health plan from your JSON — training, meals, grocery, and progress on your device."
+		content="Your private daily health plan — meals, training, and progress on your iPhone."
 	/>
-	<title>HEALTH — Personal Plan</title>
+	<title>Health — Personal Plan</title>
 </svelte:head>
 
-{#if showNav}
-	<TopStatusBar {weekLabel} dayMode={$activeDayType} />
-{/if}
 {#if $planParseError}
 	<StorageRecoveryBanner message={$planParseError} />
 {/if}

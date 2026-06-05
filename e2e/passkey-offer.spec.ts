@@ -14,6 +14,6 @@ test.describe('Health Lock offer', () => {
 		await expect(page.getByRole('dialog', { name: /protect your health plan/i })).toBeVisible();
 		await page.getByRole('button', { name: /not now/i }).click();
 		await expect(page).toHaveURL(/\/today\/?$/);
-		await expect(page.getByText('TODAY').first()).toBeVisible();
+		await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
 	});
 });
