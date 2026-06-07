@@ -2,7 +2,7 @@
 	import BottomSheet from '$lib/components/app/BottomSheet.svelte';
 	import RequiresPlan from '$lib/components/app/RequiresPlan.svelte';
 	import ChecklistRow from '$lib/components/spec/ChecklistRow.svelte';
-	import ChipRow from '$lib/components/spec/ChipRow.svelte';
+	import SegmentedControl from '$lib/components/spec/SegmentedControl.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
 	import SecondaryButton from '$lib/components/spec/SecondaryButton.svelte';
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
@@ -12,7 +12,7 @@
 	import { showToast } from '$lib/stores/toast';
 	import { get } from 'svelte/store';
 
-	let chip = $state('All');
+	let storeFilter = $state('All');
 	let showBudgetSwaps = $state(false);
 	let addOpen = $state(false);
 	let itemName = $state('');
@@ -32,11 +32,15 @@
 		return [...fromPlan, ...extras];
 	});
 
+	const storeOptions = $derived.by(() => {
+		const names = [...new Set(allRows.map((r) => r.store).filter(Boolean))].sort();
+		return [{ label: 'All stores', value: 'All' }, ...names.map((s) => ({ label: s, value: s }))];
+	});
+
 	const grouped = $derived.by(() => {
 		const byStore: Record<string, typeof allRows> = {};
 		for (const r of allRows) {
-			if (chip !== 'All' && chip === 'Store' && r.store !== 'SUPERMARKET') continue;
-			if (chip !== 'All' && chip === 'Category') continue;
+			if (storeFilter !== 'All' && r.store !== storeFilter) continue;
 			if (!byStore[r.store]) byStore[r.store] = [];
 			byStore[r.store].push(r);
 		}
@@ -75,17 +79,23 @@
 </script>
 
 <RequiresPlan
-	title="GROCERY"
+	title="Grocery"
 	emptyTitle="Grocery list needs a plan"
 	emptyBody="Your shopping list is built from the grocery section in your Health JSON. Import a plan or use the demo sample to check off items by store."
 >
 	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="GROCERY" />
+		<ScreenHeaderBlock title="Grocery" subtitle="Check off items by store" />
 		<p class="disclaimer">
 			List prices and store totals in your plan are estimates — confirm at checkout. Promos vary by
 			region.
 		</p>
-		<ChipRow chips={['All', 'Store', 'Category']} selected={chip} onSelect={(c) => (chip = c)} />
+		{#if storeOptions.length > 1}
+			<SegmentedControl
+				options={storeOptions}
+				selected={storeFilter}
+				onSelect={(v) => (storeFilter = v)}
+			/>
+		{/if}
 
 		{#if budgetSwaps.length}
 			<label class="budget-toggle nothing-surface">
@@ -96,7 +106,7 @@
 		{/if}
 
 		{#if showBudgetSwaps && budgetSwaps.length}
-			<SectionLabel text="BUDGET ALTERNATIVES" />
+			<SectionLabel text="Budget alternatives" />
 			{#each budgetSwaps as sw, i (i)}
 				<div class="swap-card nothing-surface">
 					<p class="row"><span class="mono-caps lab">Premium</span> {sw.premium}</p>
@@ -109,7 +119,7 @@
 		{/if}
 
 		{#each Object.entries(grouped) as [store, items] (store)}
-			<SectionLabel text={`STORE: ${store}`} />
+			<SectionLabel text={store} />
 			{#each items as it (it.key)}
 				<ChecklistRow
 					checked={checked(it.key)}

@@ -11,6 +11,7 @@
 	import InstallPrompt from '$lib/components/app/InstallPrompt.svelte';
 	import ToastHost from '$lib/components/app/ToastHost.svelte';
 	import UnlockGate from '$lib/components/security/UnlockGate.svelte';
+	import { documentTitleForPath } from '$lib/pageTitles';
 	import { normalizePathname } from '$lib/paths';
 	import { isLockProtectedPath } from '$lib/security/routeLock';
 	import { syncThemeFromSettings } from '$lib/theme';
@@ -48,7 +49,8 @@
 
 	const path = $derived(normalizePathname(page.url.pathname));
 	const showNav = $derived(path !== '/' && path !== '/import');
-	const showStatus = $derived(showNav);
+	const showStatus = true;
+	const pageTitle = $derived(documentTitleForPath(path));
 	const gated = $derived(isLockProtectedPath(path) && $requiresUnlock);
 </script>
 
@@ -63,7 +65,7 @@
 		name="description"
 		content="Your private daily health plan — meals, training, and progress on your iPhone."
 	/>
-	<title>Health — Personal Plan</title>
+	<title>{pageTitle}</title>
 </svelte:head>
 
 {#if $planParseError}

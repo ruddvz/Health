@@ -188,7 +188,7 @@
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<ScreenHeaderBlock title="SECURITY" subtitle="Protect your health plan on this device" />
+	<ScreenHeaderBlock title="Security" subtitle="Protect your health plan on this device" />
 
 	<section class="block nothing-surface hero">
 		<h2 class="title">Local Health Lock</h2>
@@ -433,7 +433,7 @@
 	}
 
 	.error {
-		color: var(--red);
+		color: var(--h-red);
 		font-size: 14px;
 	}
 

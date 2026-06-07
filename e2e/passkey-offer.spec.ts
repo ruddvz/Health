@@ -8,8 +8,8 @@ test.describe('Health Lock offer', () => {
 	test('Not now skips passkey offer and opens Today', async ({ page }) => {
 		await page.goto('./import');
 		await page.getByRole('button', { name: /paste json/i }).click();
-		await page.getByLabel('Plan JSON').fill(minimalPlan);
-		await page.getByRole('button', { name: 'Review' }).click();
+		await page.getByRole('textbox', { name: 'Plan JSON' }).fill(minimalPlan);
+		await page.getByRole('button', { name: 'Review plan' }).click();
 		await page.getByRole('button', { name: 'Apply plan' }).click();
 		await expect(page.getByRole('dialog', { name: /protect your health plan/i })).toBeVisible();
 		await page.getByRole('button', { name: /not now/i }).click();

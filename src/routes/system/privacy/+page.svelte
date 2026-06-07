@@ -4,7 +4,7 @@
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<ScreenHeaderBlock title="PRIVACY" subtitle="100% local by design" />
+	<ScreenHeaderBlock title="Privacy" subtitle="100% local by design" />
 
 	<PrivacySafetyCard />
 

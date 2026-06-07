@@ -25,17 +25,13 @@
 </script>
 
 <RequiresPlan
-	title="PREP"
+	title="Prep"
 	emptyTitle="Prep guide needs a plan"
 	emptyBody="Sunday prep steps and timing come from your plan JSON. Import a plan or load the sample to track prep checkboxes locally."
 >
 	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="PREP" />
-		<SectionTitleBlock
-			title="SUNDAY PREP"
-			subtitle={`Estimated time: ${totalMin || '—'} min`}
-			subtitleColor="red"
-		/>
+		<ScreenHeaderBlock title="Prep" subtitle="Sunday batch cooking steps" />
+		<SectionTitleBlock title="Sunday prep" subtitle={`Estimated time: ${totalMin || '—'} min`} />
 
 		{#each steps as s (s.key)}
 			<PrepStepCard

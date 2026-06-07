@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { focusTrap } from '$lib/a11y/focusTrap';
+	import BottomSheet from '$lib/components/app/BottomSheet.svelte';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
 	import type { MealRowDetail } from '$lib/logic/planDerive';
 
 	interface Props {
@@ -13,6 +14,12 @@
 	let timerLeft = $state(0);
 	let timerLabel = $state('—');
 	let timerId: ReturnType<typeof setInterval> | null = null;
+	let reducedMotion = $state(false);
+
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+		reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	});
 
 	const steps = $derived.by(() => {
 		if (!meal?.description) return ['Follow your meal card or plan notes.'];
@@ -34,6 +41,10 @@
 	function startTimer(seconds: number) {
 		clearTimer();
 		timerLeft = seconds;
+		if (reducedMotion) {
+			timerLabel = `${seconds}s`;
+			return;
+		}
 		const tick = () => {
 			timerLabel = timerLeft > 0 ? `${timerLeft}s` : 'Done';
 			if (timerLeft <= 0) {
@@ -58,133 +69,66 @@
 		timerLabel = '—';
 		onClose();
 	}
-
-	function onKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') close();
-	}
 </script>
 
-<svelte:window onkeydown={onKeydown} />
+<BottomSheet open={open && meal !== null} title={meal?.name ?? 'Cook mode'} onClose={close}>
+	{#if meal}
+		{#if meal.prep_method || meal.prep_minutes}
+			<p class="meta">
+				{meal.prep_method ?? 'Prep'}{meal.prep_minutes ? ` · ${meal.prep_minutes} min` : ''}
+			</p>
+		{/if}
 
-{#if open && meal}
-	<div class="modal" role="presentation">
-		<button type="button" class="backdrop" aria-label="Close cook mode" onclick={close}></button>
-		<div
-			class="sheet nothing-surface"
-			use:focusTrap={{ onEscape: onClose }}
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="cook-h"
-		>
-			<div class="head">
-				<h2 id="cook-h" class="title">{meal.name}</h2>
-				<button type="button" class="x pressable" onclick={close} aria-label="Close">×</button>
-			</div>
-			{#if meal.prep_method || meal.prep_minutes}
-				<p class="meta mono-caps">
-					{meal.prep_method ?? 'Prep'}{meal.prep_minutes ? ` · ${meal.prep_minutes} min` : ''}
-				</p>
-			{/if}
-
-			<p class="mono-caps lab">Ingredients</p>
-			<ul class="ing">
-				{#if meal.ingredients?.length}
-					{#each meal.ingredients as ing (ing.name)}
-						<li>
-							<label class="ing-row">
-								<input type="checkbox" />
-								<span>{ing.grams != null ? `${ing.grams}g ` : ''}{ing.name}</span>
-							</label>
-						</li>
-					{/each}
-				{:else}
-					<li class="muted">No ingredient list in JSON — follow the description below.</li>
-				{/if}
-			</ul>
-
-			<p class="mono-caps lab">Steps</p>
-			<ol class="steps">
-				{#each steps as step, i (i)}
-					<li>{step}</li>
+		<p class="lab">Ingredients</p>
+		<ul class="ing">
+			{#if meal.ingredients?.length}
+				{#each meal.ingredients as ing (ing.name)}
+					<li>
+						<label class="ing-row">
+							<input type="checkbox" />
+							<span>{ing.grams != null ? `${ing.grams}g ` : ''}{ing.name}</span>
+						</label>
+					</li>
 				{/each}
-			</ol>
+			{:else}
+				<li class="muted">No ingredient list in JSON — follow the description below.</li>
+			{/if}
+		</ul>
 
-			<p class="mono-caps lab">Timer</p>
-			<p class="timer-display" aria-live="polite">{timerLabel}</p>
-			<div class="timers">
-				<button type="button" class="tbtn pressable" onclick={() => startTimer(300)}>5 min</button>
-				<button type="button" class="tbtn pressable" onclick={() => startTimer(600)}>10 min</button>
-				<button type="button" class="tbtn pressable" onclick={() => startTimer(900)}>15 min</button>
-			</div>
+		<p class="lab">Steps</p>
+		<ol class="steps">
+			{#each steps as step, i (i)}
+				<li>{step}</li>
+			{/each}
+		</ol>
+
+		<p class="lab">Timer</p>
+		<p class="timer-display" aria-live="polite">{timerLabel}</p>
+		<div class="timers">
+			<button type="button" class="tbtn pressable" onclick={() => startTimer(300)}>5 min</button>
+			<button type="button" class="tbtn pressable" onclick={() => startTimer(600)}>10 min</button>
+			<button type="button" class="tbtn pressable" onclick={() => startTimer(900)}>15 min</button>
 		</div>
-	</div>
-{/if}
+	{/if}
+	{#snippet footer()}
+		<HealthButton variant="primary" block onclick={close}>Done</HealthButton>
+	{/snippet}
+</BottomSheet>
 
 <style>
-	.modal {
-		position: fixed;
-		inset: 0;
-		z-index: 220;
-		display: flex;
-		align-items: flex-end;
-		justify-content: center;
-	}
-
-	.backdrop {
-		position: absolute;
-		inset: 0;
-		border: none;
-		background: rgba(0, 0, 0, 0.6);
-		cursor: pointer;
-	}
-
-	.sheet {
-		position: relative;
-		width: min(100vw, 430px);
-		max-height: 92dvh;
-		overflow: auto;
-		padding: var(--space-4);
-		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-	}
-
-	.head {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: var(--space-2);
-		margin-bottom: var(--space-2);
-	}
-
-	.title {
-		margin: 0;
-		font-size: 20px;
-		font-weight: 650;
-		color: var(--text-1);
-	}
-
-	.x {
-		width: 44px;
-		height: 44px;
-		border: 1px solid var(--line-2);
-		border-radius: var(--radius-xs);
-		background: transparent;
-		color: var(--text-1);
-		font-size: 24px;
-		line-height: 1;
-		cursor: pointer;
-		flex-shrink: 0;
-	}
-
 	.meta {
-		margin: 0 0 var(--space-3);
-		font-size: 9px;
-		color: var(--text-3);
+		margin: 0 0 var(--s-3);
+		font-size: var(--t-caption);
+		color: var(--h-text-muted);
 	}
 
 	.lab {
-		margin: var(--space-3) 0 var(--space-2);
-		font-size: 9px;
-		color: var(--text-3);
+		margin: var(--s-3) 0 var(--s-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-faint);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
 	}
 
 	.ing {
@@ -198,47 +142,47 @@
 		align-items: flex-start;
 		gap: 10px;
 		padding: 8px 0;
-		font-size: 14px;
-		color: var(--text-2);
+		font-size: var(--t-footnote);
+		color: var(--h-text-soft);
 		cursor: pointer;
 	}
 
 	.muted {
-		font-size: 14px;
-		color: var(--text-3);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 		padding: 4px 0;
 	}
 
 	.steps {
 		margin: 0;
 		padding-left: 1.2rem;
-		font-size: 14px;
-		line-height: 1.5;
-		color: var(--text-2);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text-soft);
 	}
 
 	.timer-display {
-		margin: 0 0 var(--space-2);
+		margin: 0 0 var(--s-2);
 		font-size: 28px;
-		font-weight: 650;
+		font-weight: var(--weight-bold);
 		font-family: var(--font-mono);
-		color: var(--red);
+		color: var(--h-accent);
 	}
 
 	.timers {
 		display: flex;
-		gap: var(--space-2);
-		margin-bottom: var(--space-2);
+		gap: var(--s-2);
+		margin-bottom: var(--s-2);
 	}
 
 	.tbtn {
 		flex: 1;
 		min-height: 44px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--line-2);
-		background: var(--surface-2);
-		color: var(--text-1);
-		font-weight: 650;
+		border-radius: var(--r-control);
+		border: 1px solid var(--h-line);
+		background: var(--h-surface-2);
+		color: var(--h-text);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
 	}
 </style>

@@ -40,7 +40,7 @@
 </script>
 
 <main class="screen px-screen pt-safe stack">
-	<ScreenHeaderBlock title="ABOUT" subtitle="Health — personal plan PWA" />
+	<ScreenHeaderBlock title="About" subtitle="Health — personal plan PWA" />
 
 	<section class="block nothing-surface">
 		<p class="mono-caps lab">Version</p>

@@ -8,13 +8,13 @@
 </script>
 
 <RequiresPlan
-	title="PHASES"
+	title="Phases"
 	subtitle="Targets and focus by program phase"
 	emptyTitle="Phases need a plan"
 	emptyBody="Import a Health JSON plan or load the demo sample to see calorie targets, macros, and phase notes here."
 >
 	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="PHASES" subtitle="Targets and focus by program phase" />
+		<ScreenHeaderBlock title="Phases" subtitle="Targets and focus by program phase" />
 
 		{#if cards.length === 0}
 			<p class="empty nothing-surface">No phases in this plan.</p>
@@ -141,8 +141,9 @@
 	}
 
 	.chip[data-kind='p'] {
-		border-color: var(--red-line);
-		color: var(--text-1);
+		border-color: var(--h-accent-line);
+		color: var(--h-text);
+		background: var(--h-accent-soft);
 	}
 
 	.body {

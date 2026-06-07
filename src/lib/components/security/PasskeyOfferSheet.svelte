@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { focusTrap } from '$lib/a11y/focusTrap';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import BottomSheet from '$lib/components/app/BottomSheet.svelte';
+	import HealthButton from '$lib/components/ui/HealthButton.svelte';
 	import { validatePinFormat } from '$lib/security/crypto';
 	import { createRecoveryCodeSet } from '$lib/security/recoveryCodes';
 	import { isPlatformAuthenticatorAvailable } from '$lib/security/rpOrigin';
@@ -52,163 +53,119 @@
 	}
 </script>
 
-<div
-	class="sheet-wrap"
-	use:focusTrap={{ onEscape: ondecline }}
-	role="dialog"
-	aria-modal="true"
-	aria-labelledby="offer-title"
->
-	<div class="sheet nothing-surface">
-		<h2 id="offer-title" class="title">Protect your health plan</h2>
-		<p class="body">
-			Use Face ID, Touch ID, Windows Hello, or your device passcode to unlock this app. Your plan
-			stays on this device and is encrypted on-device. Health does not upload your meals, weight,
-			supplements, or progress data.
+<BottomSheet open={true} title="Protect your health plan" onClose={ondecline}>
+	<p class="body">
+		Use Face ID, Touch ID, Windows Hello, or your device passcode to unlock this app. Your plan
+		stays on this device and is encrypted on-device. Health does not upload your meals, weight,
+		supplements, or progress data.
+	</p>
+
+	{#if error}
+		<p class="err" role="alert">{error}</p>
+	{/if}
+
+	{#if codesShown}
+		<p class="lab">Save these recovery codes (shown once)</p>
+		<ul class="codes">
+			{#each codesShown as c (c)}
+				<li>{c}</li>
+			{/each}
+		</ul>
+	{:else}
+		<label class="field">
+			<span class="field-label">Recovery PIN (required, 4–8 digits)</span>
+			<input
+				class="inp"
+				type="password"
+				inputmode="numeric"
+				maxlength="8"
+				placeholder="Decrypts your plan on this device"
+				bind:value={recoveryPin}
+				disabled={busy}
+			/>
+		</label>
+		<p class="hint">
+			Required for encrypted storage. Passkey unlocks the app; PIN loads encrypted data.
 		</p>
+		<a class="link" href={resolve('/system/security')}>Security settings</a>
+	{/if}
 
-		{#if error}
-			<p class="err" role="alert">{error}</p>
-		{/if}
-
+	{#snippet footer()}
 		{#if codesShown}
-			<p class="mono-caps lab">Save these recovery codes (shown once)</p>
-			<ul class="codes">
-				{#each codesShown as c (c)}
-					<li>{c}</li>
-				{/each}
-			</ul>
-			<button type="button" class="primary pressable" onclick={continueToApp}
-				>Continue to app</button
-			>
+			<HealthButton variant="primary" block onclick={continueToApp}>Continue to app</HealthButton>
 		{:else}
-			<label class="field">
-				<span class="mono-caps">Recovery PIN (required, 4–8 digits)</span>
-				<input
-					class="inp"
-					type="password"
-					inputmode="numeric"
-					maxlength="8"
-					placeholder="Decrypts your plan on this device"
-					bind:value={recoveryPin}
-					disabled={busy}
-				/>
-			</label>
-			<p class="hint">
-				Required for encrypted storage. Passkey unlocks the app; PIN loads encrypted data.
-			</p>
-			<button type="button" class="primary pressable" disabled={busy || !bioOk} onclick={enable}>
+			<HealthButton variant="primary" block disabled={busy || !bioOk} onclick={enable}>
 				{bioOk ? 'Protect with passkey' : 'Passkey not available on this device'}
-			</button>
-			<button type="button" class="secondary pressable" disabled={busy} onclick={ondecline}>
-				Not now
-			</button>
-			<a class="link" href={resolve('/system/security')}>Security settings</a>
+			</HealthButton>
+			<HealthButton variant="ghost" block disabled={busy} onclick={ondecline}>Not now</HealthButton>
 		{/if}
-	</div>
-</div>
+	{/snippet}
+</BottomSheet>
 
 <style>
-	.sheet-wrap {
-		position: fixed;
-		inset: 0;
-		z-index: 90;
-		display: flex;
-		align-items: flex-end;
-		justify-content: center;
-		padding: var(--space-4);
-		background: rgba(0, 0, 0, 0.75);
-	}
-
-	.sheet {
-		width: min(430px, 100%);
-		padding: var(--space-5);
-		border: 1px solid var(--line-1);
-		border-radius: var(--radius-md) var(--radius-md) 0 0;
-	}
-
-	.title {
-		margin: 0 0 var(--space-3);
-		font-size: 22px;
-		font-weight: 700;
-	}
-
 	.body {
-		margin: 0 0 var(--space-4);
-		font-size: 14px;
-		line-height: 1.55;
-		color: var(--text-2);
+		margin: 0 0 var(--s-4);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text-soft);
 	}
 
 	.hint {
-		margin: 0 0 var(--space-3);
-		font-size: 12px;
-		color: var(--text-3);
-		line-height: 1.45;
+		margin: 0 0 var(--s-3);
+		font-size: var(--t-caption);
+		color: var(--h-text-muted);
+		line-height: var(--lh-body);
 	}
 
 	.err {
-		color: var(--red);
-		font-size: 13px;
-		margin-bottom: var(--space-3);
+		color: var(--h-red);
+		font-size: var(--t-footnote);
+		margin-bottom: var(--s-3);
 	}
 
 	.field {
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
-		margin-bottom: var(--space-3);
+		margin-bottom: var(--s-3);
+	}
+
+	.field-label {
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-muted);
 	}
 
 	.inp {
-		padding: 10px 12px;
-		border-radius: var(--radius-xs);
-		border: 1px solid var(--line-1);
-		background: rgba(0, 0, 0, 0.35);
-		color: var(--text-1);
-	}
-
-	.primary,
-	.secondary {
-		width: 100%;
-		min-height: 48px;
-		margin-top: var(--space-2);
-		border-radius: var(--radius-sm);
-		font-weight: 650;
-		cursor: pointer;
-	}
-
-	.primary {
-		border: 1px solid rgba(167, 255, 106, 0.28);
-		background: linear-gradient(180deg, rgba(167, 255, 106, 0.95), rgba(112, 242, 166, 0.86));
-		color: #081008;
-		box-shadow: 0 12px 28px rgba(112, 242, 166, 0.18);
-	}
-
-	.secondary {
-		border: 1px solid var(--line-2);
-		background: transparent;
-		color: var(--text-2);
+		min-height: 52px;
+		padding: 0 15px;
+		border-radius: var(--r-control);
+		border: 1px solid var(--h-line);
+		background: var(--input-bg);
+		color: var(--h-text);
+		font-size: var(--t-body);
 	}
 
 	.link {
 		display: block;
-		margin-top: var(--space-4);
+		margin-top: var(--s-4);
 		text-align: center;
-		font-size: 13px;
-		color: var(--text-3);
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
 	}
 
 	.codes {
-		margin: 0 0 var(--space-4);
-		padding-left: var(--space-4);
-		font-size: 12px;
+		margin: 0 0 var(--s-4);
+		padding-left: var(--s-4);
+		font-size: var(--t-caption);
+		font-family: var(--font-mono);
 		letter-spacing: 0.06em;
 	}
 
 	.lab {
-		font-size: 9px;
-		color: var(--text-3);
-		margin-bottom: var(--space-2);
+		font-size: var(--t-caption);
+		font-weight: var(--weight-semibold);
+		color: var(--h-text-muted);
+		margin-bottom: var(--s-2);
 	}
 </style>

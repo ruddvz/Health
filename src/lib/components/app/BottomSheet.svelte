@@ -30,7 +30,7 @@
 				{@render children()}
 			</div>
 			{#if footer}
-				<div class="footer">
+				<div class="footer health-glass">
 					{@render footer()}
 				</div>
 			{/if}
@@ -60,16 +60,18 @@
 
 	.sheet {
 		position: relative;
+		display: flex;
+		flex-direction: column;
 		width: min(100vw, 430px);
 		max-height: 86dvh;
-		padding: var(--s-4);
-		padding-bottom: calc(var(--s-4) + var(--safe-bottom));
+		padding: var(--s-4) var(--s-4) 0;
 		border-radius: var(--r-sheet) var(--r-sheet) 0 0;
 		border: 1px solid var(--h-line-strong);
-		overflow: auto;
+		overflow: hidden;
 	}
 
 	.handle {
+		flex-shrink: 0;
 		width: 36px;
 		height: 4px;
 		margin: 0 auto var(--s-3);
@@ -78,6 +80,7 @@
 	}
 
 	.h {
+		flex-shrink: 0;
 		margin: 0 0 var(--s-3);
 		font-size: var(--t-title-3);
 		font-weight: var(--weight-bold);
@@ -86,12 +89,20 @@
 	}
 
 	.body {
-		margin-bottom: var(--s-2);
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		padding-bottom: var(--s-3);
 	}
 
 	.footer {
+		flex-shrink: 0;
 		display: flex;
 		gap: var(--s-2);
-		margin-top: var(--s-3);
+		margin: 0 calc(-1 * var(--s-4));
+		padding: var(--s-3) var(--s-4) calc(var(--s-4) + var(--safe-bottom));
+		border-top: 1px solid var(--h-line-soft);
+		background: var(--h-surface-elevated);
 	}
 </style>

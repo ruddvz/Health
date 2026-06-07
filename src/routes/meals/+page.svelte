@@ -189,88 +189,94 @@
 			onSelect={(v) => (dayFilter = v as typeof dayFilter)}
 		/>
 
-		<section class="card macro-target">
-			<h2 class="macro-target__title">Macro targets</h2>
-			<div class="macro-target__grid">
-				<div>
-					<span class="lbl">Calories</span><span class="val"
-						>{Math.round(planned.kcal)} / {Math.round(targets.kcal)}</span
-					>
-				</div>
-				<div>
-					<span class="lbl">Protein</span><span class="val"
-						>{Math.round(planned.protein)}g / {Math.round(targets.protein)}g</span
-					>
-				</div>
-				<div>
-					<span class="lbl">Carbs</span><span class="val"
-						>{Math.round(planned.carbs)}g / {Math.round(targets.carbs)}g</span
-					>
-				</div>
-				<div>
-					<span class="lbl">Fat</span><span class="val"
-						>{Math.round(planned.fat)}g / {Math.round(targets.fat)}g</span
-					>
-				</div>
-			</div>
-		</section>
-
-		{#each meals as m, i (`${dayFilter}-${m.slot}-${i}`)}
-			<MealCard
-				index={m.slot}
-				time={m.time}
-				name={m.name}
-				kcal={m.kcal}
-				protein={m.protein}
-				carbs={m.carbs}
-				fat={m.fat}
-				track={dayTypeForTrack
-					? {
-							status: getMealSlotState($progress, logDay, dayTypeForTrack, m.slot),
-							onChange: (nx) => setMealSlot(m.slot, dayTypeForTrack, nx)
-						}
-					: undefined}
-			/>
-			<div class="meal-extra nothing-surface">
-				{#if m.swaps.length}
-					<details class="swaps">
-						<summary class="mono-caps sum">Swaps and alternatives</summary>
-						{#each m.swaps as sw (sw.label + sw.text)}
-							<p class="swap-row"><span class="mono-caps tag">{sw.label}</span> {sw.text}</p>
-						{/each}
-					</details>
-				{/if}
-				<button type="button" class="cook pressable" onclick={() => (cookMeal = m)}
-					>Cook mode</button
-				>
-			</div>
-		{/each}
-
-		{#if gap}
-			<TargetGapCard
-				title={gap.title}
-				message={gap.message}
-				metrics={gap.metrics}
-				cta="Quick Fix"
-				onCta={() => (quickFixOpen = true)}
-			/>
-		{/if}
-
-		{#if emergency.length}
-			<section class="emerg nothing-surface">
-				<p class="mono-caps emerg-t">Backup / busy-day options</p>
-				{#each emergency as line, i (i)}
-					<p class="emerg-line">{line}</p>
+		<div class="page-grid meals-grid">
+			<div class="meals-main page-stack">
+				{#each meals as m, i (`${dayFilter}-${m.slot}-${i}`)}
+					<MealCard
+						index={m.slot}
+						time={m.time}
+						name={m.name}
+						kcal={m.kcal}
+						protein={m.protein}
+						carbs={m.carbs}
+						fat={m.fat}
+						track={dayTypeForTrack
+							? {
+									status: getMealSlotState($progress, logDay, dayTypeForTrack, m.slot),
+									onChange: (nx) => setMealSlot(m.slot, dayTypeForTrack, nx)
+								}
+							: undefined}
+					/>
+					<div class="meal-extra nothing-surface">
+						{#if m.swaps.length}
+							<details class="swaps">
+								<summary class="mono-caps sum">Swaps and alternatives</summary>
+								{#each m.swaps as sw (sw.label + sw.text)}
+									<p class="swap-row"><span class="mono-caps tag">{sw.label}</span> {sw.text}</p>
+								{/each}
+							</details>
+						{/if}
+						<button type="button" class="cook pressable" onclick={() => (cookMeal = m)}
+							>Cook mode</button
+						>
+					</div>
 				{/each}
-			</section>
-		{/if}
 
-		<div class="cross-links">
-			<HealthButton variant="soft" href={ROUTES.systemGrocery}>Grocery list</HealthButton>
-			<HealthButton variant="soft" href={ROUTES.systemPrep}>Prep steps</HealthButton>
+				{#if gap}
+					<TargetGapCard
+						title={gap.title}
+						message={gap.message}
+						metrics={gap.metrics}
+						cta="Quick Fix"
+						onCta={() => (quickFixOpen = true)}
+					/>
+				{/if}
+
+				{#if emergency.length}
+					<section class="emerg nothing-surface">
+						<p class="mono-caps emerg-t">Backup / busy-day options</p>
+						{#each emergency as line, i (i)}
+							<p class="emerg-line">{line}</p>
+						{/each}
+					</section>
+				{/if}
+			</div>
+
+			<aside class="meals-rail page-stack">
+				<section class="card macro-target">
+					<h2 class="macro-target__title">Macro targets</h2>
+					<div class="macro-target__grid">
+						<div>
+							<span class="lbl">Calories</span><span class="val"
+								>{Math.round(planned.kcal)} / {Math.round(targets.kcal)}</span
+							>
+						</div>
+						<div>
+							<span class="lbl">Protein</span><span class="val"
+								>{Math.round(planned.protein)}g / {Math.round(targets.protein)}g</span
+							>
+						</div>
+						<div>
+							<span class="lbl">Carbs</span><span class="val"
+								>{Math.round(planned.carbs)}g / {Math.round(targets.carbs)}g</span
+							>
+						</div>
+						<div>
+							<span class="lbl">Fat</span><span class="val"
+								>{Math.round(planned.fat)}g / {Math.round(targets.fat)}g</span
+							>
+						</div>
+					</div>
+				</section>
+
+				<div class="cross-links">
+					<HealthButton variant="soft" block href={ROUTES.systemGrocery}>Grocery list</HealthButton>
+					<HealthButton variant="soft" block href={ROUTES.systemPrep}>Prep steps</HealthButton>
+				</div>
+
+				<SecondaryButton label="+ Add meal" onclick={() => (addOpen = true)} />
+			</aside>
 		</div>
-
-		<SecondaryButton label="+ Add meal" onclick={() => (addOpen = true)} />
 	</main>
 {/if}
 

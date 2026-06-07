@@ -30,14 +30,19 @@
 </script>
 
 <RequiresPlan
-	title="SUPPLEMENTS"
+	title="Supplements"
 	emptyTitle="Supplements need a plan"
 	emptyBody="Today's supplement schedule and stack details are read from your plan. Import JSON or load the demo sample — always follow label directions and your clinician's advice."
 >
 	<main class="screen px-screen pt-safe stack">
-		<ScreenHeaderBlock title="SUPPLEMENTS" />
+		<ScreenHeaderBlock title="Supplements" subtitle="Today's schedule from your plan" />
 
-		<SectionLabel text="TODAY'S SCHEDULE" />
+		<p class="safety-note">
+			Supplements are for convenience only. Follow label directions and your clinician's advice.
+			Health does not diagnose or prescribe.
+		</p>
+
+		<SectionLabel text="Today's schedule" />
 		{#each sched as row (row.key)}
 			<ScheduleRow
 				time={row.time}
@@ -48,7 +53,7 @@
 			/>
 		{/each}
 
-		<SectionLabel text="ALL SUPPLEMENTS" />
+		<SectionLabel text="All supplements" />
 		<ChipRow
 			chips={['All', 'Performance', 'Health', 'Other']}
 			selected={chip}
@@ -75,6 +80,13 @@
 	.screen {
 		flex: 1;
 		padding-bottom: var(--space-6);
+	}
+
+	.safety-note {
+		margin: 0 0 var(--s-3);
+		font-size: var(--t-footnote);
+		line-height: var(--lh-body);
+		color: var(--h-text-muted);
 	}
 
 	.disclaimer {
