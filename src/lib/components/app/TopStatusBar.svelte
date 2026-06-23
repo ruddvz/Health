@@ -8,7 +8,7 @@
 	let { pageContext }: Props = $props();
 </script>
 
-<header class="top-status" role="banner">
+<header class="top-status">
 	<div class="top-status__left">
 		<span class="brand">Health</span>
 		{#if pageContext}
@@ -76,7 +76,7 @@
 		background: linear-gradient(180deg, rgba(7, 10, 8, 0.82), rgba(7, 10, 8, 0.42), transparent);
 	}
 
-	html[data-theme='light'] .top-status {
+	:global(html[data-theme='light']) .top-status {
 		background: linear-gradient(
 			180deg,
 			rgba(244, 247, 241, 0.9),
