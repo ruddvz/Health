@@ -111,7 +111,7 @@
 		box-shadow: 0 12px 28px rgba(112, 242, 166, 0.18);
 	}
 
-	html[data-theme='light'] .btn--primary {
+	:global(html[data-theme='light']) .btn--primary {
 		background: linear-gradient(180deg, #43c75f, #0fa968);
 		color: #ffffff;
 		box-shadow: 0 12px 28px rgba(67, 199, 95, 0.2);
@@ -124,7 +124,7 @@
 		font-weight: 650;
 	}
 
-	html[data-theme='light'] .btn--secondary {
+	:global(html[data-theme='light']) .btn--secondary {
 		background: rgba(20, 32, 24, 0.04);
 	}
 

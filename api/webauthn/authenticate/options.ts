@@ -1,18 +1,14 @@
-import { corsPreflight } from '../../../server/webauthn/http.js';
+import { corsPreflight, methodNotAllowed, serverError } from '../../../server/webauthn/http.js';
 import { handleAuthenticateOptions } from '../../../server/webauthn/handlers.js';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(request: Request): Promise<Response> {
-	if (request.method === 'OPTIONS') return corsPreflight();
-	if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+	if (request.method === 'OPTIONS') return corsPreflight(request);
+	if (request.method !== 'POST') return methodNotAllowed(request);
 	try {
 		return await handleAuthenticateOptions(request);
 	} catch (e) {
-		const msg = e instanceof Error ? e.message : 'Server error';
-		return new Response(JSON.stringify({ ok: false, error: msg }), {
-			status: 500,
-			headers: { 'Content-Type': 'application/json' }
-		});
+		return serverError(request, e);
 	}
 }

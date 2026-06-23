@@ -151,13 +151,15 @@ async function persistSlice(
 	if (!browser) return;
 	const cfg = loadSecurityConfig();
 	const { hasVaultDek, getVaultDek } = await import('$lib/stores/healthLock');
-	if (cfg.encryptionEnabled && hasVaultDek()) {
-		const dek = getVaultDek();
+	if (cfg.encryptionEnabled) {
+		const dek = hasVaultDek() ? getVaultDek() : null;
 		if (dek) {
 			const { persistVaultSlice } = await import('$lib/security/vault');
 			await persistVaultSlice(dek, key, value);
-			return;
 		}
+		// Encryption is on but the vault is locked (no DEK): never fall back to
+		// writing plaintext to localStorage, which would defeat the vault.
+		return;
 	}
 	const lsMap = {
 		plan: LS_PLAN,

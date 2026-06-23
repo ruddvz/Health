@@ -44,6 +44,17 @@ export function corsPreflight(request: Request): Response {
 	return new Response(null, { status: 204, headers: corsHeaders(request) });
 }
 
+/** 405 with CORS headers so browsers can read the response cross-origin. */
+export function methodNotAllowed(request: Request): Response {
+	return errorResponse(request, 'Method not allowed', 405);
+}
+
+/** 500 with CORS headers; never leaks stack traces. */
+export function serverError(request: Request, e: unknown): Response {
+	const msg = e instanceof Error ? e.message : 'Server error';
+	return errorResponse(request, msg, 500);
+}
+
 export function jsonResponse(request: Request, body: unknown, status = 200): Response {
 	return new Response(JSON.stringify(body), {
 		status,

@@ -287,18 +287,6 @@
 		color: var(--h-text-soft);
 	}
 
-	.empty,
-	.stat {
-		margin: 0 0 var(--space-3);
-		font-size: 14px;
-		color: var(--text-2);
-	}
-
-	.stat {
-		font-size: 12px;
-		color: var(--text-3);
-	}
-
 	.list {
 		list-style: none;
 		padding: 0;

@@ -1,4 +1,4 @@
-import { corsPreflight } from '../../server/webauthn/http.js';
+import { corsPreflight, methodNotAllowed, serverError } from '../../server/webauthn/http.js';
 import {
 	handleBackupDelete,
 	handleBackupGet,
@@ -14,12 +14,8 @@ export default async function handler(request: Request): Promise<Response> {
 			return await handleBackupPut(request);
 		if (request.method === 'GET') return await handleBackupGet(request);
 		if (request.method === 'DELETE') return await handleBackupDelete(request);
-		return new Response('Method not allowed', { status: 405 });
+		return methodNotAllowed(request);
 	} catch (e) {
-		const msg = e instanceof Error ? e.message : 'Server error';
-		return new Response(JSON.stringify({ ok: false, error: msg }), {
-			status: 500,
-			headers: { 'Content-Type': 'application/json' }
-		});
+		return serverError(request, e);
 	}
 }
