@@ -14,9 +14,12 @@
 	import { logicalDateKey } from '$lib/logic/dateKey';
 	import { newId } from '$lib/logic/id';
 	import { downloadProgressJson } from '$lib/logic/exportProgress';
+	import { analyzeNutrition } from '$lib/logic/nutritionCoach';
+	import { analyzeTraining } from '$lib/logic/trainingCoach';
 	import { buildWeightChartModel } from '$lib/logic/weightSeries';
 	import { recentSessions } from '$lib/logic/workoutHistory';
 	import {
+		activeDayType,
 		onboarding,
 		persistOnboarding,
 		persistProgress,
@@ -114,22 +117,11 @@
 			: 'Start logging to see trends'
 	);
 
-	const insightLine = $derived.by(() => {
-		const entries = $progress.weightEntries ?? [];
-		if (entries.length < 2) {
-			return 'Log at least two weigh-ins to see a simple trend. This is informational only — not medical advice.';
-		}
-		const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
-		const first = sorted[0]?.kg ?? 0;
-		const last = sorted[sorted.length - 1]?.kg ?? 0;
-		const delta = Math.round((last - first) * 10) / 10;
-		if (Math.abs(delta) < 0.2) {
-			return 'Weight has been relatively stable over your logged entries. Trends are approximate and not medical advice.';
-		}
-		return delta > 0
-			? `Weight is up about ${delta} kg from your first to latest logged entry. Use trends as context only — not medical advice.`
-			: `Weight is down about ${Math.abs(delta)} kg from your first to latest logged entry. Use trends as context only — not medical advice.`;
-	});
+	const nutrition = $derived(
+		analyzeNutrition($plan, $progress, $settings, $activeDayType, new Date())
+	);
+	const training = $derived(analyzeTraining($progress));
+	const insightLine = $derived(`${nutrition.message} Informational only — not medical advice.`);
 </script>
 
 <main class="screen page-stack">
@@ -185,6 +177,18 @@
 
 		<aside class="progress-rail page-stack">
 			<p class="insight card" role="note">{insightLine}</p>
+
+			{#if training.insights.length}
+				<SectionLabel text="Training trend" rightText="28 days" />
+				<ul class="list card">
+					{#each training.insights as ins (ins.pattern)}
+						<li class="row">
+							<p class="t">{ins.patternLabel}</p>
+							<p class="b">{ins.status} · e1RM {ins.latestE1rmKg} kg</p>
+						</li>
+					{/each}
+				</ul>
+			{/if}
 
 			{#if sessions.length}
 				<SectionLabel text="Recent workouts" />

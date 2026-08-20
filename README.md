@@ -6,17 +6,18 @@ The production app is a **SvelteKit + TypeScript** build deployed to GitHub Page
 
 ## Implementation status
 
-| Area                                         | Status                                                               |
-| -------------------------------------------- | -------------------------------------------------------------------- |
-| Welcome + 6-step intake                      | **Complete** — autosave, validation, skip to import                  |
-| Import / paste JSON                          | **Complete** — preview, size limit, validation summary               |
-| No-plan empty states                         | **Complete** — Today, Meals, Train, Progress, System subroutes       |
-| Plan-driven Today / Meals / Train / Progress | **Complete** — macros, timeline, cook mode, training, logs           |
-| Health Lock (local passkey + vault)          | **Complete** — optional; recovery PIN required                       |
-| Cloud passkey / backup                       | **Partial** — UI gated; needs Vercel API + Supabase env              |
-| iOS 26 UI/UX redesign                        | **Complete** — design tokens, shell, routes, sheets, desktop grid    |
-| iOS PWA polish                               | **Complete** — manifest, safe-area, install prompt, per-route titles |
-| Onboarding component split                   | **Complete** — `OnboardingFlow` + per-step components                |
+| Area                                         | Status                                                                      |
+| -------------------------------------------- | --------------------------------------------------------------------------- |
+| Welcome + 6-step intake                      | **Complete** — autosave, validation, skip to import                         |
+| Import / paste JSON                          | **Complete** — preview, size limit, validation summary                      |
+| No-plan empty states                         | **Complete** — Today, Meals, Train, Progress, System subroutes              |
+| Plan-driven Today / Meals / Train / Progress | **Complete** — macros, timeline, cook mode, training, logs                  |
+| Progressive-overload / nutrition coach       | **Complete** — RIR + e1RM logging, per-pattern trend, protein-floor insight |
+| Health Lock (local passkey + vault)          | **Complete** — optional; recovery PIN required                              |
+| Cloud passkey / backup                       | **Partial** — UI gated; needs Vercel API + Supabase env                     |
+| iOS 26 UI/UX redesign                        | **Complete** — design tokens, shell, routes, sheets, desktop grid           |
+| iOS PWA polish                               | **Complete** — manifest, safe-area, install prompt, per-route titles        |
+| Onboarding component split                   | **Complete** — `OnboardingFlow` + per-step components                       |
 
 ## What the legacy app included
 
