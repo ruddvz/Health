@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Progressive-overload and nutrition coach
+
+- **RIR tracking:** optional reps-in-reserve field per logged set (`WorkoutSetEntry.rir`), plus a live estimated-1RM (Epley) readout while logging.
+- **Training coach:** `analyzeTraining()` groups logged sets by movement pattern (squat, hinge, horizontal/vertical push/pull, carry, isolation), fits a 28-day e1RM trend per pattern, and returns a status (rising/stalled/falling/food problem) with a blunt one-line prescription — surfaced as a "Progressive overload" panel on Train and a "Training trend" summary on Progress. Also nudges when a session is overdue vs. your own logging cadence.
+- **Nutrition coach:** `analyzeNutrition()` averages 7 days of logged macros, flags days under a 0.8 g/lb protein floor, lists yesterday's missed planned meals, and picks the single biggest gap with one suggested change — replacing the old two-point weight-delta blurb on Progress.
+- New pure-logic modules: `e1rm.ts`, `linearRegression.ts`, `exercisePattern.ts`, `trainingCoach.ts`, `nutritionCoach.ts`, plus `consumedTotalsForDay()` in `dayTotals.ts` for arbitrary past logical days. All local-only — no new external services or accounts required.
+
 ### Audit Definition of Done closeout
 
 - **Onboarding refactor:** `OnboardingFlow`, `StepAbout`–`StepLifestyle`, `ReviewImportSheet`, shared `onboarding-form.css`.

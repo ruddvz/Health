@@ -9,6 +9,7 @@
 	import SectionLabel from '$lib/components/spec/SectionLabel.svelte';
 	import WorkoutHeroCard from '$lib/components/spec/WorkoutHeroCard.svelte';
 	import { getTrainingDay } from '$lib/logic/planDerive';
+	import { analyzeTraining } from '$lib/logic/trainingCoach';
 	import { liftStatsFromSessions, recentSessions } from '$lib/logic/workoutHistory';
 	import {
 		activeDayType,
@@ -36,6 +37,20 @@
 
 	const sessions = $derived(recentSessions($progress, 5));
 	const liftStats = $derived(liftStatsFromSessions(recentSessions($progress, 12)));
+	const training = $derived(analyzeTraining($progress));
+
+	function statusTone(status: string): string {
+		if (status === 'rising') return 'tone-rising';
+		if (status === 'falling' || status === 'food_problem') return 'tone-falling';
+		return 'tone-stalled';
+	}
+
+	function statusLabel(status: string): string {
+		if (status === 'rising') return 'Rising';
+		if (status === 'falling') return 'Falling';
+		if (status === 'food_problem') return 'Food problem';
+		return 'Stalled';
+	}
 
 	function fmtShort(iso: string) {
 		const t = Date.parse(iso);
@@ -136,6 +151,32 @@
 						medical conditions.
 					</p>
 				</section>
+
+				{#if training.nudge}
+					<section class="card nudge-card">
+						<p>{training.nudge}</p>
+					</section>
+				{/if}
+
+				{#if training.insights.length}
+					<SectionLabel text="Progressive overload" rightText="Last 28 days" />
+					<div class="overload card">
+						{#each training.insights as ins (ins.pattern)}
+							<div class="ov-row">
+								<div class="ov-head">
+									<p class="ov-name">{ins.patternLabel} · {ins.exerciseName}</p>
+									<span class="ov-badge {statusTone(ins.status)}">{statusLabel(ins.status)}</span>
+								</div>
+								<p class="ov-vals">
+									e1RM {ins.latestE1rmKg} kg{ins.e1rmDeltaVsWeekAgoKg !== null
+										? ` (${ins.e1rmDeltaVsWeekAgoKg >= 0 ? '+' : ''}${ins.e1rmDeltaVsWeekAgoKg} vs last week)`
+										: ''}
+								</p>
+								<p class="ov-rx">{ins.prescription}</p>
+							</div>
+						{/each}
+					</div>
+				{/if}
 
 				{#if sessions.length}
 					<SectionLabel text="Recent sessions" />
@@ -249,6 +290,82 @@
 	.row__body {
 		margin: 4px 0 0;
 		font-size: var(--t-callout);
+		color: var(--h-text);
+	}
+
+	.nudge-card {
+		padding: var(--s-4);
+		margin-bottom: var(--phone-card-gap);
+	}
+
+	.nudge-card p {
+		margin: 0;
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+	}
+
+	.overload {
+		padding: var(--s-3);
+		margin-bottom: var(--phone-card-gap);
+	}
+
+	.ov-row {
+		padding: var(--s-3) 0;
+		border-bottom: 1px solid var(--h-line-soft);
+	}
+
+	.ov-row:last-child {
+		border-bottom: none;
+	}
+
+	.ov-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s-2);
+	}
+
+	.ov-name {
+		margin: 0;
+		font-size: var(--t-callout);
+		font-weight: 650;
+		color: var(--h-text);
+	}
+
+	.ov-badge {
+		flex: 0 0 auto;
+		padding: 2px 8px;
+		border-radius: 999px;
+		font-size: 10px;
+		font-weight: 650;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	.tone-rising {
+		background: rgba(120, 220, 140, 0.16);
+		color: #78dc8c;
+	}
+
+	.tone-stalled {
+		background: rgba(230, 200, 90, 0.16);
+		color: #e6c85a;
+	}
+
+	.tone-falling {
+		background: rgba(230, 110, 110, 0.16);
+		color: #e66e6e;
+	}
+
+	.ov-vals {
+		margin: 4px 0 0;
+		font-size: var(--t-footnote);
+		color: var(--h-text-muted);
+	}
+
+	.ov-rx {
+		margin: 4px 0 0;
+		font-size: var(--t-footnote);
 		color: var(--h-text);
 	}
 

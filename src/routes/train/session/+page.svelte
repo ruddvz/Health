@@ -4,6 +4,7 @@
 	import { resolve } from '$app/paths';
 	import RequiresPlan from '$lib/components/app/RequiresPlan.svelte';
 	import ScreenHeaderBlock from '$lib/components/spec/ScreenHeaderBlock.svelte';
+	import { e1rmFromSet } from '$lib/logic/e1rm';
 	import { newId } from '$lib/logic/id';
 	import { getTrainingDay } from '$lib/logic/planDerive';
 	import { persistProgress, plan, progress } from '$lib/stores/healthApp';
@@ -222,6 +223,17 @@
 									oninput={(e) => updateSet(si, { reps: (e.target as HTMLInputElement).value })}
 								/>
 							</label>
+							<label class="field">
+								<span class="mono-caps">RIR (optional)</span>
+								<input
+									class="inp"
+									type="text"
+									inputmode="numeric"
+									placeholder="reps in reserve"
+									value={s.rir ?? ''}
+									oninput={(e) => updateSet(si, { rir: (e.target as HTMLInputElement).value })}
+								/>
+							</label>
 							<label class="check">
 								<input
 									type="checkbox"
@@ -230,6 +242,11 @@
 								/>
 								<span class="mono-caps">Done</span>
 							</label>
+							{#if e1rmFromSet(s.weight_kg, s.reps) !== null}
+								<p class="e1rm mono-caps">
+									e1RM {Math.round((e1rmFromSet(s.weight_kg, s.reps) ?? 0) * 10) / 10} kg
+								</p>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -326,6 +343,12 @@
 		margin-top: var(--space-1);
 		font-size: 12px;
 		color: var(--text-2);
+	}
+
+	.e1rm {
+		margin: var(--space-2) 0 0;
+		font-size: 10px;
+		color: var(--h-accent, var(--text-3));
 	}
 
 	.row {

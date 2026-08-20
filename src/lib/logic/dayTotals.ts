@@ -92,6 +92,52 @@ export function consumedTotalsForToday(
 	};
 }
 
+/**
+ * Consumed macros for an arbitrary past logical day. Historical day type isn't stored, so both
+ * workout- and rest-day meal slots are checked (namespaced keys mean at most one branch matches
+ * per slot in practice).
+ */
+export function consumedTotalsForDay(
+	plan: PlanV2 | null,
+	phaseIndex: number,
+	progress: ProgressV2,
+	day: string
+) {
+	const targets = getPhaseTargets(plan, phaseIndex);
+	const statuses = progress.mealSlotStatus ?? {};
+	let protein = 0;
+	let carbs = 0;
+	let fat = 0;
+	let kcal = 0;
+	let loggedMealCount = 0;
+	for (const dayType of ['workout', 'rest'] as const) {
+		const meals = getMealsForDay(plan, dayType);
+		const logged = meals.filter((m) => statuses[mealSlotKey(day, dayType, m.slot)] === 'logged');
+		if (logged.length === 0) continue;
+		const sub = plannedMacrosFromMeals(logged, targets);
+		protein += sub.protein;
+		carbs += sub.carbs;
+		fat += sub.fat;
+		kcal += sub.kcal;
+		loggedMealCount += logged.length;
+	}
+	const ex = sumExtrasForDay(progress, day);
+	const qf = sumQuickFixForDay(progress, day);
+	const hasAnyLog =
+		loggedMealCount > 0 ||
+		(progress.extraMeals ?? []).some((m) => m.day === day) ||
+		(progress.quickFixItems ?? []).some((q) => q.day === day);
+	return {
+		day,
+		protein: protein + ex.protein + qf.protein,
+		carbs: carbs + ex.carbs + qf.carbs,
+		fat: fat + ex.fat + qf.fat,
+		kcal: kcal + ex.kcal + qf.kcal,
+		targets,
+		hasAnyLog
+	};
+}
+
 export function waterLitersForDay(progress: ProgressV2, day: string): number {
 	const w = progress.waterLitersByDay?.[day];
 	return typeof w === 'number' && Number.isFinite(w) ? w : 0;

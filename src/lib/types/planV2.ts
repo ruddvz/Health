@@ -81,6 +81,8 @@ export interface OnboardingState {
 export interface WorkoutSetEntry {
 	weight_kg?: string;
 	reps?: string;
+	/** Reps in reserve at this set (0 = failure), optional. */
+	rir?: string;
 	done?: boolean;
 }
 
